@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { ROUTES_CONFIG, WILDCARD_ROUTES } from '../Shared/Constants';
 import { CustomRouter } from './RootRoutes';
+import Login from '../Views/Login';
 
 // eslint-disable-next-line import/prefer-default-export
 export const PUBLIC_ROUTES: Array<CustomRouter> = [
@@ -12,7 +13,7 @@ export const PUBLIC_ROUTES: Array<CustomRouter> = [
   {
     path: `${ROUTES_CONFIG.LOGIN.path}`,
     title: ROUTES_CONFIG.LOGIN.title,
-    element: '<Login />',
+    element: <Login />,
   },
   {
     path: '*',
