@@ -8,6 +8,7 @@ import Google from '../../assets/svgs/google.svg';
 import CustomInput from '../../Components/CustomInput';
 import CustomButton from '../../Components/CustomButton';
 import { COLORS, InputBorderColor } from '../../Shared/commonStyles';
+import './styles.css';
 
 export const OnboardData = [
   {
@@ -41,7 +42,7 @@ function Login() {
   }, []);
   return (
     <div className="flex bg-white rounded-2xl">
-      <div className="w-1/2 py-8 px-14 ">
+      <div className="w-1/2 py-8 px-14 border" id="leftCtr">
         <Carousel
           autoPlay
           showArrows={false}
@@ -62,8 +63,8 @@ function Login() {
           ))}
         </Carousel>
       </div>
-      <div className=" w-1/2 py-8 px-20 flex flex-col self-center">
-        <p className="text-5xl">Login</p>
+      <div className=" w-11/12 m-auto md:w-1/2 py-8 px-5 max-w- md:px-20 sm flex flex-col text-center">
+        <p className="text-2xl md:text-2xl lg:text-4xl mb-16">Login</p>
         <CustomInput
           placeholderText="Email"
           value={email}
@@ -82,10 +83,10 @@ function Login() {
         <div className="my-2" />
         <CustomButton title="Login" onPress={() => {}} />
         <div className="my-1.5" />
-        <p className="text-xl text-gray-500 font-bold">Or With</p>
+        <p className="text-sm md:text-xl text-gray-500 font-bold">Or With</p>
         <div className="my-1.5" />
         <CustomButton
-          component={<img alt="" src={Google} />}
+          component={<img alt="" src={Google} width="26vw" />}
           backgroundColor={COLORS.LIGHT[100]}
           textColor={COLORS.DARK[100]}
           borderWidth={1}
@@ -93,6 +94,10 @@ function Login() {
           title="Login With Google"
           onPress={() => {}}
         />
+        <p className="text-sm md:text-xl font-bold">
+          Do not have an Account <a className="underline">Signup</a>
+        </p>
+        <div className="my-1.5" />
       </div>
     </div>
   );

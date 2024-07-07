@@ -20,19 +20,23 @@ function CustomButton({
   return (
     <button
       type="button"
-      className="flex justify-center h-14"
+      className="flex justify-center h-10 md:h-14"
       style={{
         backgroundColor,
         borderWidth,
         borderColor,
-        columnGap: '15px',
+        columnGap: '10px',
         alignItems: 'center',
         outline: '0px',
+        borderRadius: '8px',
       }}
       onClick={onPress}
     >
       {component}
-      <p style={{ color: textColor, alignSelf: 'center' }} className="text-2xl">
+      <p
+        style={{ color: textColor, alignSelf: 'center' }}
+        className="text-md md:text-xl lg:text-2xl"
+      >
         {title}
       </p>
     </button>

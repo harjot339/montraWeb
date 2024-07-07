@@ -34,7 +34,7 @@ function CustomInput({
       style={{
         color: inputColor,
       }}
-      className="border-b border-r border-l border-t rounded-lg border-[#F1F1FA] px-5 h-14 outline-none"
+      className="border-b border-r border-l border-t rounded-lg border-[#F1F1FA] px-5 h-10 md:h-14 outline-none "
       placeholder={placeholderText}
       value={value}
       maxLength={maxLength}
