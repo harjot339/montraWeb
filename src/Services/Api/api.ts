@@ -12,9 +12,9 @@ import { ResponseOptions } from './api.d';
 const baseQuery: BaseQueryFn = fetchBaseQuery({
   baseUrl: API_BASE_URL,
   prepareHeaders: async (headers: Headers, { getState }) => {
-    const { token } = (getState() as RootState).common;
-    if (token) {
-      headers.append('authorization', `${token}`);
+    const { user } = (getState() as RootState).common;
+    if (user) {
+      headers.append('authorization', `${user.uid}`);
     }
     return headers;
   },

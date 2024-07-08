@@ -4,31 +4,32 @@ export { STRING };
 const ROUTES = {
   HOMEPAGE: '/',
   LOGIN: '/login',
-  REGISTER: '/register',
-  ABOUT: '/about-us',
+  SIGNUP: '/signup',
+  ForgotPassword: '/forgot-password',
+  // ABOUT: '/about-us',
 };
 
 const WILDCARD_ROUTES = {
-  PUBLIC: ROUTES.HOMEPAGE,
-  PRIVATE: ROUTES.LOGIN,
+  PUBLIC: ROUTES.LOGIN,
+  PRIVATE: ROUTES.HOMEPAGE,
 };
 
 const ROUTES_CONFIG = {
   HOMEPAGE: {
     path: ROUTES.HOMEPAGE,
-    title: 'Master Plan',
+    title: 'Home',
   },
   LOGIN: {
     path: ROUTES.LOGIN,
     title: 'Login',
   },
-  REGISTER: {
-    path: ROUTES.REGISTER,
-    title: 'Register',
+  SIGNUP: {
+    path: ROUTES.SIGNUP,
+    title: 'Signup',
   },
-  ABOUT: {
-    path: ROUTES.ABOUT,
-    title: 'About us',
+  ForgotPassword: {
+    path: ROUTES.ForgotPassword,
+    title: 'Forgot Password',
   },
 };
 

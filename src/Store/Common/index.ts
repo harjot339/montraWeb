@@ -1,16 +1,17 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { UserType } from '../../Defs/user';
 
+const initialState: { user: UserType | undefined } = { user: undefined };
 const common = createSlice({
   name: 'common',
-  initialState: { token: null },
+  initialState,
   reducers: {
-    updateAuthTokenRedux: (state, action) => ({
-      ...state,
-      token: action.payload.token,
-    }),
+    setUser(state, action) {
+      return { ...state, user: action.payload };
+    },
   },
 });
 
-export const { updateAuthTokenRedux } = common.actions;
+export const { setUser } = common.actions;
 
 export default common.reducer;

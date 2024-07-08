@@ -8,19 +8,21 @@ function CustomButton({
   borderWidth = 0,
   borderColor,
   component,
+  flex,
 }: Readonly<{
   backgroundColor?: string;
   title: string;
-  onPress: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onPress: () => void;
   textColor?: string;
   borderWidth?: number;
   borderColor?: string;
   component?: React.ReactNode;
+  flex?: number;
 }>) {
   return (
     <button
       type="button"
-      className="flex justify-center h-10 md:h-14"
+      className="flex justify-center h-12 md:h-14"
       style={{
         backgroundColor,
         borderWidth,
@@ -29,6 +31,7 @@ function CustomButton({
         alignItems: 'center',
         outline: '0px',
         borderRadius: '8px',
+        flex,
       }}
       onClick={onPress}
     >
