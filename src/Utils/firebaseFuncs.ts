@@ -1,5 +1,4 @@
 import {
-  AuthError,
   createUserWithEmailAndPassword,
   sendEmailVerification,
 } from 'firebase/auth';
@@ -31,8 +30,8 @@ export async function singupUser({
       return true;
     }
   } catch (e) {
-    const error: AuthError = e as AuthError;
-    console.log(error);
+    // const error: AuthError = e as AuthError;
+    // console.log(error);
     // Toast.show({ text1: FirebaseAuthErrorHandler(error.code), type: 'error' });
     return false;
   }

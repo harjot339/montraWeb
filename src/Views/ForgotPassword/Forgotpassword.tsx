@@ -23,7 +23,7 @@ function Forgotpassword() {
       });
       return res.length !== 0;
     } catch (e) {
-      console.log(e);
+      // console.log(e);
       return false;
     }
   }
@@ -36,7 +36,7 @@ function Forgotpassword() {
           await sendPasswordResetEmail(auth, email);
         }
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       } finally {
         dispatch(setLoading(false));
       }

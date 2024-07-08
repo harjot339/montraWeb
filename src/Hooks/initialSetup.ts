@@ -24,14 +24,14 @@ export default function useInitialSetup() {
         doc(db, 'users', uid),
         (snapshot: DocumentSnapshot) => {
           const user = UserFromJson(snapshot.data() as UserType);
-          console.log('USERRR', user);
+          //   console.log('USERRR', user);
           dispatch(setUser(user));
         }
       );
       return () => unsubscribe();
     }
     return () => {};
-  }, [uid]);
+  }, [dispatch, uid]);
   //   useEffect(() => {
   //     if (uid) {
   //       const unsubscribe = onSnapshot(

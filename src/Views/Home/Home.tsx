@@ -5,6 +5,7 @@ import { COLORS } from '../../Shared/commonStyles';
 
 function Home() {
   const [month, setMonth] = useState(new Date().getMonth());
+  setMonth(month);
   const spends = useSelector(
     (state: RootState) => state.common.user?.spend?.[month]
   );

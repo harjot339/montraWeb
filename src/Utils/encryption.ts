@@ -7,7 +7,7 @@ export function decrypt(text: string, key: string) {
   try {
     return CryptoJS.AES.decrypt(text, key).toString(CryptoJS.enc.Utf8);
   } catch (e) {
-    console.log('Decryption error', text, key, e);
+    // console.log('Decryption error', text, key, e);
     return undefined;
   }
 }

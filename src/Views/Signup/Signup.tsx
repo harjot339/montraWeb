@@ -119,7 +119,7 @@ function Signup() {
       //   text1: FirebaseAuthErrorHandler(error.code),
       //   type: 'error',
       // });
-      console.log(e);
+      // console.log(e);
       dispatch(setLoading(false));
     }
   };

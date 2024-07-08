@@ -9,7 +9,7 @@ function RootRouter() {
   const guest = useRoutes(guestRoutes);
   const authenticated = useRoutes(authenticatedRoutes);
   const uid = useSelector((state: RootState) => state?.common?.user?.uid);
-  console.log('Token', uid);
+  // console.log('Token', uid);
   const isAuthenticated = !!uid;
   return (
     <>
