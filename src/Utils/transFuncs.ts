@@ -33,6 +33,5 @@ export default function TransFromJson(
     attachementType: decrypt(json.attachementType, uid) ?? json.attachementType,
     from: decrypt(json.from, uid) ?? json.from ?? '',
     to: decrypt(json.to, uid) ?? json.to ?? '',
-    deleted: json.deleted ?? false,
   };
 }

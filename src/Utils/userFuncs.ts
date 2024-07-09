@@ -122,15 +122,15 @@ export function UserToJson({
     income: {},
     notification: {},
     currency: encrypt('USD', uid),
-    theme: encrypt('device', uid),
+    theme: encrypt('device', uid) as 'device' | 'light' | 'dark',
     isSocial,
   };
 }
 export function UserFromJson(json: DocumentData): UserType {
   return {
     uid: json.uid,
-    email: decrypt(json.email, json.uid),
-    name: decrypt(json.name, json.uid),
+    email: decrypt(json.email, json.uid) ?? json.email,
+    name: decrypt(json.name, json.uid) ?? json.name,
     pin: json.pin !== '' ? decrypt(json.pin, json.uid) ?? json.pin : '',
     expenseCategory:
       json?.expenseCategory?.map((item: string) => decrypt(item, json.uid)) ??

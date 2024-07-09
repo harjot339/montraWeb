@@ -22,7 +22,7 @@ function CustomButton({
   return (
     <button
       type="button"
-      className="flex justify-center h-12 md:h-14"
+      className="flex justify-center min-h-12 md:h-14"
       style={{
         backgroundColor,
         borderWidth,
