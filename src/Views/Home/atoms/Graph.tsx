@@ -1,5 +1,5 @@
 import ReactApexChart from 'react-apexcharts';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Timestamp } from 'firebase/firestore';
 import { TransactionType } from '../../../Defs/transaction';
 import { COLORS } from '../../../Shared/commonStyles';
@@ -124,8 +124,6 @@ function Graph({
             axisTicks: { show: false },
             axisBorder: { show: false },
             labels: { show: false },
-            forceNiceScale: true,
-            logarithmic: true,
           },
           tooltip: {
             custom({ series, seriesIndex, dataPointIndex }) {
@@ -158,4 +156,4 @@ function Graph({
   );
 }
 
-export default Graph;
+export default React.memo(Graph);

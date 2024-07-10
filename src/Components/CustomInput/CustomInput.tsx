@@ -6,6 +6,7 @@ function CustomInput({
   placeholderText,
   maxLength = 100,
   inputColor = COLORS.DARK[100],
+  flex,
 }: Readonly<{
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -20,6 +21,7 @@ function CustomInput({
     <input
       style={{
         color: inputColor,
+        flex,
       }}
       className="border-b border-r border-l border-t rounded-lg border-[#F1F1FA] px-5 h-12 md:h-14 outline-none "
       placeholder={placeholderText}

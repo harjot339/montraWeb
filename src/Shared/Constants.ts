@@ -6,6 +6,7 @@ const ROUTES = {
   LOGIN: '/login',
   SIGNUP: '/signup',
   ForgotPassword: '/forgot-password',
+  Transactions: '/transactions',
   // ABOUT: '/about-us',
 };
 
@@ -30,6 +31,10 @@ const ROUTES_CONFIG = {
   ForgotPassword: {
     path: ROUTES.ForgotPassword,
     title: 'Forgot Password',
+  },
+  Transactions: {
+    path: ROUTES.Transactions,
+    title: 'Transactions',
   },
 };
 

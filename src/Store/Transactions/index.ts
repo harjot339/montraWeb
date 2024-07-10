@@ -70,9 +70,9 @@ const TransactionSlice = createSlice({
     // clearCatFilter(state) {
     //   state.filters.cat = [];
     // },
-    // setConversionData(state, action) {
-    //   state.conversion = action.payload;
-    // },
+    setConversionData(state, action) {
+      return { ...state, conversion: action.payload };
+    },
     // setTabButton(state, action) {
     //   state.isTabButtonOpen = action.payload;
     // },
@@ -86,7 +86,7 @@ export const {
   //   setFilters,
   //   openCatSheet,
   //   setSortFilter,
-  //   setConversionData,
+  setConversionData,
   //   setCatFilter,
   //   clearCatFilter,
   //   openLogoutSheet,

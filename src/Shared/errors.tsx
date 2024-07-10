@@ -102,3 +102,67 @@ export function PassEmptyError({
     <div style={{ height: '25px' }} />
   );
 }
+
+export function EmptyZeroError({
+  value,
+  formKey,
+  errorText,
+}: Readonly<{
+  value: string;
+  formKey: boolean;
+  errorText: string;
+}>) {
+  return (value === '' || Number(value) <= 0 || value.trim() === '.') &&
+    formKey ? (
+    <p
+      className="pl-4 sm:pl-8"
+      style={{
+        color: 'white',
+        fontSize: '28px',
+        alignSelf: 'flex-start',
+      }}
+    >
+      {errorText}
+    </p>
+  ) : (
+    <div style={{ height: '25px' }} />
+  );
+}
+
+export function EmptyError({
+  value,
+  formKey,
+  errorText,
+}: Readonly<{
+  value: string;
+  formKey: boolean;
+  errorText: string;
+  color?: string;
+  size?: number;
+}>) {
+  return value === '' && formKey ? (
+    <p style={style.error}>{errorText}</p>
+  ) : (
+    <div style={{ height: '25px' }} />
+  );
+}
+
+export function CompundEmptyError({
+  value1,
+  value2,
+  formKey,
+  errorText,
+}: Readonly<{
+  value1: string;
+  value2: string;
+  formKey: boolean;
+  errorText: string;
+  color?: string;
+  size?: number;
+}>) {
+  return (value1 === '' || value2 === '') && formKey ? (
+    <p style={style.error}>{errorText}</p>
+  ) : (
+    <div style={{ height: '25px' }} />
+  );
+}

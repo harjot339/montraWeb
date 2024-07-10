@@ -32,3 +32,20 @@ export const catIcons: {
   bill: { icon: Bill, color: COLORS.VIOLET[20] },
   subscription: { icon: Bill, color: COLORS.VIOLET[20] },
 };
+
+export const formatWithCommas = (num: string) => {
+  const parts = num.split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return parts.join('.');
+};
+
+export const MimeToExtension: { [key: string]: string } = {
+  'application/pdf': 'pdf',
+  'application/msword': 'doc',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+    'docx',
+  'text/csv': 'csv',
+  'application/vnd.ms-excel': 'xls',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
+  'text/plain': 'txt',
+};

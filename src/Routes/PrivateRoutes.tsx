@@ -2,6 +2,7 @@ import { Navigate } from 'react-router-dom';
 import { ROUTES_CONFIG, WILDCARD_ROUTES } from '../Shared/Constants';
 import { CustomRouter } from './RootRoutes';
 import Home from '../Views/Home';
+import TransactionScreen from '../Views/Transactions/TransactionScreen';
 
 // eslint-disable-next-line import/prefer-default-export
 export const PRIVATE_ROUTES: Array<CustomRouter> = [
@@ -11,9 +12,9 @@ export const PRIVATE_ROUTES: Array<CustomRouter> = [
     title: ROUTES_CONFIG.HOMEPAGE.title,
   },
   {
-    path: '/wishlist',
-    element: 'Your wishlist here',
-    title: 'Dashboard',
+    path: ROUTES_CONFIG.Transactions.path,
+    element: <TransactionScreen />,
+    title: ROUTES_CONFIG.Transactions.title,
   },
   {
     path: '*',

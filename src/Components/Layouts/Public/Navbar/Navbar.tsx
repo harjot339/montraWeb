@@ -4,13 +4,16 @@
 import { useState } from 'react';
 import { signOut } from 'firebase/auth';
 import { useDispatch } from 'react-redux';
+import { Link, useLocation } from 'react-router-dom';
 import { COLORS } from '../../../../Shared/commonStyles';
 import { auth } from '../../../../Utils/firebaseConfig';
 import { setUser } from '../../../../Store/Common';
+import { ROUTES } from '../../../../Shared/Constants';
 
 export function SidebarLayout({ children }: { children: React.JSX.Element }) {
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
+  const location = useLocation();
   return (
     <>
       <aside
@@ -21,22 +24,28 @@ export function SidebarLayout({ children }: { children: React.JSX.Element }) {
         <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
           <ul className="space-y-2 font-medium">
             <li>
-              <a
-                href="#"
+              <Link
+                to={ROUTES.HOMEPAGE}
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                style={{
+                  backgroundColor:
+                    location.pathname === '/' ? COLORS.VIOLET[20] : undefined,
+                  color:
+                    location.pathname === '/' ? COLORS.VIOLET[100] : undefined,
+                }}
               >
                 <span className="ms-3">Dashboard</span>
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
+              <Link
+                to={ROUTES.Transactions}
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <span className="flex-1 ms-3 whitespace-nowrap">
                   Transactions
                 </span>
-              </a>
+              </Link>
             </li>
 
             <li>

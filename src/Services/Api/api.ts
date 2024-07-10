@@ -5,19 +5,11 @@ import {
   BaseQueryFn,
   BaseQueryApi,
 } from '@reduxjs/toolkit/query/react';
-import type { RootState } from '../../Store';
-import { API_BASE_URL } from './Constants';
 import { ResponseOptions } from './api.d';
 
 const baseQuery: BaseQueryFn = fetchBaseQuery({
-  baseUrl: API_BASE_URL,
-  prepareHeaders: async (headers: Headers, { getState }) => {
-    const { user } = (getState() as RootState).common;
-    if (user) {
-      headers.append('authorization', `${user.uid}`);
-    }
-    return headers;
-  },
+  baseUrl:
+    'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/',
 });
 
 const baseQueryWithInterceptor = async (

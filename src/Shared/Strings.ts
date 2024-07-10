@@ -230,3 +230,24 @@ export const monthData = [
   { label: 'November', value: 11 },
   { label: 'December', value: 12 },
 ];
+
+export const weekData = [
+  { label: 'Sunday', value: 0 },
+  { label: 'Monday', value: 1 },
+  { label: 'Tuesday', value: 2 },
+  { label: 'Wednesday', value: 3 },
+  { label: 'Thursday', value: 4 },
+  { label: 'Friday', value: 5 },
+  { label: 'Saturday', value: 6 },
+];
+
+export const FreqDropdownData = [
+  { label: 'Yearly', value: 'yearly' },
+  { label: 'Monthly', value: 'monthly' },
+  { label: 'Weekly', value: 'weekly' },
+  { label: 'Daily', value: 'daily' },
+];
+export const EndDropdownData = [
+  { label: 'Never', value: 'never' },
+  { label: 'Date', value: 'date' },
+];
