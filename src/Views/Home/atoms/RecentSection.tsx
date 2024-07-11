@@ -11,6 +11,12 @@ function RecentSection({ month }: Readonly<{ month: number }>) {
   const data = useSelector(
     (state: RootState) => state.transactions.transactions
   );
+  const conversion = useSelector(
+    (state: RootState) => state.transactions.conversion
+  );
+  const currency = useSelector(
+    (state: RootState) => state.common.user?.currency
+  );
   const navigate = useNavigate();
   return (
     <div className="rounded-lg min-w-56 flex-1 bg-white px-4 sm:px-8 py-4">
@@ -44,7 +50,13 @@ function RecentSection({ month }: Readonly<{ month: number }>) {
         .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
         .slice(0, 5)
         .map((item) => (
-          <TransactionListItem item={item} key={item.id} width="full" />
+          <TransactionListItem
+            item={item}
+            key={item.id}
+            width="full"
+            currency={currency}
+            conversion={conversion}
+          />
         ))}
     </div>
   );

@@ -1,15 +1,31 @@
 import React from 'react';
 import { Timestamp } from 'firebase/firestore';
+import {
+  catIcons,
+  formatAMPM,
+  formatWithCommas,
+} from '../../Utils/commonFuncs';
 import { COLORS } from '../../Shared/commonStyles';
-import { catIcons, formatAMPM } from '../../Utils/commonFuncs';
 import { TransactionType } from '../../Defs/transaction';
 import Money from '../../assets/svgs/money-bag.svg';
 import Transfer from '../../assets/svgs/currency-exchange.svg';
+import { currencies } from '../../Shared/Strings';
 
 function TransactionListItem({
   item,
   width,
-}: Readonly<{ item: TransactionType; width: 'full' | 'half' }>) {
+  currency,
+  conversion,
+}: Readonly<{
+  item: TransactionType;
+  width: 'full' | 'half';
+  currency: string | undefined;
+  conversion: {
+    [key: string]: {
+      [key: string]: number;
+    };
+  };
+}>) {
   const getAmtSymbol = (x: TransactionType) => {
     if (x.type === 'expense') {
       return '-';
@@ -70,7 +86,14 @@ function TransactionListItem({
           style={{ color: getAmtColor(item) }}
           className="font-semibold text-lg sm:text-xl overflow-hidden whitespace-nowrap text-ellipsis"
         >
-          {getAmtSymbol(item)} ${item.amount}
+          {getAmtSymbol(item)} {currencies[currency ?? 'USD'].symbol}
+          {formatWithCommas(
+            Number(
+              (
+                conversion.usd[(currency ?? 'USD').toLowerCase()] * item.amount
+              ).toFixed(1)
+            ).toString()
+          )}
         </p>
         <p className="text-xs sm:text-sm" style={{ color: COLORS.DARK[25] }}>
           {formatAMPM(

@@ -12,6 +12,12 @@ function TransactionScreen() {
   const transaction = useSelector(
     (state: RootState) => state.transactions.transactions
   );
+  const conversion = useSelector(
+    (state: RootState) => state.transactions.conversion
+  );
+  const currency = useSelector(
+    (state: RootState) => state.common.user?.currency
+  );
   // state
   const [month] = useState<number>(new Date().getMonth());
   // functions
@@ -190,7 +196,13 @@ function TransactionScreen() {
           </p>
           <ul className="flex flex-wrap gap-x-3 border" key={data.title}>
             {data.data.map((item) => (
-              <TransactionListItem item={item} key={item.id} width="half" />
+              <TransactionListItem
+                item={item}
+                key={item.id}
+                width="half"
+                conversion={conversion}
+                currency={currency}
+              />
             ))}
           </ul>
         </>
