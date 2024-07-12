@@ -21,20 +21,7 @@ function AuthLayout() {
     return Onbarding3;
   }, []);
   const loc = useLocation();
-  // const [alert, setAlert] = useState(false)
   return (
-    // <Alert
-    //   show={alert}
-    //   text1={STRINGS.PleaseVerifyEmail}
-    //   text2={STRINGS.VerifyEmailSent}
-    //   buttonText1="Resend"
-    //   buttonText2="Ok"
-    //   buttonOnPress1={() => {}}
-    //   buttonOnPress2={() => {
-    //     setAlert(false);
-    //   }}
-    //   setAlert={setAlert}
-    // >
     <div className="flex justify-center bg-white rounded-2xl w-11/12 py-5">
       <div className="w-1/2 px-10 hidden sm:block self-center" id="leftCtr">
         <Carousel

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { useDispatch } from 'react-redux';
 import { collection, getDocs } from 'firebase/firestore';
@@ -66,4 +66,4 @@ function Forgotpassword() {
   );
 }
 
-export default Forgotpassword;
+export default React.memo(Forgotpassword);

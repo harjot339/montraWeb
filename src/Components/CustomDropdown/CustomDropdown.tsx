@@ -1,3 +1,4 @@
+import React from 'react';
 import ArrowDown from '../../assets/svgs/arrow down.svg';
 import {
   InputBorderColor,
@@ -10,17 +11,19 @@ function CustomDropdown({
   onChange,
   flex,
   placeholder,
+  borderColor = InputBorderColor,
 }: Readonly<{
   data: { label: string; value: string | number }[];
   value: string | number;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   flex?: number;
   placeholder: string;
+  borderColor?: string;
 }>) {
   return (
     <div
       className="flex bg-transparent border h-12 md:h-14 rounded-lg pr-3"
-      style={{ borderColor: InputBorderColor, flex }}
+      style={{ borderColor, flex }}
     >
       <select
         className="myDropdown flex-1 bg-transparent outline-none h-12 md:h-14 rounded-lg px-5 appearance-none"
@@ -49,4 +52,4 @@ function CustomDropdown({
   );
 }
 
-export default CustomDropdown;
+export default React.memo(CustomDropdown);

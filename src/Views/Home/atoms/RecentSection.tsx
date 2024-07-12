@@ -6,14 +6,13 @@ import { COLORS } from '../../../Shared/commonStyles';
 import TransactionListItem from '../../../Components/TransactionListItem';
 import { RootState } from '../../../Store';
 import { ROUTES_CONFIG } from '../../../Shared/Constants';
+import { STRINGS } from '../../../Shared/Strings';
 
 function RecentSection({ month }: Readonly<{ month: number }>) {
   const data = useSelector(
     (state: RootState) => state.transactions.transactions
   );
-  const conversion = useSelector(
-    (state: RootState) => state.transactions.conversion
-  );
+  const conversion = useSelector((state: RootState) => state.common.conversion);
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
   );
@@ -22,7 +21,7 @@ function RecentSection({ month }: Readonly<{ month: number }>) {
     <div className="rounded-lg min-w-56 flex-1 bg-white px-4 sm:px-8 py-4">
       <div className="flex justify-between">
         <p className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
-          Recent
+          {STRINGS.Recent}
         </p>
         <button
           type="button"
@@ -35,7 +34,7 @@ function RecentSection({ month }: Readonly<{ month: number }>) {
             navigate(ROUTES_CONFIG.Transactions.path);
           }}
         >
-          See All
+          {STRINGS.SeeAll}
         </button>
       </div>
       {data
@@ -51,6 +50,7 @@ function RecentSection({ month }: Readonly<{ month: number }>) {
         .slice(0, 5)
         .map((item) => (
           <TransactionListItem
+            disabled
             item={item}
             key={item.id}
             width="full"

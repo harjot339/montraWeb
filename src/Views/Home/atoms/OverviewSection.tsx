@@ -1,10 +1,9 @@
-/* eslint-disable no-restricted-globals */
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { COLORS } from '../../../Shared/commonStyles';
 import { RootState } from '../../../Store';
 import { formatWithCommas } from '../../../Utils/commonFuncs';
-import { currencies } from '../../../Shared/Strings';
+import { currencies, STRINGS } from '../../../Shared/Strings';
 
 function OverviewSection({ month }: Readonly<{ month: number }>) {
   const spends = useSelector(
@@ -16,15 +15,13 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
   );
-  const conversion = useSelector(
-    (state: RootState) => state.transactions.conversion
-  );
+  const conversion = useSelector((state: RootState) => state.common.conversion);
   const totalSpend = Object.values(spends ?? []).reduce((a, b) => a + b, 0);
   const totalIncome = Object.values(incomes ?? []).reduce((a, b) => a + b, 0);
   const currencyConvert = useCallback(
     (amount: number) => {
       if (
-        isNaN(
+        Number.isNaN(
           Number(
             (
               (conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ?? 1) *
@@ -59,7 +56,7 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
             className="text-md md:text-lg font-normal"
             style={{ color: COLORS.DARK[25] }}
           >
-            Account Balance
+            {STRINGS.AccountBalance}
           </p>
         </div>
         <div className="">
@@ -71,7 +68,7 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
             className="text-md md:text-lg font-normal"
             style={{ color: COLORS.DARK[25] }}
           >
-            Expense
+            {STRINGS.Expense}
           </p>
         </div>
         <div className="">
@@ -83,7 +80,7 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
             className="text-md md:text-lg font-normal"
             style={{ color: COLORS.DARK[25] }}
           >
-            Income
+            {STRINGS.Income}
           </p>
         </div>
       </div>

@@ -45,4 +45,4 @@ function Loader({ children }: Readonly<{ children: React.JSX.Element }>) {
   );
 }
 
-export default Loader;
+export default React.memo(Loader);

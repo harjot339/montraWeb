@@ -206,4 +206,4 @@ function RepeatDataModal({
   );
 }
 
-export default RepeatDataModal;
+export default React.memo(RepeatDataModal);

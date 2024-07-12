@@ -1,19 +1,27 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { signOut } from 'firebase/auth';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
+import { doc, updateDoc } from 'firebase/firestore';
 import { COLORS } from '../../../../Shared/commonStyles';
-import { auth } from '../../../../Utils/firebaseConfig';
+import { auth, db } from '../../../../Utils/firebaseConfig';
 import { setUser } from '../../../../Store/Common';
 import { ROUTES } from '../../../../Shared/Constants';
+import { currencies } from '../../../../Shared/Strings';
+import { RootState } from '../../../../Store';
+import { encrypt } from '../../../../Utils/encryption';
 
 export function SidebarLayout({ children }: { children: React.JSX.Element }) {
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
   const location = useLocation();
+  const currency = useSelector(
+    (state: RootState) => state.common.user?.currency
+  );
+  const uid = useSelector((state: RootState) => state.common.user?.uid);
   return (
     <>
       <aside
@@ -23,39 +31,41 @@ export function SidebarLayout({ children }: { children: React.JSX.Element }) {
       >
         <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
           <ul className="space-y-2 font-medium">
-            <li>
-              <Link
-                to={ROUTES.HOMEPAGE}
-                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                style={{
-                  backgroundColor:
-                    location.pathname === '/' ? COLORS.VIOLET[20] : undefined,
-                  color:
-                    location.pathname === '/' ? COLORS.VIOLET[100] : undefined,
-                }}
-              >
-                <span className="ms-3">Dashboard</span>
-              </Link>
-            </li>
-            <li>
-              <Link
-                to={ROUTES.Transactions}
-                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-              >
-                <span className="flex-1 ms-3 whitespace-nowrap">
-                  Transactions
-                </span>
-              </Link>
-            </li>
-
-            <li>
-              <a
-                href="#"
-                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-              >
-                <span className="flex-1 ms-3 whitespace-nowrap">Budgets</span>
-              </a>
-            </li>
+            {[
+              {
+                name: 'Dashboard',
+                route: ROUTES.HOMEPAGE,
+                check: location.pathname === '/',
+              },
+              {
+                name: 'Transactions',
+                route: ROUTES.Transactions,
+                check: location.pathname.startsWith('/transactions'),
+              },
+              {
+                name: 'Budgets',
+                route: ROUTES.Budgets,
+                check: location.pathname.startsWith('/budgets'),
+              },
+              {
+                name: 'Report',
+                route: ROUTES.Report,
+                check: location.pathname.startsWith('/report'),
+              },
+            ].map(({ name, route, check }) => (
+              <li key={name}>
+                <Link
+                  to={route}
+                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                  style={{
+                    backgroundColor: check ? COLORS.VIOLET[20] : undefined,
+                    color: check ? COLORS.VIOLET[100] : undefined,
+                  }}
+                >
+                  <span className="ms-3">{name}</span>
+                </Link>
+              </li>
+            ))}
             <li>
               <a
                 href="#"
@@ -77,6 +87,20 @@ export function SidebarLayout({ children }: { children: React.JSX.Element }) {
               </a>
             </li>
           </ul>
+          <select
+            value={currency ?? 'USD'}
+            onChange={async (e) => {
+              await updateDoc(doc(db, 'users', uid!), {
+                currency: encrypt(e.target.value, uid!),
+              });
+            }}
+          >
+            {Object.entries(currencies).map(([key, { symbol, code }]) => (
+              <option key={key} value={code}>
+                {symbol} {code}
+              </option>
+            ))}
+          </select>
         </div>
       </aside>
       <div
@@ -89,8 +113,9 @@ export function SidebarLayout({ children }: { children: React.JSX.Element }) {
         }}
         onClick={() => {
           setIsOpen(false);
-          const sidebar = document.getElementById('default-sidebar');
-          sidebar!.classList.toggle('-translate-x-full');
+          document
+            .getElementById('default-sidebar')!
+            .classList.toggle('-translate-x-full');
         }}
       />
       <button
@@ -102,8 +127,9 @@ export function SidebarLayout({ children }: { children: React.JSX.Element }) {
         id="toggleSidebarButton"
         onClick={() => {
           setIsOpen(true);
-          const sidebar = document.getElementById('default-sidebar');
-          sidebar!.classList.toggle('-translate-x-full');
+          document
+            .getElementById('default-sidebar')!
+            .classList.toggle('-translate-x-full');
         }}
       >
         <svg
@@ -133,4 +159,4 @@ export function SidebarLayout({ children }: { children: React.JSX.Element }) {
   );
 }
 
-export default SidebarLayout;
+export default React.memo(SidebarLayout);

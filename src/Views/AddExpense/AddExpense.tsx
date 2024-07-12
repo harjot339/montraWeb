@@ -1,7 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ReactSwitch from 'react-switch';
+import { Timestamp } from 'firebase/firestore';
 import CustomButton from '../../Components/CustomButton';
 import CustomDropdown from '../../Components/CustomDropdown/CustomDropdown';
 import CustomInput from '../../Components/CustomInput';
@@ -21,17 +22,20 @@ import ArrowRight from '../../assets/svgs/arrow right 2.svg';
 import Transfer from '../../assets/svgs/transfer.svg';
 import { setLoading } from '../../Store/Loader';
 import { handleOnline } from '../../Utils/firebaseFuncs';
+import CategoryModal from '../../Components/CategoryModal';
 
 function AddExpense({
   setIsOpen,
   pageType,
   isEdit,
   prevTransaction,
+  height,
 }: Readonly<{
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   pageType: 'income' | 'expense' | 'transfer';
   isEdit: boolean;
   prevTransaction?: TransactionType;
+  height?: string;
 }>) {
   const expenseCategory = useSelector(
     (state: RootState) => state.common.user?.expenseCategory
@@ -40,9 +44,7 @@ function AddExpense({
     (state: RootState) => state.common.user?.incomeCategory
   );
   const user = useSelector((state: RootState) => state.common.user);
-  const conversion = useSelector(
-    (state: RootState) => state.transactions.conversion
-  );
+  const conversion = useSelector((state: RootState) => state.common.conversion);
   const dispatch = useDispatch();
   const month = new Date().getMonth();
   // state
@@ -64,6 +66,7 @@ function AddExpense({
   const [img, setImg] = useState<File | undefined>(undefined);
   const [checked, setChecked] = useState(false);
   const [modal, setModal] = useState<boolean>(false);
+  const [addCategoryModal, setAddCategoryModal] = useState<boolean>(false);
 
   //   const [date, setDate] = useState<Date>(getDate());
   const getBackgroundColor = useMemo(() => {
@@ -127,10 +130,55 @@ function AddExpense({
       dispatch(setLoading(false));
     }
   };
+  useEffect(() => {
+    if (isEdit) {
+      setAmount(String(prevTransaction!.amount));
+      setCat(prevTransaction!.category);
+      setDesc(prevTransaction!.desc);
+      setWallet(prevTransaction!.wallet);
+      setRepeatData(
+        prevTransaction?.freq === null ? undefined : prevTransaction?.freq
+      );
+      setFrom(prevTransaction!.from);
+      setTo(prevTransaction!.to);
+    }
+  }, [isEdit, prevTransaction]);
+  const getDate = useCallback(() => {
+    if (repeatData) {
+      if (isEdit) {
+        if ((repeatData.date as Timestamp)?.seconds !== undefined) {
+          return `${Timestamp.fromMillis(
+            (repeatData.date as Timestamp).seconds * 1000
+          )
+            ?.toDate()
+            ?.getDate()} ${
+            monthData[
+              Timestamp.fromMillis(
+                (repeatData.date as Timestamp).seconds * 1000
+              )
+                ?.toDate()
+                ?.getMonth()
+            ].label
+          } ${Timestamp.fromMillis(
+            (repeatData.date as Timestamp).seconds * 1000
+          )
+            ?.toDate()
+            ?.getFullYear()}`;
+        }
+        return `${(repeatData.date as Date)?.getDate()} ${
+          monthData[(repeatData.date as Date)?.getMonth()].label
+        } ${(repeatData.date as Date)?.getFullYear()}`;
+      }
+      return `${(repeatData.date as Date)?.getDate()} ${
+        monthData[(repeatData.date as Date)?.getMonth()].label
+      } ${(repeatData.date as Date)?.getFullYear()}`;
+    }
+    return '';
+  }, [isEdit, repeatData]);
   return (
     <div
       className="hidden sm:flex flex-col rounded-lg flex-1 justify-between"
-      style={{ backgroundColor: getBackgroundColor }}
+      style={{ backgroundColor: getBackgroundColor, height, minWidth: '22vw' }}
     >
       <RepeatDataModal
         modal={modal}
@@ -139,10 +187,13 @@ function AddExpense({
         setRepeatData={setRepeatData}
         repeatData={repeatData}
       />
-      <div
-        className="flex justify-between px-4 sm:px-8 pt-4"
-        style={{ alignItems: 'center' }}
-      >
+      <CategoryModal
+        modal={addCategoryModal}
+        setModal={setAddCategoryModal}
+        setMyCategory={setCat}
+        type={pageType}
+      />
+      <div className="flex justify-between px-4 sm:px-8 pt-4 items-center">
         <div />
         <p className="text-3xl text-white font-semibold">
           {pageType[0].toUpperCase() + pageType.slice(1)}
@@ -232,7 +283,11 @@ function AddExpense({
                   return { label: item, value: item };
                 })}
                 onChange={(e) => {
-                  setCat(e.target.value);
+                  if (e.target.value === 'add') {
+                    setAddCategoryModal(true);
+                  } else {
+                    setCat(e.target.value);
+                  }
                 }}
                 value={cat}
               />
@@ -304,8 +359,14 @@ function AddExpense({
               />
             </>
           )}
-
-          <AttachmentCtr img={img} setImg={setImg} setFile={setFile} />
+          <AttachmentCtr
+            img={img}
+            setImg={setImg}
+            setFile={setFile}
+            isEdit={isEdit}
+            attachement={prevTransaction?.attachement}
+            attachementType={prevTransaction?.attachementType}
+          />
           <div className="my-2.5" />
           {pageType !== 'transfer' && (
             <>
@@ -334,10 +395,7 @@ function AddExpense({
             </>
           )}
           {repeatData && (
-            <div
-              className="flex justify-between"
-              style={{ alignItems: 'center' }}
-            >
+            <div className="flex justify-between items-center">
               <div>
                 <p className="text-xl font-semibold">{STRINGS.Frequency}</p>
                 <p>
@@ -355,7 +413,7 @@ function AddExpense({
               {repeatData.end !== 'never' ? (
                 <div>
                   <p className="text-xl font-semibold">End After</p>
-                  <p>{(repeatData.date as Date).toLocaleDateString()}</p>
+                  <p>{getDate()}</p>
                 </div>
               ) : (
                 <div />

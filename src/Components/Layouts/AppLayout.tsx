@@ -1,3 +1,4 @@
+import React from 'react';
 import PrivateLayout from './Private/PrivateLayout';
 import PublicLayout from './Public/PublicLayout';
 import { AppLayoutProps } from './AppLayout.d';
@@ -10,4 +11,4 @@ function AppLayout({ isAuthenticated, children }: AppLayoutProps) {
   );
 }
 
-export default AppLayout;
+export default React.memo(AppLayout);

@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Timestamp } from 'firebase/firestore';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { TransactionType } from '../../Defs/transaction';
 import { RootState } from '../../Store';
 import TransactionListItem from '../../Components/TransactionListItem';
+import { monthData, STRINGS } from '../../Shared/Strings';
+import CustomDropdown from '../../Components/CustomDropdown/CustomDropdown';
 
 function TransactionScreen() {
   const [offset] = useState<number>(0);
@@ -12,14 +15,15 @@ function TransactionScreen() {
   const transaction = useSelector(
     (state: RootState) => state.transactions.transactions
   );
-  const conversion = useSelector(
-    (state: RootState) => state.transactions.conversion
-  );
+  const conversion = useSelector((state: RootState) => state.common.conversion);
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
   );
+  const navigate = useNavigate();
+  const params = useParams();
   // state
-  const [month] = useState<number>(new Date().getMonth());
+  const [month, setMonth] = useState<number>(new Date().getMonth());
+
   // functions
   function filterDataByDate(data: TransactionType[], ofset: number) {
     const startOfToday = new Date().setHours(0, 0, 0, 0) / 1000;
@@ -188,25 +192,48 @@ function TransactionScreen() {
     return x;
   }
   return (
-    <div className="sm:ml-48 pt-4 px-4">
-      {applyFilters(offset).map((data) => (
-        <>
-          <p className="text-4xl font-semibold my-3">
-            {data.title[0].toUpperCase() + data.title.slice(1)}
-          </p>
-          <ul className="flex flex-wrap gap-x-3 border" key={data.title}>
-            {data.data.map((item) => (
-              <TransactionListItem
-                item={item}
-                key={item.id}
-                width="half"
-                conversion={conversion}
-                currency={currency}
-              />
-            ))}
-          </ul>
-        </>
-      ))}
+    <div className="sm:ml-48 pt-4 px-4 flex gap-3 justify-between">
+      <div className="w-full">
+        <div className="flex w-full flex-1 justify-between items-center">
+          <p className="text-5xl font-semibold my-3">{STRINGS.Transaction}</p>
+          <CustomDropdown
+            borderColor="#00000040"
+            data={monthData}
+            value={month + 1}
+            placeholder="Month"
+            onChange={(e) => {
+              setMonth(Number(e.target.value) - 1);
+            }}
+          />
+        </div>
+        <div className="w-full">
+          {applyFilters(offset).map((data) => (
+            <>
+              {data.data.length !== 0 && data.title !== '' && (
+                <p className="text-3xl font-semibold my-3">
+                  {data.title[0].toUpperCase() + data.title.slice(1)}
+                </p>
+              )}
+              <ul className="flex flex-wrap gap-4 px-3" key={data.title}>
+                {data.data.map((item) => (
+                  <TransactionListItem
+                    selected={params.id === item.id}
+                    item={item}
+                    key={item.id}
+                    width="half"
+                    conversion={conversion}
+                    currency={currency}
+                    onClick={() => {
+                      navigate(item.id, { replace: params?.id !== undefined });
+                    }}
+                  />
+                ))}
+              </ul>
+            </>
+          ))}
+        </div>
+      </div>
+      <Outlet />
     </div>
   );
 }

@@ -41,6 +41,15 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
                         ? 100
                         : ((spends?.[key] ?? 0) / val.limit) * 100
                     }
+                    customLabel={`${
+                      (spends?.[key] ?? 0) / val.limit > 1
+                        ? String(100)
+                        : String(
+                            (((spends?.[key] ?? 0) / val.limit) * 100).toFixed(
+                              0
+                            )
+                          )
+                    }%`}
                   />
                 </td>
                 <td className="text-xl font-semibold">{val.limit}</td>

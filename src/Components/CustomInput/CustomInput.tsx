@@ -1,3 +1,4 @@
+import React from 'react';
 import { COLORS } from '../../Shared/commonStyles';
 
 function CustomInput({
@@ -32,4 +33,4 @@ function CustomInput({
   );
 }
 
-export default CustomInput;
+export default React.memo(CustomInput);

@@ -6,7 +6,7 @@ import { authenticatedRoutes, guestRoutes } from './config';
 import AppLayout from '../Components/Layouts/AppLayout';
 import type { RootState } from '../Store';
 import { useGetUsdConversionQuery } from '../Services/Api/module/converApi';
-import { setConversionData } from '../Store/Transactions';
+import { setConversionData } from '../Store/Common';
 
 function RootRouter() {
   const guest = useRoutes(guestRoutes);

@@ -1,3 +1,4 @@
+import React from 'react';
 import { COLORS } from '../../Shared/commonStyles';
 
 function CustomButton({
@@ -22,13 +23,12 @@ function CustomButton({
   return (
     <button
       type="button"
-      className="flex justify-center min-h-12 md:h-14"
+      className="flex justify-center min-h-12 md:h-14 items-center"
       style={{
         backgroundColor,
         borderWidth,
         borderColor,
         columnGap: '10px',
-        alignItems: 'center',
         outline: '0px',
         borderRadius: '8px',
         flex,
@@ -46,4 +46,4 @@ function CustomButton({
   );
 }
 
-export default CustomButton;
+export default React.memo(CustomButton);
