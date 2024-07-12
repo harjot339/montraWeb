@@ -1,4 +1,5 @@
 import {
+  AuthError,
   createUserWithEmailAndPassword,
   sendEmailVerification,
 } from 'firebase/auth';
@@ -10,12 +11,15 @@ import {
   Timestamp,
   updateDoc,
 } from 'firebase/firestore';
+import { toast } from 'react-toastify';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { v4 as uuidv4 } from 'uuid';
 import { auth, db, storage } from './firebaseConfig';
 import { UserFromJson, UserToJson } from './userFuncs';
 import { RepeatDataType, TransactionType } from '../Defs/transaction';
 import { encrypt } from './encryption';
 import { UserType } from '../Defs/user';
+import { FirebaseAuthErrorHandler } from './commonFuncs';
 
 export async function singupUser({
   name,
@@ -41,19 +45,22 @@ export async function singupUser({
       return true;
     }
   } catch (e) {
-    // const error: AuthError = e as AuthError;
-    // console.log(error);
-    // Toast.show({ text1: FirebaseAuthErrorHandler(error.code), type: 'error' });
+    const error: AuthError = e as AuthError;
+    toast.error(FirebaseAuthErrorHandler(error.code));
     return false;
   }
   return false;
 }
 export async function getAttachmentUrl({
+  prevTransaction,
+  isEdit,
   attachement,
   attachementType,
   id,
   uid,
 }: {
+  isEdit: boolean;
+  prevTransaction: TransactionType | undefined;
   attachement: File | undefined;
   attachementType: TransactionType['attachementType'];
   id: string;
@@ -61,13 +68,16 @@ export async function getAttachmentUrl({
 }) {
   let url = '';
   try {
+    if (
+      isEdit &&
+      attachement !== undefined &&
+      prevTransaction?.attachementType !== 'none'
+    ) {
+      return prevTransaction?.attachement ?? '';
+    }
     if (attachementType !== 'none' && attachement) {
-      // if (!attachement?.startsWith('https://firebasestorage.googleapis.com')) {
       await uploadBytes(ref(storage, `users/${uid}/${id}`), attachement);
       url = await getDownloadURL(ref(storage, `users/${uid}/${id}`));
-      // } else {
-      //   url = attachement;
-      // }
     }
   } catch (e) {
     // console.log(e)
@@ -175,6 +185,85 @@ export async function handleIncomeUpdate({
     [`income.${month}.${category}`]: encrypt(String(finalAmount), uid),
   });
 }
+export async function handleOnlineNotify({
+  curr,
+  totalSpent,
+  uid,
+  month,
+  category,
+}: {
+  curr: DocumentSnapshot;
+  totalSpent: number;
+  uid: string;
+  month: number;
+  category: string;
+}) {
+  const totalBudget = UserFromJson(curr.data() as UserType)?.budget?.[month]?.[
+    category
+  ];
+  if (totalBudget.alert) {
+    if (
+      totalBudget &&
+      (totalSpent >= totalBudget.limit ||
+        totalSpent >= totalBudget.limit * (totalBudget.percentage / 100))
+    ) {
+      try {
+        const notificationId = uuidv4();
+        await Notification.requestPermission();
+        if (totalSpent >= totalBudget.limit) {
+          await updateDoc(doc(db, 'users', uid), {
+            [`notification.${notificationId}`]: {
+              type: encrypt('budget-limit', uid),
+              category: encrypt(category, uid),
+              id: notificationId,
+              time: Timestamp.now(),
+              read: false,
+              percentage: totalBudget.percentage,
+            },
+          });
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const notif = new Notification(
+            `${
+              category[0].toUpperCase() + category.slice(1)
+            } Budget Limit Exceeded`,
+            {
+              body: `Your ${category[0].toUpperCase()}${category.slice(
+                1
+              )} budget has exceeded the limit`,
+            }
+          );
+        } else if (
+          totalSpent >=
+          totalBudget.limit * (totalBudget.percentage / 100)
+        ) {
+          await updateDoc(doc(db, 'users', uid), {
+            [`notification.${notificationId}`]: {
+              type: encrypt('budget-percent', uid),
+              category: encrypt(category, uid),
+              id: notificationId,
+              time: Timestamp.now(),
+              read: false,
+              percentage: totalBudget.percentage,
+            },
+          });
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const notif = new Notification(
+            `Exceeded ${totalBudget.percentage}% of ${
+              category[0].toUpperCase() + category.slice(1)
+            } budget`,
+            {
+              body: `You've exceeded ${totalBudget.percentage}% of your ${
+                category[0].toUpperCase() + category.slice(1)
+              } budget. Take action to stay on track.`,
+            }
+          );
+        }
+      } catch (e) {
+        toast.error(e as string);
+      }
+    }
+  }
+}
 export async function handleNewIncome({
   curr,
   uid,
@@ -235,15 +324,15 @@ export async function handleExpenseUpdate({
     await updateDoc(doc(db, 'users', uid), {
       [`spend.${month}.${category}`]: encrypt(String(finalAmount), uid),
     });
-    // if (category !== 'transfer') {
-    //   await handleOnlineNotify({
-    //     category,
-    //     month,
-    //     uid,
-    //     totalSpent: finalAmount,
-    //     curr,
-    //   });
-    // }
+    if (category !== 'transfer') {
+      await handleOnlineNotify({
+        category,
+        month,
+        uid,
+        totalSpent: finalAmount,
+        curr,
+      });
+    }
   } catch (e) {
     // console.log('ERROR', e)
   }
@@ -277,15 +366,15 @@ export async function handleNewExpense({
     await updateDoc(doc(db, 'users', uid), {
       [`spend.${month}.${category}`]: encrypt(String(finalAmount), uid),
     });
-    // if (category !== 'transfer') {
-    //   await handleOnlineNotify({
-    //     category,
-    //     month,
-    //     uid,
-    //     totalSpent: finalAmount,
-    //     curr,
-    //   });
-    // }
+    if (category !== 'transfer') {
+      await handleOnlineNotify({
+        category,
+        month,
+        uid,
+        totalSpent: finalAmount,
+        curr,
+      });
+    }
   } catch (e) {
     // console.log(e)
   }
@@ -336,11 +425,18 @@ export const handleOnline = async ({
     attachementType,
     id,
     uid,
+    prevTransaction,
+    isEdit,
   });
   const trans = createTransaction({
     id,
     url,
-    attachementType,
+    attachementType:
+      isEdit &&
+      attachement !== undefined &&
+      prevTransaction?.attachementType !== 'none'
+        ? prevTransaction?.attachementType ?? 'none'
+        : attachementType,
     amount: amount.replace(/,/g, ''),
     category: pageType === 'transfer' ? 'transfer' : category!,
     conversion,

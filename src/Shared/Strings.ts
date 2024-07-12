@@ -14,6 +14,13 @@ export const passRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\s])[A-Za-z\d@$!%*?&\s]{8,}$/;
 
 export const STRINGS = {
+  Dashboard: 'Dashboard',
+  ClearAll: 'Clear All',
+  Recent: 'Recent',
+  InvalidEmail: 'Invalid Email Address',
+  Ok: 'Ok',
+  Resend: 'Resend',
+  AccountBalance: 'Account Balance',
   FileError: 'File should be less than 10 Mb',
   PleaseFillBothFields: 'Please fill both the fields.',
   PleaseSelectOption: 'Please select an option',

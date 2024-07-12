@@ -1,0 +1,18 @@
+.thumb {
+  background-color: #7f3dff;
+  translate: 0 -15px;
+  padding: 8px 18px;
+  border-radius: 20px;
+  color: white;
+  outline: none;
+}
+.track-0 {
+  background-color: #7f3dff;
+  height: 13px;
+  border-radius: 50px;
+}
+.track-1 {
+  background-color: #e3e5e5;
+  height: 13px;
+  border-radius: 50px;
+}

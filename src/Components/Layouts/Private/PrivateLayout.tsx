@@ -8,4 +8,4 @@ function PrivateLayout({ children }: Readonly<AppLayoutProps>) {
   return <Navbar>{children as React.JSX.Element}</Navbar>;
 }
 
-export default PrivateLayout;
+export default React.memo(PrivateLayout);

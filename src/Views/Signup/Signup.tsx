@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { AuthError, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { toast } from 'react-toastify';
 import Google from '../../assets/svgs/google.svg';
 import CustomInput from '../../Components/CustomInput';
 import CustomButton from '../../Components/CustomButton';
 import { COLORS, InputBorderColor } from '../../Shared/commonStyles';
 import CustomPassInput from '../../Components/CustomPassInput';
 import { singupUser } from '../../Utils/firebaseFuncs';
-import { emailRegex, nameRegex } from '../../Shared/Strings';
+import { emailRegex, nameRegex, STRINGS } from '../../Shared/Strings';
 import {
   ConfirmPassError,
   EmailValError,
@@ -22,6 +23,7 @@ import { ROUTES } from '../../Shared/Constants';
 import { auth, db } from '../../Utils/firebaseConfig';
 import { UserFromJson, UserToJson } from '../../Utils/userFuncs';
 import { setUser } from '../../Store/Common';
+import { FirebaseAuthErrorHandler } from '../../Utils/commonFuncs';
 
 function Signup() {
   // constants
@@ -70,18 +72,13 @@ function Signup() {
         dispatch(setLoading(true));
         const res = await singupUser({ name, email, pass });
         if (res) {
-          //   console.log('sjdfn');
-          //   //   Toast.show({ text1: STRINGS.SignupSuccesful, visibilityTime: 2000 });
+          toast.success(STRINGS.SignupSuccesful);
           navigate(ROUTES.LOGIN, { replace: true });
         }
         dispatch(setLoading(false));
       } catch (e) {
-        // const error: AuthError = e as AuthError;
-        // Toast.show({
-        //   text1: FirebaseAuthErrorHandler(error.code),
-        //   type: 'error',
-        // });
-        // console.log(e.code);
+        const error: AuthError = e as AuthError;
+        toast.error(FirebaseAuthErrorHandler(error.code));
         dispatch(setLoading(false));
       }
     }
@@ -114,22 +111,18 @@ function Signup() {
       }
       dispatch(setLoading(false));
     } catch (e) {
-      // const error: AuthError = e as AuthError;
-      // Toast.show({
-      //   text1: FirebaseAuthErrorHandler(error.code),
-      //   type: 'error',
-      // });
-      // console.log(e);
+      const error: AuthError = e as AuthError;
+      toast.error(FirebaseAuthErrorHandler(error.code));
       dispatch(setLoading(false));
     }
   };
   return (
     <div className="w-11/12 sm:w-1/2 py-8 px-5 sm flex flex-col text-center self-center">
       <p className="text-3xl font-semibold md:text-4xl lg:text-5xl mb-16">
-        Signup
+        {STRINGS.SIGNUP}
       </p>
       <CustomInput
-        placeholderText="Full Name"
+        placeholderText={STRINGS.Name}
         value={name}
         onChange={(e) => {
           setName(e.target.value);
@@ -137,7 +130,7 @@ function Signup() {
       />
       <NameValError name={name} formKey={form.name} />
       <CustomInput
-        placeholderText="Email"
+        placeholderText={STRINGS.Email}
         value={email}
         onChange={(e) => {
           setEmail(e.target.value);
@@ -145,7 +138,7 @@ function Signup() {
       />
       <EmailValError email={email} formKey={form.email} />
       <CustomPassInput
-        placeholderText="Password"
+        placeholderText={STRINGS.Password}
         value={pass}
         onChange={(e) => {
           setPass(e.target.value);
@@ -153,7 +146,7 @@ function Signup() {
       />
       <PassValidationError pass={pass} formKey={form.pass} />
       <CustomPassInput
-        placeholderText="Confirm Password"
+        placeholderText={STRINGS.ConfrimPassword}
         value={confirmPass}
         onChange={(e) => {
           setConfirmPass(e.target.value);
@@ -174,9 +167,9 @@ function Signup() {
           }}
         />
         <p className="inline ml-4 text-xl text-start">
-          By signing up, you agree to the{' '}
+          {STRINGS.BySigningUp}{' '}
           <a href="." className=" text-[#7F3DFF]">
-            Terms of Service and Privacy Policy
+            {STRINGS.Terms}
           </a>
         </p>
       </div>
@@ -191,14 +184,14 @@ function Signup() {
         textColor={COLORS.DARK[100]}
         borderWidth={1}
         borderColor={InputBorderColor}
-        title="Sign Up With Google"
+        title={STRINGS.SignupWithGoogle}
         onPress={handleGoogle}
       />
       <div className="my-2" />
       <p className="text-sm md:text-xl font-bold">
-        Already have an Account?{' '}
+        {STRINGS.AlreadyHaveAccount}{' '}
         <Link to="/login" className="underline text-[#7F3DFF]">
-          Login
+          {STRINGS.LOGIN}
         </Link>
       </p>
       <div className="my-1.5" />

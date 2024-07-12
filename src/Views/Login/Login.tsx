@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
+  AuthError,
   GoogleAuthProvider,
+  sendEmailVerification,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signOut,
+  UserCredential,
 } from 'firebase/auth';
+import Modal from 'react-modal';
 import { getDoc, doc, setDoc } from 'firebase/firestore';
+import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import Google from '../../assets/svgs/google.svg';
 import CustomInput from '../../Components/CustomInput';
@@ -17,6 +23,8 @@ import { setUser } from '../../Store/Common';
 import { auth, db } from '../../Utils/firebaseConfig';
 import { UserToJson, UserFromJson } from '../../Utils/userFuncs';
 import { EmailEmptyError, PassEmptyError } from '../../Shared/errors';
+import { STRINGS } from '../../Shared/Strings';
+import { FirebaseAuthErrorHandler } from '../../Utils/commonFuncs';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -25,9 +33,12 @@ function Login() {
     email: false,
     pass: false,
   });
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [userCreds, setUserCreds] = useState<UserCredential>();
   // const navigate = useNavigate();
   const dispatch = useDispatch();
   const handleLogin = async () => {
+    // toast.error('esfm ');
     setForm({ email: true, pass: true });
     if (email !== '' && pass.trim() !== '') {
       try {
@@ -37,45 +48,17 @@ function Login() {
           const data = await getDoc(doc(db, 'users', creds.user.uid));
           const user = UserFromJson(data.data()!);
           dispatch(setUser(user));
-          // navigate('wishlist', { replace: true });
           // dispatch(setTheme(undefined));
         } else {
-          // setAlert(true);
-          // alert(STRINGS.PleaseVerifyEmail);
-          // Alert.alert(STRINGS.PleaseVerifyEmail, STRINGS.VerifyEmailSent, [
-          //   {
-          //     text: 'Resend',
-          //     onPress: () => {
-          //       (async () => {
-          // try {
-          //   await creds.user.sendEmailVerification();
-          //   await auth().signOut();
-          // } catch (e) {
-          //   console.log(e);
-          //   await auth().signOut();
-          // }
-          //       })();
-          //     },
-          //   },
-          //   {
-          //     text: 'OK',
-          //     onPress: () => {
-          //       (async () => {
-          //         await auth().signOut();
-          //       })();
-          //     },
-          //   },
-          // ]);
+          setIsOpen(true);
+          setUserCreds(creds);
         }
+        dispatch(setLoading(false));
       } catch (e) {
-        // const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
-        // console.log(e);
-        // Toast.show({
-        //   text1: FirebaseAuthErrorHandler(error.code),
-        //   type: 'error',
-        // });
+        const error: AuthError = e as AuthError;
+        dispatch(setLoading(false));
+        toast.error(FirebaseAuthErrorHandler(error.code));
       }
-      dispatch(setLoading(false));
     }
   };
   const handleGoogle = async () => {
@@ -105,29 +88,84 @@ function Login() {
         }
       }
     } catch (e) {
-      // const error: FirebaseAuthTypes.NativeFirebaseAuthError = e;
-      // if (
-      //   error.message !==
-      //   'android.credentials.GetCredentialException.TYPE_USER_CANCELED'
-      // ) {
-      //   Toast.show({
-      //     text1: FirebaseAuthErrorHandler(error.code),
-      //     type: 'error',
-      //   });
-      // }
-      // console.log(e);
+      const error: AuthError = e as AuthError;
+      toast.error(FirebaseAuthErrorHandler(error.code));
     } finally {
       dispatch(setLoading(false));
     }
   };
   return (
     <div className="w-11/12 sm:w-1/2 py-8 px-5 sm flex flex-col text-center self-center">
+      <Modal
+        isOpen={isOpen}
+        onRequestClose={() => {
+          setIsOpen(false);
+        }}
+        style={{
+          content: {
+            width: 'min-content',
+            height: 'min-content',
+            margin: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+          },
+          overlay: {
+            backgroundColor: '#00000050',
+          },
+        }}
+      >
+        <div
+          style={{
+            width: '30vw',
+            display: 'flex',
+            flexDirection: 'column',
+            textAlign: 'center',
+            padding: '20px 50px',
+          }}
+        >
+          <p className="text-3xl mb-6 font-semibold">
+            {STRINGS.PleaseVerifyEmail}
+          </p>
+          <p className="text-lg mb-7">{STRINGS.VerifyEmailSent}</p>
+          <div className="flex gap-x-8">
+            <CustomButton
+              flex={1}
+              title={STRINGS.Resend}
+              onPress={async () => {
+                try {
+                  if (userCreds) {
+                    await sendEmailVerification(userCreds.user);
+                  }
+                  await signOut(auth);
+                } catch (e) {
+                  const error: AuthError = e as AuthError;
+                  toast.error(FirebaseAuthErrorHandler(error.code));
+                  await signOut(auth);
+                } finally {
+                  setIsOpen(false);
+                }
+              }}
+              backgroundColor={COLORS.VIOLET[20]}
+              textColor={COLORS.VIOLET[100]}
+            />
+            <CustomButton
+              flex={1}
+              title={STRINGS.Ok}
+              onPress={() => {
+                setIsOpen(false);
+              }}
+            />
+          </div>
+        </div>
+      </Modal>
       <div className="max-w-2xl flex flex-col self-center w-11/12">
         <p className="text-3xl font-semibold md:text-4xl lg:text-5xl mb-16">
-          Login
+          {STRINGS.LOGIN}
         </p>
         <CustomInput
-          placeholderText="Email"
+          placeholderText={STRINGS.Email}
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
@@ -135,14 +173,14 @@ function Login() {
         />
         <EmailEmptyError email={email} formKey={form.email} />
         <CustomPassInput
-          placeholderText="Password"
+          placeholderText={STRINGS.Password}
           value={pass}
           onChange={(e) => {
             setPass(e.target.value);
           }}
         />
         <PassEmptyError pass={pass} formKey={form.pass} />
-        <CustomButton title="Login" onPress={handleLogin} />
+        <CustomButton title={STRINGS.LOGIN} onPress={handleLogin} />
         <div className="my-2" />
         <p className="text-sm md:text-xl text-gray-500 font-bold">Or With</p>
         <div className="my-2" />
@@ -152,7 +190,7 @@ function Login() {
           textColor={COLORS.DARK[100]}
           borderWidth={1}
           borderColor={InputBorderColor}
-          title="Login With Google"
+          title={STRINGS.LoginGoogle}
           onPress={handleGoogle}
         />
         <div className="my-3" />
@@ -160,13 +198,13 @@ function Login() {
           to="/forgot-password"
           className="text-sm md:text-xl font-bold  text-[#7F3DFF]"
         >
-          Forgot Password ?
+          {STRINGS.ForgotPassword}
         </Link>
         <div className="my-2" />
         <p className="text-sm md:text-xl font-bold">
-          Don&apos;t have an Account?{' '}
+          {STRINGS.DontHaveAccount}{' '}
           <Link to="/signup" className="underline text-[#7F3DFF]">
-            Signup
+            {STRINGS.SIGNUP}
           </Link>
         </p>
         <div className="my-1.5" />

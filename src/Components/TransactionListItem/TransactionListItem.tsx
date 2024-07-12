@@ -16,6 +16,9 @@ function TransactionListItem({
   width,
   currency,
   conversion,
+  disabled = false,
+  onClick,
+  selected = false,
 }: Readonly<{
   item: TransactionType;
   width: 'full' | 'half';
@@ -25,6 +28,9 @@ function TransactionListItem({
       [key: string]: number;
     };
   };
+  onClick?: () => void;
+  disabled?: boolean;
+  selected?: boolean;
 }>) {
   const getAmtSymbol = (x: TransactionType) => {
     if (x.type === 'expense') {
@@ -45,12 +51,16 @@ function TransactionListItem({
     return COLORS.PRIMARY.BLUE;
   };
   return (
-    <div
-      className={
-        width === 'full'
-          ? 'flex mb-4 border p-2.5 sm:p-3 rounded-xl gap-x-2'
-          : 'flex mb-4 border p-2.5 sm:p-3 rounded-xl gap-x-2 w-5/12 bg-white'
-      }
+    <button
+      onClick={onClick}
+      type="button"
+      disabled={disabled}
+      className="flex mb-4 border p-2.5 sm:p-3 rounded-xl gap-x-2 bg-white items-center outline-none text-start hover:bg-violet-50"
+      style={{
+        width: width === 'half' ? '32%' : '100%',
+        minWidth: '400px',
+        backgroundColor: selected ? COLORS.VIOLET[20] : '',
+      }}
       key={item.id}
     >
       <div
@@ -76,10 +86,19 @@ function TransactionListItem({
         )}
       </div>
       <div className="w-full overflow-hidden">
-        <p className="text-ellipsis overflow-hidden text-lg sm:text-xl font-semibold">
-          {item.category[0].toUpperCase() + item.category.slice(1)}
+        <p
+          className="text-ellipsis overflow-hidden text-lg sm:text-xl font-semibold"
+          style={{ color: selected ? COLORS.VIOLET[100] : '' }}
+        >
+          {item?.type === 'transfer'
+            ? `${
+                item!.from[0].toUpperCase() + item!.from.slice(1)
+              } - ${item!.to[0].toUpperCase()}${item!.to.slice(1)}`
+            : item.category[0].toUpperCase() + item.category.slice(1)}
         </p>
-        <p className="text-sm sm:text-lg">{item.desc}</p>
+        <p className="text-sm sm:text-lg text-ellipsis overflow-hidden whitespace-nowrap">
+          {item.desc}
+        </p>
       </div>
       <div className="min-w-20 text-end w-full">
         <p
@@ -101,7 +120,7 @@ function TransactionListItem({
           )}
         </p>
       </div>
-    </div>
+    </button>
   );
 }
 

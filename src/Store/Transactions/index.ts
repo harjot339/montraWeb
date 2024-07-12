@@ -11,7 +11,6 @@ const initialState: {
     cat: string[];
   };
   transactions: TransactionType[];
-  conversion: { [key: string]: { [key: string]: number } };
   isLogoutOpen: boolean;
   isTabButtonOpen: boolean;
 } = {
@@ -19,7 +18,6 @@ const initialState: {
   isFilterOpen: false,
   isCatOpen: false,
   filters: { filter: 'none', sort: 'none', cat: [] },
-  conversion: {},
   isLogoutOpen: false,
   isTabButtonOpen: false,
   transactions: [],
@@ -37,41 +35,38 @@ const TransactionSlice = createSlice({
     // openLogoutSheet(state, action) {
     //   state.isLogoutOpen = action.payload;
     // },
-    // setFilters(state, action) {
-    //   if (action.payload === 0) {
-    //     state.filters.filter = 'income';
-    //   } else if (action.payload === 1) {
-    //     state.filters.filter = 'expense';
-    //   } else if (action.payload === 2) {
-    //     state.filters.filter = 'transfer';
-    //   } else {
-    //     state.filters.filter = 'none';
-    //   }
-    //   state.isFilterOpen = false;
-    // },
-    // setSortFilter(state, action) {
-    //   if (action.payload === 0) {
-    //     state.filters.sort = 'highest';
-    //   } else if (action.payload === 1) {
-    //     state.filters.sort = 'lowest';
-    //   } else if (action.payload === 2) {
-    //     state.filters.sort = 'newest';
-    //   } else if (action.payload === 3) {
-    //     state.filters.sort = 'oldest';
-    //   } else {
-    //     state.filters.sort = 'none';
-    //   }
-    //   state.isFilterOpen = false;
-    // },
-    // setCatFilter(state, action) {
-    //   console.log(action.payload);
-    //   state.filters.cat = action.payload;
-    // },
-    // clearCatFilter(state) {
-    //   state.filters.cat = [];
-    // },
-    setConversionData(state, action) {
-      return { ...state, conversion: action.payload };
+    setFilters(state, action) {
+      if (action.payload === 0) {
+        return { ...state, filters: { ...state.filters, filter: 'income' } };
+      }
+      if (action.payload === 1) {
+        return { ...state, filters: { ...state.filters, filter: 'expense' } };
+      }
+      if (action.payload === 2) {
+        return { ...state, filters: { ...state.filters, filter: 'transfer' } };
+      }
+      return { ...state, filters: { ...state.filters, filter: 'none' } };
+    },
+    setSortFilter(state, action) {
+      if (action.payload === 0) {
+        return { ...state, filters: { ...state.filters, sort: 'highest' } };
+      }
+      if (action.payload === 1) {
+        return { ...state, filters: { ...state.filters, sort: 'lowest' } };
+      }
+      if (action.payload === 2) {
+        return { ...state, filters: { ...state.filters, sort: 'newest' } };
+      }
+      if (action.payload === 3) {
+        return { ...state, filters: { ...state.filters, sort: 'oldest' } };
+      }
+      return { ...state, filters: { ...state.filters, sort: 'none' } };
+    },
+    setCatFilter(state, action) {
+      return { ...state, filters: { ...state.filters, cat: action.payload } };
+    },
+    clearCatFilter(state) {
+      return { ...state, filters: { ...state.filters, cat: [] } };
     },
     // setTabButton(state, action) {
     //   state.isTabButtonOpen = action.payload;
@@ -83,12 +78,11 @@ const TransactionSlice = createSlice({
 });
 export const {
   //   openFilterSheet,
-  //   setFilters,
+  setFilters,
   //   openCatSheet,
-  //   setSortFilter,
-  setConversionData,
-  //   setCatFilter,
-  //   clearCatFilter,
+  setSortFilter,
+  setCatFilter,
+  clearCatFilter,
   //   openLogoutSheet,
   //   setTabButton,
   setTransactions,

@@ -1,12 +1,11 @@
-const STRING: string = 'Test';
-export { STRING };
-
 const ROUTES = {
   HOMEPAGE: '/',
   LOGIN: '/login',
   SIGNUP: '/signup',
   ForgotPassword: '/forgot-password',
   Transactions: '/transactions',
+  Budgets: '/budgets',
+  Report: '/report',
   // ABOUT: '/about-us',
 };
 
@@ -35,6 +34,14 @@ const ROUTES_CONFIG = {
   Transactions: {
     path: ROUTES.Transactions,
     title: 'Transactions',
+  },
+  Budgets: {
+    path: ROUTES.Budgets,
+    title: 'Budgets',
+  },
+  Report: {
+    path: ROUTES.Report,
+    title: 'Financial Report',
   },
 };
 

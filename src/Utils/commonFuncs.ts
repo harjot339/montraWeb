@@ -1,3 +1,4 @@
+import { STRINGS } from '../Shared/Strings';
 import { COLORS } from '../Shared/commonStyles';
 import Car from '../assets/svgs/car.svg';
 import Bill from '../assets/svgs/recurring bill.svg';
@@ -49,3 +50,19 @@ export const MimeToExtension: { [key: string]: string } = {
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
   'text/plain': 'txt',
 };
+
+export function FirebaseAuthErrorHandler(code: string) {
+  if (code === 'auth/email-already-in-use') {
+    return STRINGS.EmailAdressAlreadyUsed;
+  }
+  if (code === 'auth/invalid-credential') {
+    return STRINGS.CredentialMalformed;
+  }
+  if (code === 'auth/network-request-failed') {
+    return STRINGS.NetworkError;
+  }
+  if (code === 'auth/invalid-email') {
+    return STRINGS.InvalidEmail;
+  }
+  return STRINGS.UnknownError;
+}
