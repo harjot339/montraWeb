@@ -177,8 +177,8 @@ function AddExpense({
   }, [isEdit, repeatData]);
   return (
     <div
-      className="hidden sm:flex flex-col rounded-lg flex-1 justify-between"
-      style={{ backgroundColor: getBackgroundColor, height, minWidth: '22vw' }}
+      className="hidden sm:flex flex-col rounded-lg h-fit flex-1"
+      style={{ backgroundColor: getBackgroundColor, height, maxWidth: '550px' }}
     >
       <RepeatDataModal
         modal={modal}
@@ -208,9 +208,10 @@ function AddExpense({
           <img src={ArrowRight} alt="" width="40px" />
         </button>
       </div>
+      <div className="min-h-48" />
       <div>
         <p className="text-5xl px-4 sm:px-8 text-white opacity-80 font-semibold">
-          How much?
+          {STRINGS.HowMuch}
         </p>
         <input
           onClick={() => {

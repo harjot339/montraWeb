@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Timestamp } from 'firebase/firestore';
 import { TransactionType } from '../../../Defs/transaction';
 import { COLORS } from '../../../Shared/commonStyles';
+import { STRINGS } from '../../../Shared/Strings';
 
 function Graph({
   data,
@@ -51,7 +52,7 @@ function Graph({
     });
   //   console.log(graphData)
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col rounded-lg bg-white">
       {!hideDropdown && (
         <select
           value={graphDay}
@@ -61,16 +62,16 @@ function Graph({
           }}
         >
           <option key={0} value={0}>
-            Today
+            {STRINGS.Today}
           </option>
           <option key={1} value={1}>
-            Week
+            {STRINGS.Week}
           </option>
           <option key={2} value={2}>
-            Month
+            {STRINGS.Month}
           </option>
           <option key={3} value={3}>
-            Year
+            {STRINGS.Year}
           </option>
         </select>
       )}

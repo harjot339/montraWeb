@@ -11,7 +11,7 @@ function BudgetItem({
   conversion,
   onClick,
   color,
-}: {
+}: Readonly<{
   item: [
     string,
     {
@@ -31,7 +31,7 @@ function BudgetItem({
   };
   onClick: () => void;
   color: string;
-}) {
+}>) {
   const getValue = useCallback(
     (
       val: {
@@ -60,7 +60,7 @@ function BudgetItem({
     <button
       type="button"
       key={key}
-      className="flex rounded-lg bg-white px-2 sm:px-4 py-4  flex-col"
+      className="flex rounded-lg bg-white px-2 sm:px-4 py-4 min-w-96 w flex-col"
       onClick={onClick}
     >
       <div className="flex justify-between mb-3 w-full">
@@ -79,16 +79,18 @@ function BudgetItem({
         {STRINGS.Remaining} {currencies[currency!].symbol}
         {formatWithCommas(Number(getValue(val, key)).toString())}
       </p>
-      <ProgressBar
-        width="25vw"
-        bgColor={color}
-        completed={
-          (spend?.[key] ?? 0) / val.limit > 1
-            ? 100
-            : ((spend?.[key] ?? 0) / val.limit) * 100
-        }
-        isLabelVisible={false}
-      />
+      <div className="max-w-96 w-full">
+        <ProgressBar
+          width="100%"
+          bgColor={color}
+          completed={
+            (spend?.[key] ?? 0) / val.limit > 1
+              ? 100
+              : ((spend?.[key] ?? 0) / val.limit) * 100
+          }
+          isLabelVisible={false}
+        />
+      </div>
       <p className="text-2xl font-semibold mt-2 mb-3">
         {currencies[currency!].symbol}
         {formatWithCommas(

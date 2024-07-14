@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AuthError,
@@ -37,7 +37,7 @@ function Login() {
   const [userCreds, setUserCreds] = useState<UserCredential>();
   // const navigate = useNavigate();
   const dispatch = useDispatch();
-  const handleLogin = async () => {
+  const handleLogin = useCallback(async () => {
     // toast.error('esfm ');
     setForm({ email: true, pass: true });
     if (email !== '' && pass.trim() !== '') {
@@ -60,8 +60,8 @@ function Login() {
         toast.error(FirebaseAuthErrorHandler(error.code));
       }
     }
-  };
-  const handleGoogle = async () => {
+  }, [dispatch, email, pass]);
+  const handleGoogle = useCallback(async () => {
     try {
       dispatch(setLoading(true));
       const provider = new GoogleAuthProvider();
@@ -93,7 +93,7 @@ function Login() {
     } finally {
       dispatch(setLoading(false));
     }
-  };
+  }, [dispatch]);
   return (
     <div className="w-11/12 sm:w-1/2 py-8 px-5 sm flex flex-col text-center self-center">
       <Modal

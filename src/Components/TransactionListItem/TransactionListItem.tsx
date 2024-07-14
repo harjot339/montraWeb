@@ -57,8 +57,9 @@ function TransactionListItem({
       disabled={disabled}
       className="flex mb-4 border p-2.5 sm:p-3 rounded-xl gap-x-2 bg-white items-center outline-none text-start hover:bg-violet-50"
       style={{
-        width: width === 'half' ? '32%' : '100%',
-        minWidth: '400px',
+        width: '100%',
+        maxWidth: width === 'half' ? '400px' : '100%',
+        // minWidth: width === 'half' ? '200px' : undefined,
         backgroundColor: selected ? COLORS.VIOLET[20] : '',
       }}
       key={item.id}

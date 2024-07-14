@@ -192,10 +192,12 @@ function TransactionScreen() {
     return x;
   }
   return (
-    <div className="sm:ml-48 pt-4 px-4 flex gap-3 justify-between">
+    <div className="sm:ml-48 pt-4 px-2 sm:px-4 flex gap-3 justify-between">
       <div className="w-full">
         <div className="flex w-full flex-1 justify-between items-center">
-          <p className="text-5xl font-semibold my-3">{STRINGS.Transaction}</p>
+          <p className="text-3xl sm:text-4xl font-bold my-3">
+            {STRINGS.Transaction}
+          </p>
           <CustomDropdown
             borderColor="#00000040"
             data={monthData}
@@ -210,11 +212,14 @@ function TransactionScreen() {
           {applyFilters(offset).map((data) => (
             <>
               {data.data.length !== 0 && data.title !== '' && (
-                <p className="text-3xl font-semibold my-3">
+                <p className="text-2xl sm:text-3xl font-semibold my-3">
                   {data.title[0].toUpperCase() + data.title.slice(1)}
                 </p>
               )}
-              <ul className="flex flex-wrap gap-4 px-3" key={data.title}>
+              <ul
+                className="flex flex-wrap gap-1 sm:gap-4 px-3"
+                key={data.title}
+              >
                 {data.data.map((item) => (
                   <TransactionListItem
                     selected={params.id === item.id}

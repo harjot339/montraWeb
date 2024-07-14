@@ -26,3 +26,4 @@ mason*
 bricks
 # env files
 .env*
+.firebase

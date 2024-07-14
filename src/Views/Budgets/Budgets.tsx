@@ -31,7 +31,9 @@ function Budgets() {
     <div className="sm:ml-48 pt-4 px-4 flex">
       <div className="w-full mr-4">
         <div className="flex justify-between w-full items-center mb-3">
-          <p className="text-5xl font-semibold my-4">{STRINGS.Budget}</p>
+          <p className="text-3xl sm:text-4xl font-bold my-4">
+            {STRINGS.Budget}
+          </p>
           <div className="flex gap-x-4">
             {!isOpen && params?.id === undefined && (
               <div className="flex min-w-80 ">

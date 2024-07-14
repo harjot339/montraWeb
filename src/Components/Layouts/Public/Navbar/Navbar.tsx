@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { signOut } from 'firebase/auth';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
@@ -22,6 +22,27 @@ export function SidebarLayout({ children }: { children: React.JSX.Element }) {
     (state: RootState) => state.common.user?.currency
   );
   const uid = useSelector((state: RootState) => state.common.user?.uid);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  const navbarStyle =
+    windowWidth >= 480
+      ? { padding: '0.5rem' }
+      : {
+          paddingTop: '2.5rem',
+          paddingLeft: '0.5rem',
+          paddingBottom: '0.5rem',
+        };
   return (
     <>
       <aside
@@ -66,14 +87,14 @@ export function SidebarLayout({ children }: { children: React.JSX.Element }) {
                 </Link>
               </li>
             ))}
-            <li>
+            {/* <li>
               <a
                 href="#"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <span className="flex-1 ms-3 whitespace-nowrap">Profile</span>
               </a>
-            </li>
+            </li> */}
             <li>
               <a
                 onClick={async () => {
@@ -123,7 +144,8 @@ export function SidebarLayout({ children }: { children: React.JSX.Element }) {
         data-drawer-toggle="default-sidebar"
         aria-controls="default-sidebar"
         type="button"
-        className="flex items-center p-2 w-screen text-sm text-gray-500 sm:hidden focus:outline-none  dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+        style={navbarStyle}
+        className="flex items-center w-full text-sm text-gray-500 sm:hidden focus:outline-none dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
         id="toggleSidebarButton"
         onClick={() => {
           setIsOpen(true);

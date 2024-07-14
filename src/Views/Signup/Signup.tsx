@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { AuthError, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
@@ -50,7 +50,7 @@ function Signup() {
   // redux
   const dispatch = useDispatch();
   // functions
-  const handleSignup = async () => {
+  const handleSignup = useCallback(async () => {
     setForm({
       name: true,
       email: true,
@@ -64,10 +64,13 @@ function Signup() {
       email !== '' &&
       testInput(emailRegex, email) &&
       pass.trim() !== '' &&
-      pass.length >= 6 &&
-      pass === confirmPass &&
-      checked
+      pass.trim().length >= 6 &&
+      pass === confirmPass
     ) {
+      if (!checked) {
+        toast.error(STRINGS.TermsError);
+        return;
+      }
       try {
         dispatch(setLoading(true));
         const res = await singupUser({ name, email, pass });
@@ -82,8 +85,8 @@ function Signup() {
         dispatch(setLoading(false));
       }
     }
-  };
-  const handleGoogle = async () => {
+  }, [checked, confirmPass, dispatch, email, name, navigate, pass]);
+  const handleGoogle = useCallback(async () => {
     try {
       dispatch(setLoading(true));
       const provider = new GoogleAuthProvider();
@@ -115,10 +118,10 @@ function Signup() {
       toast.error(FirebaseAuthErrorHandler(error.code));
       dispatch(setLoading(false));
     }
-  };
+  }, [dispatch]);
   return (
-    <div className="w-11/12 sm:w-1/2 py-8 px-5 sm flex flex-col text-center self-center">
-      <p className="text-3xl font-semibold md:text-4xl lg:text-5xl mb-16">
+    <div className="w-11/12 sm:w-1/2 px-5 sm flex flex-col text-center self-center">
+      <p className="text-3xl font-semibold md:text-4xl lg:text-5xl mb-12 md:mb-8">
         {STRINGS.SIGNUP}
       </p>
       <CustomInput
@@ -157,16 +160,17 @@ function Signup() {
         pass={pass}
         formKey={form.confirmPass}
       />
-      <div className="flex justify-start mt-2">
+      <div className="flex justify-start mt-1">
         <input
           type="checkbox"
-          className="h-7 w-7"
+          id="checkbox"
+          className="h-7 w-7 rounded-full"
           value={String(checked)}
           onClick={(e) => {
             setChecked((e.target as HTMLInputElement).checked);
           }}
         />
-        <p className="inline ml-4 text-xl text-start">
+        <p className="inline ml-4 text-md md:text-xl text-start">
           {STRINGS.BySigningUp}{' '}
           <a href="." className=" text-[#7F3DFF]">
             {STRINGS.Terms}
@@ -176,7 +180,9 @@ function Signup() {
       <div className="my-3" />
       <CustomButton title="Sign Up" onPress={handleSignup} />
       <div className="my-2" />
-      <p className="text-sm md:text-xl text-gray-500 font-bold">Or With</p>
+      <p className="text-sm md:text-xl text-gray-500 font-bold">
+        {STRINGS.OrWith}
+      </p>
       <div className="my-2" />
       <CustomButton
         component={<img alt="" src={Google} width="26vw" />}
@@ -188,7 +194,7 @@ function Signup() {
         onPress={handleGoogle}
       />
       <div className="my-2" />
-      <p className="text-sm md:text-xl font-bold">
+      <p className="text-md md:text-xl font-bold">
         {STRINGS.AlreadyHaveAccount}{' '}
         <Link to="/login" className="underline text-[#7F3DFF]">
           {STRINGS.LOGIN}

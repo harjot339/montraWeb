@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import ProgressBar from '@ramonak/react-progress-bar';
 import { RootState } from '../../../Store';
 import { getMyColor } from '../../../Utils/commonFuncs';
+import { STRINGS } from '../../../Shared/Strings';
 
 function BudgetSection({ month }: Readonly<{ month: number }>) {
   const budgets = useSelector(
@@ -17,11 +18,11 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
         <p className="text-2xl md:text-3xl lg:text-4xl font-bold ">Budgets</p>
         <table className="w-full mt-4">
           <tr className="text-xl border-b-2">
-            <th>Category</th>
-            <th>Percentage</th>
-            <th>Limit</th>
-            <th>Spent</th>
-            <th>Left</th>
+            <th>{STRINGS.Category}</th>
+            <th>{STRINGS.Percentage}</th>
+            <th>{STRINGS.Limit}</th>
+            <th>{STRINGS.Spent}</th>
+            <th>{STRINGS.Left}</th>
           </tr>
           {Object.entries(budgets ?? {}).map(([key, val]) => (
             <>
@@ -32,9 +33,10 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
                 <td className="text-xl font-semibold">
                   {key[0].toUpperCase() + key.slice(1)}
                 </td>
-                <td width="30vw">
+                <td>
                   <ProgressBar
-                    width="30vw"
+                    // width="30vw"
+                    isLabelVisible={false}
                     bgColor={getMyColor()}
                     completed={
                       (spends?.[key] ?? 0) / val.limit > 1

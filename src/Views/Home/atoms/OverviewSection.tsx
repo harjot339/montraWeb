@@ -44,11 +44,13 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
     [conversion?.usd, currency]
   );
   return (
-    <div className="rounded-lg bg-white py-4 px-4">
-      <p className="text-2xl md:text-3xl lg:text-4xl font-bold">Overview</p>
+    <div className="rounded-lg bg-white py-4 px-2 sm:px-4">
+      <p className="text-2xl md:text-3xl lg:text-4xl font-bold">
+        {STRINGS.Overview}
+      </p>
       <div className="flex mt-5 justify-evenly gap-3 text-center">
-        <div className="">
-          <p className="text-xl md:text-2xl lg:text-3xl font-semibold">
+        <div>
+          <p className="text-xl md:text-2xl lg:text-3xl font-semibold max-w-24 overflow-hidden text-ellipsis whitespace-nowrap">
             {currencies[currency ?? 'usd'].symbol}
             {currencyConvert(9400)}
           </p>
@@ -59,8 +61,8 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
             {STRINGS.AccountBalance}
           </p>
         </div>
-        <div className="">
-          <p className="text-xl md:text-2xl lg:text-3xl font-semibold">
+        <div>
+          <p className="text-xl md:text-2xl lg:text-3xl font-semibold max-w-24 overflow-hidden text-ellipsis whitespace-nowrap">
             {currencies[currency ?? 'usd'].symbol}
             {currencyConvert(totalSpend)}
           </p>
@@ -71,8 +73,8 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
             {STRINGS.Expense}
           </p>
         </div>
-        <div className="">
-          <p className="text-xl md:text-2xl lg:text-3xl font-semibold">
+        <div>
+          <p className="text-xl md:text-2xl lg:text-3xl font-semibold max-w-24 overflow-hidden text-ellipsis whitespace-nowrap">
             {currencies[currency ?? 'usd'].symbol}
             {currencyConvert(totalIncome)}
           </p>
