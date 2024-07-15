@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import ReactApexChart from 'react-apexcharts';
 import { Timestamp } from 'firebase/firestore';
 import ProgressBar from '@ramonak/react-progress-bar';
+import clsx from 'clsx';
 import { currencies, monthData, STRINGS } from '../../Shared/Strings';
 import Graph from '../Home/atoms/Graph';
 import { RootState } from '../../Store';
@@ -12,6 +13,8 @@ import ExportDataModal from './atoms/ExportDataModal';
 import TransactionListItem from '../../Components/TransactionListItem';
 import { formatWithCommas, getMyColor } from '../../Utils/commonFuncs';
 import { COLORS } from '../../Shared/commonStyles';
+import SidebarButton from '../../Components/SidebarButton/SidebarButton';
+import useAppTheme from '../../Hooks/themeHook';
 
 function FinancialReport() {
   const [month, setMonth] = useState(new Date().getMonth());
@@ -38,11 +41,20 @@ function FinancialReport() {
     (state: RootState) => state.common.user?.currency
   );
   const [modal, setModal] = useState<boolean>(false);
+  const [theme] = useAppTheme();
   return (
     <div className="sm:ml-48 pt-4 px-4">
       <ExportDataModal modal={modal} setModal={setModal} />
       <div className="flex justify-between mb-6 items-center">
-        <p className="text-4xl font-semibold">{STRINGS.FinancialReport}</p>
+        <SidebarButton />
+        <p
+          className={clsx(
+            'text-4xl font-semibold',
+            theme === 'dark' && 'text-white'
+          )}
+        >
+          {STRINGS.FinancialReport}
+        </p>
         <div className="flex gap-x-8">
           <div className="flex w-72">
             <CustomButton
@@ -54,7 +66,6 @@ function FinancialReport() {
             />
           </div>
           <CustomDropdown
-            borderColor="#00000040"
             data={[
               { label: 'Expense', value: 'expense' },
               { label: 'Income', value: 'income' },
@@ -66,7 +77,6 @@ function FinancialReport() {
             value={type}
           />
           <CustomDropdown
-            borderColor="#00000040"
             data={monthData}
             placeholder={STRINGS.Month}
             onChange={(e) => {
@@ -76,7 +86,12 @@ function FinancialReport() {
           />
         </div>
       </div>
-      <div className="rounded-lg flex bg-white py-4 px-4">
+      <div
+        className={clsx(
+          'rounded-lg flex py-4 px-4',
+          theme === 'dark' ? 'bg-black' : 'bg-white'
+        )}
+      >
         <div className="w-1/2">
           <div className="h-96">
             <Graph data={data} month={month} hideDropdown type={type} />
@@ -92,6 +107,7 @@ function FinancialReport() {
                 );
               })
               .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
+              .slice(0, 5)
               .map((item) => (
                 <TransactionListItem
                   disabled
@@ -143,6 +159,7 @@ function FinancialReport() {
                     },
                   },
                 },
+                noData: { text: STRINGS.NotEnoughData },
                 legend: { show: false },
                 labels: Object.keys(spends ?? {}).reduce(
                   (acc: string[], curr) => {
@@ -166,7 +183,9 @@ function FinancialReport() {
                         className="w-5 h-5 rounded-full"
                         style={{ backgroundColor: color }}
                       />
-                      <p>{item[0][0].toUpperCase() + item[0].slice(1)}</p>
+                      <p className={clsx(theme === 'dark' && 'text-white')}>
+                        {item[0][0].toUpperCase() + item[0].slice(1)}
+                      </p>
                     </div>
                     <p
                       className="text-2xl font-semibold"
@@ -189,6 +208,7 @@ function FinancialReport() {
                     </p>
                   </div>
                   <ProgressBar
+                    isLabelVisible={false}
                     completed={(
                       (item[1] /
                         (type === 'expense'

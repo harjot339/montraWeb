@@ -9,11 +9,13 @@ import ReactSwitch from 'react-switch';
 import ReactSlider from 'react-slider';
 import { toast } from 'react-toastify';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import clsx from 'clsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { COLORS } from '../../Shared/commonStyles';
 import { STRINGS } from '../../Shared/Strings';
 import ArrowLeft from '../../assets/svgs/arrow left.svg';
+import ArrowLeftBlack from '../../assets/svgs/arrow left black.svg';
 import { EmptyError, EmptyZeroError } from '../../Shared/errors';
 import { formatWithCommas } from '../../Utils/commonFuncs';
 import CustomButton from '../../Components/CustomButton';
@@ -25,6 +27,7 @@ import { encrypt } from '../../Utils/encryption';
 import { db } from '../../Utils/firebaseConfig';
 import { handleOnlineNotify } from '../../Utils/firebaseFuncs';
 import CategoryModal from '../../Components/CategoryModal';
+import useAppTheme from '../../Hooks/themeHook';
 
 function CreateBudget({
   setIsOpen,
@@ -142,6 +145,7 @@ function CreateBudget({
     }
   }, [budget, isEdit, params]);
   const [addCategoryModal, setAddCategoryModal] = useState<boolean>(false);
+  const [theme] = useAppTheme();
   return (
     <div
       className="hidden sm:flex flex-col rounded-lg flex-1 justify-between"
@@ -165,16 +169,30 @@ function CreateBudget({
             setIsOpen(false);
           }}
         >
-          <img src={ArrowLeft} alt="" width="40px" />
+          {theme === 'dark' ? (
+            <img src={ArrowLeftBlack} alt="" width="40px" />
+          ) : (
+            <img src={ArrowLeft} alt="" width="40px" />
+          )}
         </button>
-        <p className="text-3xl text-white font-semibold">
+        <p
+          className={clsx(
+            'text-3xl font-semibold',
+            theme === 'dark' ? 'text-black' : 'text-white'
+          )}
+        >
           {STRINGS.CreateBudget}
         </p>
         <div />
       </div>
       <div>
-        <p className="text-5xl px-4 sm:px-8 text-white opacity-80 font-semibold">
-          How much?
+        <p
+          className={clsx(
+            'text-5xl px-4 sm:px-8 opacity-80 font-semibold',
+            theme === 'dark' ? 'text-black' : 'text-white'
+          )}
+        >
+          {STRINGS.HowMuch}
         </p>
         <input
           onClick={() => {
@@ -188,7 +206,10 @@ function CreateBudget({
             }
           }}
           value={`$ ${amount}`}
-          className="bg-transparent w-full px-4 sm:px-8 h-20 outline-none text-6xl text-white font-semibold"
+          className={clsx(
+            'bg-transparent w-full px-4 sm:px-8 h-20 outline-none text-6xl font-semibold',
+            theme === 'dark' ? 'text-black' : 'text-white'
+          )}
           maxLength={10}
           onChange={(e) => {
             const str = e.target.value;
@@ -236,7 +257,12 @@ function CreateBudget({
           errorText={STRINGS.PleaseFillAnAmount}
           formKey={form}
         />
-        <div className="bg-white px-4 sm:px-8 py-8 rounded-t-2xl rounded-b-lg flex flex-col">
+        <div
+          className={clsx(
+            'px-4 sm:px-8 py-8 rounded-t-2xl rounded-b-lg flex flex-col',
+            theme === 'dark' ? 'bg-black' : 'bg-white'
+          )}
+        >
           <CustomDropdown
             placeholder={STRINGS.Category}
             data={dropdownData}
@@ -255,7 +281,12 @@ function CreateBudget({
             value={cat}
           />
 
-          <div className="flex justify-between items-center">
+          <div
+            className={clsx(
+              'flex justify-between items-center',
+              theme === 'dark' ? 'text-white' : 'text-black'
+            )}
+          >
             <div>
               <p className="text-2xl font-semibold">{STRINGS.RecieveAlert}</p>
               <p>

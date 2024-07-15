@@ -1,5 +1,6 @@
 import React from 'react';
 import { Timestamp } from 'firebase/firestore';
+import clsx from 'clsx';
 import {
   catIcons,
   formatAMPM,
@@ -10,6 +11,7 @@ import { TransactionType } from '../../Defs/transaction';
 import Money from '../../assets/svgs/money-bag.svg';
 import Transfer from '../../assets/svgs/currency-exchange.svg';
 import { currencies } from '../../Shared/Strings';
+import useAppTheme from '../../Hooks/themeHook';
 
 function TransactionListItem({
   item,
@@ -50,12 +52,16 @@ function TransactionListItem({
     }
     return COLORS.PRIMARY.BLUE;
   };
+  const [theme] = useAppTheme();
   return (
     <button
       onClick={onClick}
       type="button"
       disabled={disabled}
-      className="flex mb-4 border p-2.5 sm:p-3 rounded-xl gap-x-2 bg-white items-center outline-none text-start hover:bg-violet-50"
+      className={clsx(
+        'flex mb-4 border p-2.5 sm:p-3 rounded-xl gap-x-2  items-center outline-none text-start ',
+        theme === 'dark' ? 'bg-black' : 'bg-white'
+      )}
       style={{
         width: '100%',
         maxWidth: width === 'half' ? '400px' : '100%',
@@ -88,16 +94,24 @@ function TransactionListItem({
       </div>
       <div className="w-full overflow-hidden">
         <p
-          className="text-ellipsis overflow-hidden text-lg sm:text-xl font-semibold"
+          className={clsx(
+            'text-ellipsis overflow-hidden text-lg sm:text-xl font-semibold',
+            theme === 'dark' && 'text-white'
+          )}
           style={{ color: selected ? COLORS.VIOLET[100] : '' }}
         >
           {item?.type === 'transfer'
             ? `${
-                item!.from[0].toUpperCase() + item!.from.slice(1)
-              } - ${item!.to[0].toUpperCase()}${item!.to.slice(1)}`
+                item.from[0].toUpperCase() + item.from.slice(1)
+              } - ${item.to[0].toUpperCase()}${item.to.slice(1)}`
             : item.category[0].toUpperCase() + item.category.slice(1)}
         </p>
-        <p className="text-sm sm:text-lg text-ellipsis overflow-hidden whitespace-nowrap">
+        <p
+          className={clsx(
+            'text-sm sm:text-lg text-ellipsis overflow-hidden whitespace-nowrap',
+            theme === 'dark' && 'text-white'
+          )}
+        >
           {item.desc}
         </p>
       </div>

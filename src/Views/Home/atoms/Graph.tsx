@@ -1,9 +1,12 @@
 import ReactApexChart from 'react-apexcharts';
 import React, { useState } from 'react';
 import { Timestamp } from 'firebase/firestore';
+import clsx from 'clsx';
 import { TransactionType } from '../../../Defs/transaction';
 import { COLORS } from '../../../Shared/commonStyles';
 import { STRINGS } from '../../../Shared/Strings';
+import useAppTheme from '../../../Hooks/themeHook';
+import CustomDropdown from '../../../Components/CustomDropdown';
 
 function Graph({
   data,
@@ -51,29 +54,32 @@ function Graph({
       };
     });
   //   console.log(graphData)
+  const [theme] = useAppTheme();
   return (
-    <div className="flex flex-col rounded-lg bg-white">
+    <div
+      className={clsx(
+        'flex flex-col rounded-lg ',
+        theme === 'dark' ? 'bg-black' : 'bg-white'
+      )}
+    >
       {!hideDropdown && (
-        <select
-          value={graphDay}
-          className="border rounded-xl py-2 px-3 my-3 mx-3 self-end"
-          onChange={(e) => {
-            setGraphDay(Number(e.target.value));
-          }}
-        >
-          <option key={0} value={0}>
-            {STRINGS.Today}
-          </option>
-          <option key={1} value={1}>
-            {STRINGS.Week}
-          </option>
-          <option key={2} value={2}>
-            {STRINGS.Month}
-          </option>
-          <option key={3} value={3}>
-            {STRINGS.Year}
-          </option>
-        </select>
+        <div className="max-w-36 self-end px-3 py-2">
+          <CustomDropdown
+            onChange={(e) => {
+              setGraphDay(Number(e.target.value));
+            }}
+            data={[
+              STRINGS.Today,
+              STRINGS.Week,
+              STRINGS.Month,
+              STRINGS.Year,
+            ].map((item, i) => {
+              return { label: item, value: i };
+            })}
+            placeholder=""
+            value={graphDay}
+          />
+        </div>
       )}
       <ReactApexChart
         options={{

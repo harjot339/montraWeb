@@ -14,6 +14,7 @@ export const passRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\s])[A-Za-z\d@$!%*?&\s]{8,}$/;
 
 export const STRINGS = {
+  Filters: 'Filters',
   Percentage: 'Percentage',
   Limit: 'Limit',
   Spent: 'Spent',

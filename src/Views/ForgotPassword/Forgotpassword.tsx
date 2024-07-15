@@ -10,10 +10,12 @@ import CustomInput from '../../Components/CustomInput';
 import { setLoading } from '../../Store/Loader';
 import { decrypt } from '../../Utils/encryption';
 import { STRINGS } from '../../Shared/Strings';
+import useAppTheme from '../../Hooks/themeHook';
 
 function Forgotpassword() {
   const [email, setEmail] = useState('');
   const [form, setForm] = useState(false);
+  const appTheme = useAppTheme();
   const dispatch = useDispatch();
   async function isUserExist(currentEmail: string) {
     try {
@@ -58,6 +60,7 @@ function Forgotpassword() {
           {STRINGS.EnterEmailForReset}
         </p>
         <CustomInput
+          inputColor={appTheme[1].DARK[100]}
           placeholderText="Email"
           value={email}
           onChange={(e) => {

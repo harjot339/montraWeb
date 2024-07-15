@@ -9,6 +9,8 @@ import { monthData, STRINGS, weekData } from '../../../Shared/Strings';
 import CustomDropdown from '../../../Components/CustomDropdown';
 import { RootState } from '../../../Store';
 import { setLoading } from '../../../Store/Loader';
+import useAppTheme from '../../../Hooks/themeHook';
+import { COLORS } from '../../../Shared/commonStyles';
 
 function ExportDataModal({
   modal,
@@ -68,6 +70,7 @@ function ExportDataModal({
         };
       });
   }, [data, dataType, dataRange]);
+  const [theme] = useAppTheme();
   return (
     <Modal
       isOpen={modal}
@@ -83,14 +86,24 @@ function ExportDataModal({
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
+          backgroundColor:
+            theme === 'dark' ? COLORS.DARK[100] : COLORS.LIGHT[100],
+          border: 0,
         },
         overlay: {
-          backgroundColor: '#00000050',
+          backgroundColor: theme === 'dark' ? '#ffffff30' : '#00000050',
         },
       }}
     >
-      <div style={{ width: '30vw', display: 'flex', flexDirection: 'column' }}>
-        <p>{STRINGS.WhatExport}</p>
+      <div
+        style={{
+          width: '30vw',
+          display: 'flex',
+          flexDirection: 'column',
+          color: theme === 'dark' ? COLORS.LIGHT[100] : COLORS.DARK[100],
+        }}
+      >
+        <p className="text-2xl my-2">{STRINGS.WhatExport}</p>
         <CustomDropdown
           data={['all', 'expense', 'income', 'transfer'].map((item) => {
             return {
@@ -106,7 +119,7 @@ function ExportDataModal({
           placeholder=""
           value={dataType}
         />
-        <p>{STRINGS.Whendaterange}</p>
+        <p className="text-2xl mt-4 mb-2">{STRINGS.Whendaterange}</p>
         <CustomDropdown
           data={['7', '15', '30'].map((item) => {
             return {
@@ -120,7 +133,7 @@ function ExportDataModal({
           placeholder=""
           value={String(dataRange)}
         />
-        <p>{STRINGS.WhatFormat}</p>
+        <p className="text-2xl mt-4 mb-2">{STRINGS.WhatFormat}</p>
         <CustomDropdown
           data={[
             'csv',
@@ -137,6 +150,7 @@ function ExportDataModal({
           placeholder=""
           value={dataFormat}
         />
+        <div className="my-4" />
         <CustomButton
           title={STRINGS.Export}
           onPress={async () => {

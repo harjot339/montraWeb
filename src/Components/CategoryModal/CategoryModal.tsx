@@ -12,6 +12,8 @@ import { RootState } from '../../Store';
 import { db } from '../../Utils/firebaseConfig';
 import { addExpenseCategory, addIncomeCategory } from '../../Store/Common';
 import { encrypt } from '../../Utils/encryption';
+import useAppTheme from '../../Hooks/themeHook';
+import { COLORS } from '../../Shared/commonStyles';
 
 function CategoryModal({
   modal,
@@ -34,6 +36,7 @@ function CategoryModal({
   const incomeCats = useSelector(
     (state: RootState) => state.common.user?.incomeCategory
   );
+  const [theme, COLOR] = useAppTheme();
   return (
     <Modal
       isOpen={modal}
@@ -51,15 +54,19 @@ function CategoryModal({
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
+          border: 0,
+          backgroundColor:
+            theme === 'dark' ? COLORS.DARK[100] : COLORS.LIGHT[100],
         },
         overlay: {
-          backgroundColor: '#00000050',
+          backgroundColor: theme === 'dark' ? '#ffffff30' : '#00000050',
         },
       }}
     >
       <div style={{ width: '30vw', display: 'flex', flexDirection: 'column' }}>
         <CustomInput
-          placeholderText="Category"
+          inputColor={COLOR.DARK[100]}
+          placeholderText={STRINGS.Category}
           onChange={(e) => {
             setCategory(e.target.value);
           }}

@@ -1,8 +1,10 @@
 import ProgressBar from '@ramonak/react-progress-bar';
 import React, { useCallback } from 'react';
+import clsx from 'clsx';
 import { STRINGS, currencies } from '../../../Shared/Strings';
 import { formatWithCommas } from '../../../Utils/commonFuncs';
 import Alert from '../../../assets/svgs/alert.svg';
+import useAppTheme from '../../../Hooks/themeHook';
 
 function BudgetItem({
   item,
@@ -56,11 +58,15 @@ function BudgetItem({
   );
   const key = item[0];
   const val = item[1];
+  const [theme] = useAppTheme();
   return (
     <button
       type="button"
       key={key}
-      className="flex rounded-lg bg-white px-2 sm:px-4 py-4 min-w-96 w flex-col"
+      className={clsx(
+        'flex rounded-lg px-2 sm:px-4 py-4 w-full max-w-lg flex-col',
+        theme === 'dark' ? 'bg-black text-white' : 'bg-white'
+      )}
       onClick={onClick}
     >
       <div className="flex justify-between mb-3 w-full">

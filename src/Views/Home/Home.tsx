@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import clsx from 'clsx';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../Store';
 import { COLORS } from '../../Shared/commonStyles';
@@ -12,6 +13,7 @@ import RecentSection from './atoms/RecentSection';
 import OverviewSection from './atoms/OverviewSection';
 import AddExpense from '../AddExpense/AddExpense';
 import Header from './atoms/Header';
+import useAppTheme from '../../Hooks/themeHook';
 
 function Home() {
   const [month, setMonth] = useState(new Date().getMonth());
@@ -22,7 +24,7 @@ function Home() {
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [pageType, setPageType] = useState<'income' | 'expense' | 'transfer'>();
-
+  const [theme] = useAppTheme();
   return (
     <div className="sm:ml-48 pt-4 pb-2 px-5">
       <Header month={month} setMonth={setMonth} />
@@ -45,7 +47,12 @@ function Home() {
           />
         )}
         {!isOpen && (
-          <div className="hidden sm:flex rounded-lg bg-white px-2 sm:px-4 py-4  flex-col gap-y-6">
+          <div
+            className={clsx(
+              'hidden sm:flex rounded-lg px-2 sm:px-4 py-4 flex-col gap-y-6',
+              theme === 'dark' ? 'bg-black' : 'bg-white'
+            )}
+          >
             <button
               type="button"
               className="h-14 min-w-14 rounded-lg hover:opacity-85 flex justify-center items-center"

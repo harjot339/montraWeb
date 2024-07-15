@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { Timestamp } from 'firebase/firestore';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import clsx from 'clsx';
 import { useSelector } from 'react-redux';
 import { TransactionType } from '../../Defs/transaction';
 import { RootState } from '../../Store';
 import TransactionListItem from '../../Components/TransactionListItem';
 import { monthData, STRINGS } from '../../Shared/Strings';
 import CustomDropdown from '../../Components/CustomDropdown/CustomDropdown';
+import useIsMobile from '../../Hooks/mobileCheckHook';
+import SidebarButton from '../../Components/SidebarButton/SidebarButton';
+import useAppTheme from '../../Hooks/themeHook';
 
 function TransactionScreen() {
   const [offset] = useState<number>(0);
@@ -191,54 +195,80 @@ function TransactionScreen() {
     }
     return x;
   }
-  return (
+  const isMobile = useIsMobile();
+  const [theme] = useAppTheme();
+  return isMobile && params?.id !== undefined ? (
+    <Outlet />
+  ) : (
     <div className="sm:ml-48 pt-4 px-2 sm:px-4 flex gap-3 justify-between">
       <div className="w-full">
         <div className="flex w-full flex-1 justify-between items-center">
-          <p className="text-3xl sm:text-4xl font-bold my-3">
+          <SidebarButton />
+          <p
+            className={clsx(
+              'text-3xl sm:text-4xl font-bold my-3',
+              theme === 'dark' && 'text-white'
+            )}
+          >
             {STRINGS.Transaction}
           </p>
           <CustomDropdown
-            borderColor="#00000040"
             data={monthData}
             value={month + 1}
-            placeholder="Month"
+            placeholder={STRINGS.Month}
             onChange={(e) => {
               setMonth(Number(e.target.value) - 1);
             }}
           />
         </div>
-        <div className="w-full">
-          {applyFilters(offset).map((data) => (
-            <>
-              {data.data.length !== 0 && data.title !== '' && (
-                <p className="text-2xl sm:text-3xl font-semibold my-3">
-                  {data.title[0].toUpperCase() + data.title.slice(1)}
-                </p>
-              )}
-              <ul
-                className="flex flex-wrap gap-1 sm:gap-4 px-3"
-                key={data.title}
-              >
-                {data.data.map((item) => (
-                  <TransactionListItem
-                    selected={params.id === item.id}
-                    item={item}
-                    key={item.id}
-                    width="half"
-                    conversion={conversion}
-                    currency={currency}
-                    onClick={() => {
-                      navigate(item.id, { replace: params?.id !== undefined });
-                    }}
-                  />
-                ))}
-              </ul>
-            </>
-          ))}
-        </div>
+        {applyFilters(offset).length === 2 &&
+        applyFilters(offset)[0].data.length === 0 &&
+        applyFilters(offset)[1].data.length === 0 ? (
+          <div className="flex w-full h-full justify-center items-center">
+            <p className="text-gray-400 text-xl">
+              {STRINGS.NoTransactionsMonth}
+            </p>
+          </div>
+        ) : (
+          <div className="w-full">
+            {applyFilters(offset).map((data) => (
+              <>
+                {data.data.length !== 0 && data.title !== '' && (
+                  <p
+                    className={clsx(
+                      'text-2xl sm:text-3xl font-semibold my-3',
+                      theme === 'dark' && 'text-white'
+                    )}
+                  >
+                    {data.title[0].toUpperCase() + data.title.slice(1)}
+                  </p>
+                )}
+                <ul
+                  className="flex flex-wrap gap-1 sm:gap-4 px-3"
+                  key={data.title}
+                >
+                  {data.data.map((item) => (
+                    <TransactionListItem
+                      selected={params.id === item.id}
+                      item={item}
+                      key={item.id}
+                      width="half"
+                      conversion={conversion}
+                      currency={currency}
+                      onClick={() => {
+                        navigate(item.id, {
+                          replace: params?.id !== undefined,
+                        });
+                      }}
+                    />
+                  ))}
+                </ul>
+              </>
+            ))}
+          </div>
+        )}
       </div>
-      <Outlet />
+      {!isMobile && <Outlet />}
     </div>
   );
 }

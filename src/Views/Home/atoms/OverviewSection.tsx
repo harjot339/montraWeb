@@ -1,9 +1,11 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
+import clsx from 'clsx';
 import { COLORS } from '../../../Shared/commonStyles';
 import { RootState } from '../../../Store';
 import { formatWithCommas } from '../../../Utils/commonFuncs';
 import { currencies, STRINGS } from '../../../Shared/Strings';
+import useAppTheme from '../../../Hooks/themeHook';
 
 function OverviewSection({ month }: Readonly<{ month: number }>) {
   const spends = useSelector(
@@ -43,15 +45,31 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
     },
     [conversion?.usd, currency]
   );
+  const [theme] = useAppTheme();
   return (
-    <div className="rounded-lg bg-white py-4 px-2 sm:px-4">
-      <p className="text-2xl md:text-3xl lg:text-4xl font-bold">
+    <div
+      className={clsx(
+        'rounded-lg py-4 px-2 sm:px-4',
+        theme === 'dark' ? 'bg-black' : 'bg-white'
+      )}
+    >
+      <p
+        className={clsx(
+          'text-2xl md:text-3xl lg:text-4xl font-bold',
+          theme === 'dark' && 'text-white'
+        )}
+      >
         {STRINGS.Overview}
       </p>
       <div className="flex mt-5 justify-evenly gap-3 text-center">
         <div>
-          <p className="text-xl md:text-2xl lg:text-3xl font-semibold max-w-24 overflow-hidden text-ellipsis whitespace-nowrap">
-            {currencies[currency ?? 'usd'].symbol}
+          <p
+            className={clsx(
+              'text-xl md:text-2xl lg:text-3xl font-semibold max-w-max overflow-hidden text-ellipsis whitespace-nowrap',
+              theme === 'dark' && 'text-white'
+            )}
+          >
+            {currencies[currency ?? 'USD'].symbol}
             {currencyConvert(9400)}
           </p>
           <p
@@ -62,8 +80,13 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
           </p>
         </div>
         <div>
-          <p className="text-xl md:text-2xl lg:text-3xl font-semibold max-w-24 overflow-hidden text-ellipsis whitespace-nowrap">
-            {currencies[currency ?? 'usd'].symbol}
+          <p
+            className={clsx(
+              'text-xl md:text-2xl lg:text-3xl font-semibold max-w-max overflow-hidden text-ellipsis whitespace-nowrap',
+              theme === 'dark' && 'text-white'
+            )}
+          >
+            {currencies[currency ?? 'USD'].symbol}
             {currencyConvert(totalSpend)}
           </p>
           <p
@@ -74,8 +97,13 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
           </p>
         </div>
         <div>
-          <p className="text-xl md:text-2xl lg:text-3xl font-semibold max-w-24 overflow-hidden text-ellipsis whitespace-nowrap">
-            {currencies[currency ?? 'usd'].symbol}
+          <p
+            className={clsx(
+              'text-xl md:text-2xl lg:text-3xl font-semibold max-w-max overflow-hidden text-ellipsis whitespace-nowrap',
+              theme === 'dark' && 'text-white'
+            )}
+          >
+            {currencies[currency ?? 'USD'].symbol}
             {currencyConvert(totalIncome)}
           </p>
           <p

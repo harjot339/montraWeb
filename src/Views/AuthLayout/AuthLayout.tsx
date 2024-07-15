@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import 'react-responsive-carousel/lib/styles/carousel.min.css'; // requires a loader
+import clsx from 'clsx';
 import { Carousel } from 'react-responsive-carousel';
 import Onbarding1 from '../../assets/images/onboarding1.png';
 import Onbarding2 from '../../assets/images/onboarding2.png';
@@ -9,6 +10,7 @@ import Login from '../Login';
 import Signup from '../Signup';
 import { OnboardData } from '../../Shared/Strings';
 import Forgotpassword from '../ForgotPassword/Forgotpassword';
+import useAppTheme from '../../Hooks/themeHook';
 
 function AuthLayout() {
   const image = useCallback((i: number) => {
@@ -21,8 +23,14 @@ function AuthLayout() {
     return Onbarding3;
   }, []);
   const loc = useLocation();
+  const [theme] = useAppTheme();
   return (
-    <div className="flex justify-center bg-white rounded-2xl w-11/12 py-5">
+    <div
+      className={clsx(
+        'flex justify-center rounded-2xl w-11/12 py-5',
+        theme === 'dark' ? 'bg-black text-white' : 'bg-white'
+      )}
+    >
       <div className="w-1/2 px-10 hidden sm:block self-center" id="leftCtr">
         <Carousel
           autoPlay

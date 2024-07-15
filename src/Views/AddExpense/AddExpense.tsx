@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import clsx from 'clsx';
 import ReactSwitch from 'react-switch';
 import { Timestamp } from 'firebase/firestore';
 import CustomButton from '../../Components/CustomButton';
@@ -19,10 +20,12 @@ import { COLORS } from '../../Shared/commonStyles';
 import RepeatDataModal from './atoms/RepeatDataModal';
 import { RepeatDataType, TransactionType } from '../../Defs/transaction';
 import ArrowRight from '../../assets/svgs/arrow right 2.svg';
+import ArrowRightBlack from '../../assets/svgs/arrow right black.svg';
 import Transfer from '../../assets/svgs/transfer.svg';
 import { setLoading } from '../../Store/Loader';
 import { handleOnline } from '../../Utils/firebaseFuncs';
 import CategoryModal from '../../Components/CategoryModal';
+import useAppTheme from '../../Hooks/themeHook';
 
 function AddExpense({
   setIsOpen,
@@ -175,6 +178,7 @@ function AddExpense({
     }
     return '';
   }, [isEdit, repeatData]);
+  const [theme, COLOR] = useAppTheme();
   return (
     <div
       className="hidden sm:flex flex-col rounded-lg h-fit flex-1"
@@ -195,7 +199,12 @@ function AddExpense({
       />
       <div className="flex justify-between px-4 sm:px-8 pt-4 items-center">
         <div />
-        <p className="text-3xl text-white font-semibold">
+        <p
+          className={clsx(
+            'text-3xl font-semibold',
+            theme === 'dark' ? 'text-black' : 'text-white'
+          )}
+        >
           {pageType[0].toUpperCase() + pageType.slice(1)}
         </p>
         <button
@@ -205,12 +214,21 @@ function AddExpense({
             setIsOpen(false);
           }}
         >
-          <img src={ArrowRight} alt="" width="40px" />
+          {theme === 'dark' ? (
+            <img src={ArrowRightBlack} alt="" width="40px" />
+          ) : (
+            <img src={ArrowRight} alt="" width="40px" />
+          )}
         </button>
       </div>
       <div className="min-h-48" />
       <div>
-        <p className="text-5xl px-4 sm:px-8 text-white opacity-80 font-semibold">
+        <p
+          className={clsx(
+            'text-5xl px-4 sm:px-8 opacity-80 font-semibold',
+            theme === 'dark' ? 'text-black' : 'text-white'
+          )}
+        >
           {STRINGS.HowMuch}
         </p>
         <input
@@ -225,7 +243,10 @@ function AddExpense({
             }
           }}
           value={`$ ${amount}`}
-          className="bg-transparent w-full px-4 sm:px-8 h-20 outline-none text-6xl text-white font-semibold"
+          className={clsx(
+            'bg-transparent w-full px-4 sm:px-8 h-20 outline-none text-6xl font-semibold',
+            theme === 'dark' ? 'text-black' : 'text-white'
+          )}
           maxLength={10}
           onChange={(e) => {
             const str = e.target.value;
@@ -273,7 +294,12 @@ function AddExpense({
           errorText={STRINGS.PleaseFillAnAmount}
           formKey={form}
         />
-        <div className="bg-white px-4 sm:px-8 py-8 rounded-t-2xl flex flex-col">
+        <div
+          className={clsx(
+            'px-4 sm:px-8 py-8 rounded-t-2xl flex flex-col',
+            theme === 'dark' ? 'bg-black' : 'bg-white'
+          )}
+        >
           {pageType !== 'transfer' ? (
             <>
               <CustomDropdown
@@ -302,6 +328,7 @@ function AddExpense({
             <>
               <div className="flex gap-x-4">
                 <CustomInput
+                  inputColor={COLOR.DARK[100]}
                   flex={1}
                   placeholderText={STRINGS.From}
                   onChange={(e) => {
@@ -316,6 +343,7 @@ function AddExpense({
                   className="rounded-full"
                 />
                 <CustomInput
+                  inputColor={COLOR.DARK[100]}
                   placeholderText={STRINGS.To}
                   flex={1}
                   onChange={(e) => {
@@ -333,6 +361,7 @@ function AddExpense({
             </>
           )}
           <CustomInput
+            inputColor={COLOR.DARK[100]}
             placeholderText={STRINGS.Description}
             onChange={(e) => {
               setDesc(e.target.value);
@@ -371,7 +400,12 @@ function AddExpense({
           <div className="my-2.5" />
           {pageType !== 'transfer' && (
             <>
-              <div className="flex justify-between">
+              <div
+                className={clsx(
+                  'flex justify-between',
+                  theme === 'dark' && 'text-white'
+                )}
+              >
                 <div>
                   <p className="text-2xl font-semibold">{STRINGS.Repeat}</p>
                   <p>{STRINGS.RepeatTransaction}</p>
@@ -396,7 +430,12 @@ function AddExpense({
             </>
           )}
           {repeatData && (
-            <div className="flex justify-between items-center">
+            <div
+              className={clsx(
+                'flex justify-between items-center',
+                theme === 'dark' && 'text-white'
+              )}
+            >
               <div>
                 <p className="text-xl font-semibold">{STRINGS.Frequency}</p>
                 <p>
@@ -413,7 +452,7 @@ function AddExpense({
               </div>
               {repeatData.end !== 'never' ? (
                 <div>
-                  <p className="text-xl font-semibold">End After</p>
+                  <p className="text-xl font-semibold">{STRINGS.EndAfter}</p>
                   <p>{getDate()}</p>
                 </div>
               ) : (

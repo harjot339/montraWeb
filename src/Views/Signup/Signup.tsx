@@ -24,6 +24,7 @@ import { auth, db } from '../../Utils/firebaseConfig';
 import { UserFromJson, UserToJson } from '../../Utils/userFuncs';
 import { setUser } from '../../Store/Common';
 import { FirebaseAuthErrorHandler } from '../../Utils/commonFuncs';
+import useAppTheme from '../../Hooks/themeHook';
 
 function Signup() {
   // constants
@@ -47,6 +48,7 @@ function Signup() {
     confirmPass: false,
     terms: false,
   });
+  const appTheme = useAppTheme();
   // redux
   const dispatch = useDispatch();
   // functions
@@ -125,6 +127,7 @@ function Signup() {
         {STRINGS.SIGNUP}
       </p>
       <CustomInput
+        inputColor={appTheme[1].DARK[100]}
         placeholderText={STRINGS.Name}
         value={name}
         onChange={(e) => {
@@ -134,6 +137,7 @@ function Signup() {
       <NameValError name={name} formKey={form.name} />
       <CustomInput
         placeholderText={STRINGS.Email}
+        inputColor={appTheme[1].DARK[100]}
         value={email}
         onChange={(e) => {
           setEmail(e.target.value);
@@ -142,6 +146,7 @@ function Signup() {
       <EmailValError email={email} formKey={form.email} />
       <CustomPassInput
         placeholderText={STRINGS.Password}
+        inputColor={appTheme[1].DARK[100]}
         value={pass}
         onChange={(e) => {
           setPass(e.target.value);
@@ -150,6 +155,7 @@ function Signup() {
       <PassValidationError pass={pass} formKey={form.pass} />
       <CustomPassInput
         placeholderText={STRINGS.ConfrimPassword}
+        inputColor={appTheme[1].DARK[100]}
         value={confirmPass}
         onChange={(e) => {
           setConfirmPass(e.target.value);

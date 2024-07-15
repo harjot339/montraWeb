@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Modal from 'react-modal';
+import clsx from 'clsx';
 import CustomButton from '../../../Components/CustomButton';
 import CustomDropdown from '../../../Components/CustomDropdown/CustomDropdown';
 import { RepeatDataType } from '../../../Defs/transaction';
@@ -11,6 +12,8 @@ import {
   STRINGS,
 } from '../../../Shared/Strings';
 import { EmptyError } from '../../../Shared/errors';
+import useAppTheme from '../../../Hooks/themeHook';
+import { COLORS } from '../../../Shared/commonStyles';
 
 function RepeatDataModal({
   modal,
@@ -70,6 +73,7 @@ function RepeatDataModal({
     setEnd((repeatData?.end as 'date' | 'never') ?? undefined);
     setDate(repeatData?.date as Date);
   }, [repeatData]);
+  const [theme] = useAppTheme();
   return (
     <Modal
       isOpen={modal}
@@ -88,13 +92,24 @@ function RepeatDataModal({
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
+          border: 0,
+          backgroundColor:
+            theme === 'dark' ? COLORS.DARK[100] : COLORS.LIGHT[100],
         },
         overlay: {
-          backgroundColor: '#00000050',
+          backgroundColor: theme === 'dark' ? '#ffffff30' : '#00000050',
         },
       }}
     >
-      <div style={{ width: '30vw', display: 'flex', flexDirection: 'column' }}>
+      <div
+        style={{
+          width: '30vw',
+          display: 'flex',
+          flexDirection: 'column',
+          backgroundColor:
+            theme === 'dark' ? COLORS.DARK[100] : COLORS.LIGHT[100],
+        }}
+      >
         <div className="flex gap-x-4">
           <CustomDropdown
             placeholder={STRINGS.Frequency}
@@ -169,7 +184,10 @@ function RepeatDataModal({
           {end === 'date' && (
             <input
               type="date"
-              className="border rounded-lg px-4"
+              className={clsx(
+                'border rounded-lg px-4',
+                theme === 'dark' && 'text-white'
+              )}
               min={new Date().toISOString().split('T')[0]}
               value={new Date().toISOString().split('T')[0]}
               onChange={(e) => {

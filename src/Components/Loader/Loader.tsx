@@ -20,7 +20,7 @@ function Loader({ children }: Readonly<{ children: React.JSX.Element }>) {
           backgroundColor: 'rgba(0,0,0,0.5)',
         }}
       >
-        <div role="status">
+        <div>
           <svg
             aria-hidden="true"
             className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-[#7F3DFF]"
