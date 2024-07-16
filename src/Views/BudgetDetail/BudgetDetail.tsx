@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import Modal from 'react-modal';
 import ProgressBar from '@ramonak/react-progress-bar';
-import { deleteField, doc, updateDoc } from 'firebase/firestore';
-import { toast } from 'react-toastify';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import clsx from 'clsx';
 import { ROUTES } from '../../Shared/Constants';
-import ArrowLeft from '../../assets/svgs/arrow left black.svg';
-import Trash from '../../assets/svgs/trash black.svg';
+import ArrowLeftBlack from '../../assets/svgs/arrow left black.svg';
+import ArrowLeft from '../../assets/svgs/arrow left.svg';
+import TrashBlack from '../../assets/svgs/trash black.svg';
+import Trash from '../../assets/svgs/trash.svg';
 import Money from '../../assets/svgs/money-bag.svg';
 import Alert from '../../assets/svgs/alert white.svg';
 import { currencies, STRINGS } from '../../Shared/Strings';
@@ -15,9 +15,9 @@ import { catIcons, formatWithCommas } from '../../Utils/commonFuncs';
 import { RootState } from '../../Store';
 import { COLORS } from '../../Shared/commonStyles';
 import CustomButton from '../../Components/CustomButton';
-import { setLoading } from '../../Store/Loader';
-import { db } from '../../Utils/firebaseConfig';
 import CreateBudget from '../CreateBudget';
+import DeleteBudgetModal from '../../Components/DeleteBudgetModal/DeleteBudgetModal';
+import useAppTheme from '../../Hooks/themeHook';
 
 function BudgetDetail() {
   const navigate = useNavigate();
@@ -43,79 +43,24 @@ function BudgetDetail() {
   const spend = spends?.[selectedCategory] ?? 0;
   const [modal, setModal] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const dispatch = useDispatch();
+  const [theme] = useAppTheme();
   return isOpen ? (
     <CreateBudget isEdit setIsOpen={setIsOpen} />
   ) : (
     <div
-      className="flex-col rounded-lg flex w-full max-w-[420px] pb-5 bg-white justify-between sticky top-2 right-2"
+      className={clsx(
+        'flex-col rounded-lg flex w-full max-w-[420px] pb-5 justify-between sticky top-2 right-2',
+        theme === 'dark' ? 'bg-black' : 'bg-white'
+      )}
       style={{ height: '95vh' }}
     >
-      {' '}
-      <Modal
-        isOpen={modal}
-        onRequestClose={() => {
-          setModal(false);
-        }}
-        style={{
-          content: {
-            width: 'min-content',
-            height: 'min-content',
-            margin: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-          },
-          overlay: {
-            backgroundColor: '#00000050',
-          },
-        }}
-      >
-        <div
-          style={{
-            width: '30vw',
-            display: 'flex',
-            flexDirection: 'column',
-            textAlign: 'center',
-            padding: '20px 50px',
-          }}
-        >
-          <p className="text-3xl mb-6 font-semibold">{STRINGS.Removebudget}</p>
-          <p className="text-lg mb-7">{STRINGS.SureRemoveBudgetNo}</p>
-          <div className="flex gap-x-8">
-            <CustomButton
-              flex={1}
-              title={STRINGS.No}
-              onPress={() => {
-                setModal(false);
-              }}
-            />
-            <CustomButton
-              flex={1}
-              title={STRINGS.Yes}
-              onPress={async () => {
-                try {
-                  setModal(false);
-                  dispatch(setLoading(true));
-                  await updateDoc(doc(db, 'users', uid!), {
-                    [`budget.${month}.${selectedCategory}`]: deleteField(),
-                  });
-                  toast.success(STRINGS.BudgetDeletedSuccesfully);
-                } catch (e) {
-                  toast.error(e as string);
-                } finally {
-                  setModal(false);
-                  navigate(ROUTES.Budgets);
-                  dispatch(setLoading(false));
-                }
-              }}
-              backgroundColor={COLORS.VIOLET[20]}
-              textColor={COLORS.VIOLET[100]}
-            />
-          </div>
-        </div>
-      </Modal>
+      <DeleteBudgetModal
+        modal={modal}
+        setModal={setModal}
+        month={Number(month)}
+        selectedCategory={selectedCategory}
+        uid={uid}
+      />
       {budget && (
         <div className="flex flex-col justify-between h-full">
           <div className="flex-col flex">
@@ -127,9 +72,18 @@ function BudgetDetail() {
                   navigate(ROUTES.Budgets);
                 }}
               >
-                <img src={ArrowLeft} alt="" width="40px" />
+                {theme === 'dark' ? (
+                  <img src={ArrowLeft} alt="" width="40px" />
+                ) : (
+                  <img src={ArrowLeftBlack} alt="" width="40px" />
+                )}
               </button>
-              <p className="text-black font-semibold text-xl">
+              <p
+                className={clsx(
+                  'font-semibold text-xl',
+                  theme === 'dark' ? 'text-white' : 'text-black'
+                )}
+              >
                 {STRINGS.DetailBudget}
               </p>
               <button
@@ -139,7 +93,11 @@ function BudgetDetail() {
                   setModal(true);
                 }}
               >
-                <img src={Trash} alt="" width="40px" />
+                {theme === 'dark' ? (
+                  <img src={Trash} alt="" width="40px" />
+                ) : (
+                  <img src={TrashBlack} alt="" width="40px" />
+                )}
               </button>
             </div>
             <div className="flex justify-center mt-10">
@@ -161,16 +119,31 @@ function BudgetDetail() {
                     width="25px"
                   />
                 </div>
-                <p className="text-2xl font-semibold max-w-56 text-ellipsis overflow-hidden whitespace-nowrap">
+                <p
+                  className={clsx(
+                    'text-2xl font-semibold max-w-56 text-ellipsis overflow-hidden whitespace-nowrap',
+                    theme === 'dark' && 'text-white'
+                  )}
+                >
                   {params.id!.split('_')[1][0].toUpperCase() +
                     params.id!.split('_')[1].slice(1)}
                 </p>
               </div>
             </div>
-            <p className="self-center text-5xl font-semibold mt-5">
+            <p
+              className={clsx(
+                'self-center text-5xl font-semibold mt-5',
+                theme === 'dark' && 'text-white'
+              )}
+            >
               {STRINGS.Remaining}
             </p>
-            <p className="self-center text-6xl font-semibold mt-5 mb-6">
+            <p
+              className={clsx(
+                'self-center text-6xl font-semibold mt-5 mb-6',
+                theme === 'dark' && 'text-white'
+              )}
+            >
               {currencies[currency!].symbol}
               {budget.limit - spend < 0 || spend === undefined
                 ? '0'

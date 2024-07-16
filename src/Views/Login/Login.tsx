@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AuthError,
@@ -25,6 +25,7 @@ import { UserToJson, UserFromJson } from '../../Utils/userFuncs';
 import { EmailEmptyError, PassEmptyError } from '../../Shared/errors';
 import { STRINGS } from '../../Shared/Strings';
 import { FirebaseAuthErrorHandler } from '../../Utils/commonFuncs';
+import useAppTheme from '../../Hooks/themeHook';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -37,7 +38,7 @@ function Login() {
   const [userCreds, setUserCreds] = useState<UserCredential>();
   // const navigate = useNavigate();
   const dispatch = useDispatch();
-  const handleLogin = async () => {
+  const handleLogin = useCallback(async () => {
     // toast.error('esfm ');
     setForm({ email: true, pass: true });
     if (email !== '' && pass.trim() !== '') {
@@ -60,8 +61,8 @@ function Login() {
         toast.error(FirebaseAuthErrorHandler(error.code));
       }
     }
-  };
-  const handleGoogle = async () => {
+  }, [dispatch, email, pass]);
+  const handleGoogle = useCallback(async () => {
     try {
       dispatch(setLoading(true));
       const provider = new GoogleAuthProvider();
@@ -93,7 +94,8 @@ function Login() {
     } finally {
       dispatch(setLoading(false));
     }
-  };
+  }, [dispatch]);
+  const appTheme = useAppTheme();
   return (
     <div className="w-11/12 sm:w-1/2 py-8 px-5 sm flex flex-col text-center self-center">
       <Modal
@@ -110,9 +112,13 @@ function Login() {
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
+            backgroundColor:
+              appTheme[0] === 'dark' ? COLORS.DARK[100] : COLORS.LIGHT[100],
+            color: appTheme[1].DARK[100],
+            border: '0px',
           },
           overlay: {
-            backgroundColor: '#00000050',
+            backgroundColor: appTheme[0] === 'dark' ? '#ffffff30' : '#00000050',
           },
         }}
       >
@@ -165,6 +171,7 @@ function Login() {
           {STRINGS.LOGIN}
         </p>
         <CustomInput
+          inputColor={appTheme[1].DARK[100]}
           placeholderText={STRINGS.Email}
           value={email}
           onChange={(e) => {
@@ -173,6 +180,7 @@ function Login() {
         />
         <EmailEmptyError email={email} formKey={form.email} />
         <CustomPassInput
+          inputColor={appTheme[1].DARK[100]}
           placeholderText={STRINGS.Password}
           value={pass}
           onChange={(e) => {

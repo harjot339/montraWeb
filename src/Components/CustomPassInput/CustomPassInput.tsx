@@ -29,7 +29,7 @@ function CustomPassInput({
         style={{
           color: inputColor,
         }}
-        className=" px-5 h-12 md:h-14 outline-none w-11/12 rounded-lg"
+        className=" px-5 h-12 md:h-14 outline-none w-11/12 rounded-lg bg-transparent"
         placeholder={placeholderText}
         type={hide ? 'text' : 'password'}
         value={value}

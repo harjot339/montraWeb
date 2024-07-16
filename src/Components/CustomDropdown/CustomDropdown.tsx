@@ -1,9 +1,11 @@
 import React from 'react';
+import clsx from 'clsx';
 import ArrowDown from '../../assets/svgs/arrow down.svg';
 import {
   InputBorderColor,
   PlaceholderTextColor,
 } from '../../Shared/commonStyles';
+import useAppTheme from '../../Hooks/themeHook';
 
 function CustomDropdown({
   data,
@@ -20,9 +22,13 @@ function CustomDropdown({
   placeholder: string;
   borderColor?: string;
 }>) {
+  const [theme] = useAppTheme();
   return (
     <div
-      className="flex bg-transparent border h-12 md:h-14 rounded-lg pr-3"
+      className={clsx(
+        'flex bg-transparent border h-12 md:h-14 rounded-lg pr-3',
+        theme === 'dark' && 'text-white'
+      )}
       style={{ borderColor, flex }}
     >
       <select

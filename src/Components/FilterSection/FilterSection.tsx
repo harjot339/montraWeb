@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import clsx from 'clsx';
 import Multiselect from 'multiselect-react-dropdown';
 import { COLORS } from '../../Shared/commonStyles';
 import { STRINGS } from '../../Shared/Strings';
@@ -11,6 +12,7 @@ import {
 } from '../../Store/Transactions';
 import CustomButton from '../CustomButton';
 import { RootState } from '../../Store';
+import useAppTheme from '../../Hooks/themeHook';
 
 function FilterSection() {
   const [filter, setFilter] = useState<number>(-1);
@@ -26,10 +28,23 @@ function FilterSection() {
     (state: RootState) => state.common.user?.expenseCategory
   );
   const dispatch = useDispatch();
+  const [theme, COLOR] = useAppTheme();
   return (
-    <div className="rounded-lg bg-white px-2 sm:px-4 py-4 sticky top-2 right-0 min-w-96 h-fit">
+    <div
+      className={clsx(
+        'rounded-lg px-2 sm:px-4 py-4 sticky top-2 right-0 min-w-96 h-fit',
+        theme === 'dark' ? 'bg-black' : 'bg-white'
+      )}
+    >
       <div className="flex items-center justify-between">
-        <p className="text-3xl font-semibold ">Filters</p>
+        <p
+          className={clsx(
+            'text-3xl font-semibold ',
+            theme === 'dark' && 'text-white'
+          )}
+        >
+          {STRINGS.Filters}
+        </p>
         <button
           type="button"
           className="rounded-2xl px-4 h-8 text-sm sm:text-base font-semibold"
@@ -50,7 +65,14 @@ function FilterSection() {
           {STRINGS.Reset}
         </button>
       </div>
-      <p className="text-xl font-semibold my-3">{STRINGS.FilterBy}</p>
+      <p
+        className={clsx(
+          'text-xl font-semibold my-3',
+          theme === 'dark' && 'text-white'
+        )}
+      >
+        {STRINGS.FilterBy}
+      </p>
       <div className="flex flex-wrap gap-3">
         {['Income', 'Expense', 'Transfer'].map((item, i) => (
           <button
@@ -60,8 +82,8 @@ function FilterSection() {
             style={{
               border: `1px solid ${COLORS.LIGHT[20]}`,
               backgroundColor:
-                filter === i ? COLORS.VIOLET[20] : COLORS.LIGHT[100],
-              color: filter === i ? COLORS.VIOLET[100] : COLORS.DARK[100],
+                filter === i ? COLORS.VIOLET[20] : COLOR.LIGHT[100],
+              color: filter === i ? COLORS.VIOLET[100] : COLOR.DARK[100],
             }}
             onClick={() => {
               if (filter === i) {
@@ -75,7 +97,14 @@ function FilterSection() {
           </button>
         ))}
       </div>
-      <p className="text-xl font-semibold my-3">{STRINGS.SortBy}</p>
+      <p
+        className={clsx(
+          'text-xl font-semibold my-3',
+          theme === 'dark' && 'text-white'
+        )}
+      >
+        {STRINGS.SortBy}
+      </p>
       <div className="flex flex-wrap gap-3">
         {['Highest', 'Lowest', 'Newest', 'Oldest'].map((item, i) => (
           <button
@@ -85,8 +114,8 @@ function FilterSection() {
             style={{
               border: `1px solid ${COLORS.LIGHT[20]}`,
               backgroundColor:
-                sort === i ? COLORS.VIOLET[20] : COLORS.LIGHT[100],
-              color: sort === i ? COLORS.VIOLET[100] : COLORS.DARK[100],
+                sort === i ? COLORS.VIOLET[20] : COLOR.LIGHT[100],
+              color: sort === i ? COLORS.VIOLET[100] : COLOR.DARK[100],
             }}
             onClick={() => {
               if (sort === i) {
@@ -100,9 +129,23 @@ function FilterSection() {
           </button>
         ))}
       </div>
-      <p className="text-xl font-semibold my-3">{STRINGS.Category}</p>
+      <p
+        className={clsx(
+          'text-xl font-semibold my-3',
+          theme === 'dark' && 'text-white'
+        )}
+      >
+        {STRINGS.Category}
+      </p>
       <div>
-        <p className="text-xl font-semibold my-3">{STRINGS.Income}</p>
+        <p
+          className={clsx(
+            'text-xl font-semibold my-3',
+            theme === 'dark' && 'text-white'
+          )}
+        >
+          {STRINGS.Income}
+        </p>
         <Multiselect
           ref={multiRef1}
           placeholder="Income Categories"
@@ -128,7 +171,14 @@ function FilterSection() {
             return { cat: item, key: item[0].toUpperCase() + item.slice(1) };
           })}
         />
-        <p className="text-xl font-semibold my-3">{STRINGS.Expense}</p>
+        <p
+          className={clsx(
+            'text-xl font-semibold my-3',
+            theme === 'dark' && 'text-white'
+          )}
+        >
+          {STRINGS.Expense}
+        </p>
         <Multiselect
           ref={multiRef2}
           placeholder="Expense Categories"
