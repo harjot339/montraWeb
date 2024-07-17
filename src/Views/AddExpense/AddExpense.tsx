@@ -19,13 +19,14 @@ import AttachmentCtr from './atoms/AttachmentCtr';
 import { COLORS } from '../../Shared/commonStyles';
 import RepeatDataModal from './atoms/RepeatDataModal';
 import { RepeatDataType, TransactionType } from '../../Defs/transaction';
-import ArrowRight from '../../assets/svgs/arrow right 2.svg';
-import ArrowRightBlack from '../../assets/svgs/arrow right black.svg';
-import Transfer from '../../assets/svgs/transfer.svg';
+import ArrowLeft from '../../assets/svgs/arrow left.svg';
+import ArrowLeftBlack from '../../assets/svgs/arrow left black.svg';
 import { setLoading } from '../../Store/Loader';
 import { handleOnline } from '../../Utils/firebaseFuncs';
 import CategoryModal from '../../Components/CategoryModal';
 import useAppTheme from '../../Hooks/themeHook';
+import { useIsMobile, useIsTablet } from '../../Hooks/mobileCheckHook';
+import MoneyInput from '../../Components/MoneyInput';
 
 function AddExpense({
   setIsOpen,
@@ -70,8 +71,6 @@ function AddExpense({
   const [checked, setChecked] = useState(false);
   const [modal, setModal] = useState<boolean>(false);
   const [addCategoryModal, setAddCategoryModal] = useState<boolean>(false);
-
-  //   const [date, setDate] = useState<Date>(getDate());
   const getBackgroundColor = useMemo(() => {
     if (pageType === 'expense') {
       return COLORS.PRIMARY.RED;
@@ -135,7 +134,16 @@ function AddExpense({
   };
   useEffect(() => {
     if (isEdit) {
-      setAmount(String(prevTransaction!.amount));
+      setAmount(
+        formatWithCommas(
+          Number(
+            (
+              (conversion?.usd?.[user?.currency?.toLowerCase() ?? 'usd'] ?? 1) *
+              Number(prevTransaction?.amount)
+            ).toFixed(2)
+          ).toString()
+        )
+      );
       setCat(prevTransaction!.category);
       setDesc(prevTransaction!.desc);
       setWallet(prevTransaction!.wallet);
@@ -145,7 +153,7 @@ function AddExpense({
       setFrom(prevTransaction!.from);
       setTo(prevTransaction!.to);
     }
-  }, [isEdit, prevTransaction]);
+  }, [amount, conversion?.usd, isEdit, prevTransaction, user?.currency]);
   const getDate = useCallback(() => {
     if (repeatData) {
       if (isEdit) {
@@ -179,10 +187,15 @@ function AddExpense({
     return '';
   }, [isEdit, repeatData]);
   const [theme, COLOR] = useAppTheme();
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
   return (
     <div
-      className="hidden sm:flex flex-col rounded-lg h-fit flex-1"
-      style={{ backgroundColor: getBackgroundColor, height, maxWidth: '550px' }}
+      className={clsx(
+        'flex flex-col rounded-lg h-screen justify-between w-full',
+        !isMobile && !isTablet && 'max-w-[450px]'
+      )}
+      style={{ backgroundColor: getBackgroundColor, height }}
     >
       <RepeatDataModal
         modal={modal}
@@ -198,15 +211,6 @@ function AddExpense({
         type={pageType}
       />
       <div className="flex justify-between px-4 sm:px-8 pt-4 items-center">
-        <div />
-        <p
-          className={clsx(
-            'text-3xl font-semibold',
-            theme === 'dark' ? 'text-black' : 'text-white'
-          )}
-        >
-          {pageType[0].toUpperCase() + pageType.slice(1)}
-        </p>
         <button
           type="button"
           className="bg-transparent outline-none"
@@ -215,13 +219,22 @@ function AddExpense({
           }}
         >
           {theme === 'dark' ? (
-            <img src={ArrowRightBlack} alt="" width="40px" />
+            <img src={ArrowLeftBlack} alt="" width="40px" />
           ) : (
-            <img src={ArrowRight} alt="" width="40px" />
+            <img src={ArrowLeft} alt="" width="40px" />
           )}
         </button>
+        <p
+          className={clsx(
+            'text-3xl font-semibold',
+            theme === 'dark' ? 'text-black' : 'text-white'
+          )}
+        >
+          {pageType[0].toUpperCase() + pageType.slice(1)}
+        </p>
+        <div className="w-10" />
       </div>
-      <div className="min-h-48" />
+      {/* <div className="min-h-48" /> */}
       <div>
         <p
           className={clsx(
@@ -231,64 +244,7 @@ function AddExpense({
         >
           {STRINGS.HowMuch}
         </p>
-        <input
-          onClick={() => {
-            if (amount === '0') {
-              setAmount('');
-            }
-          }}
-          onBlur={() => {
-            if (amount === '') {
-              setAmount('0');
-            }
-          }}
-          value={`$ ${amount}`}
-          className={clsx(
-            'bg-transparent w-full px-4 sm:px-8 h-20 outline-none text-6xl font-semibold',
-            theme === 'dark' ? 'text-black' : 'text-white'
-          )}
-          maxLength={10}
-          onChange={(e) => {
-            const str = e.target.value;
-            let numericValue = str.replace(/[^0-9.]+/g, '');
-            if (str === '.') {
-              return;
-            }
-            const decimalCount = numericValue.split('.').length - 1;
-
-            if (decimalCount > 1) {
-              const parts = numericValue.split('.');
-              numericValue = `${parts[0]}.${parts.slice(1).join('')}`;
-            }
-
-            if (numericValue.length > 0 && numericValue.endsWith('.')) {
-              // Allow only if it is not the only character
-              if (
-                numericValue.length === 1 ||
-                numericValue[numericValue.length - 2] === '.'
-              ) {
-                numericValue = numericValue.slice(0, -1);
-              }
-            }
-
-            // Limit to 2 digits after decimal point
-            if (decimalCount === 1) {
-              const parts = numericValue.split('.');
-              if (parts[1].length > 2) {
-                numericValue = `${parts[0]}.${parts[1].slice(0, 2)}`;
-              }
-            }
-
-            if (decimalCount === 1 && numericValue.length > 9) {
-              // Adjusted to account for the two decimal places
-              numericValue = numericValue.slice(0, 9);
-            } else if (decimalCount === 0 && numericValue.length > 7) {
-              numericValue = numericValue.slice(0, 7);
-            }
-
-            setAmount(formatWithCommas(numericValue));
-          }}
-        />
+        <MoneyInput amount={amount} setAmount={setAmount} theme={theme} />
         <EmptyZeroError
           value={amount}
           errorText={STRINGS.PleaseFillAnAmount}
@@ -310,13 +266,20 @@ function AddExpense({
                   return { label: item, value: item };
                 })}
                 onChange={(e) => {
-                  if (e.target.value === 'add') {
+                  if (e!.value === 'add') {
                     setAddCategoryModal(true);
                   } else {
-                    setCat(e.target.value);
+                    setCat(e!.value as string);
                   }
                 }}
-                value={cat}
+                value={
+                  cat
+                    ? {
+                        value: cat,
+                        label: cat[0].toUpperCase() + cat.slice(1),
+                      }
+                    : undefined
+                }
               />
               <EmptyError
                 errorText={STRINGS.PleaseSelectACategory}
@@ -326,7 +289,7 @@ function AddExpense({
             </>
           ) : (
             <>
-              <div className="flex gap-x-4">
+              <div className="flex w-full gap-x-3">
                 <CustomInput
                   inputColor={COLOR.DARK[100]}
                   flex={1}
@@ -335,12 +298,6 @@ function AddExpense({
                     setFrom(e.target.value);
                   }}
                   value={from}
-                />
-                <img
-                  src={Transfer}
-                  alt=""
-                  width="30px"
-                  className="rounded-full"
                 />
                 <CustomInput
                   inputColor={COLOR.DARK[100]}
@@ -378,9 +335,16 @@ function AddExpense({
                   { label: 'Chase', value: 'chase' },
                 ]}
                 onChange={(e) => {
-                  setWallet(e.target.value);
+                  setWallet(e!.value as string);
                 }}
-                value={wallet}
+                value={
+                  wallet
+                    ? {
+                        value: wallet,
+                        label: wallet[0].toUpperCase() + wallet.slice(1),
+                      }
+                    : undefined
+                }
               />
               <EmptyError
                 errorText={STRINGS.PleaseSelectAWallet}

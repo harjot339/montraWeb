@@ -64,7 +64,7 @@ function TransactionListItem({
       )}
       style={{
         width: '100%',
-        maxWidth: width === 'half' ? '400px' : '100%',
+        maxWidth: width === 'half' ? '400px' : '',
         // minWidth: width === 'half' ? '200px' : undefined,
         backgroundColor: selected ? COLORS.VIOLET[20] : '',
       }}
@@ -125,7 +125,7 @@ function TransactionListItem({
             Number(
               (
                 conversion.usd[(currency ?? 'USD').toLowerCase()] * item.amount
-              ).toFixed(1)
+              ).toFixed(2)
             ).toString()
           )}
         </p>

@@ -28,7 +28,7 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
             (
               (conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ?? 1) *
               amount
-            ).toFixed(1)
+            ).toFixed(2)
           )
         )
       ) {
@@ -39,7 +39,7 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
           (
             (conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ?? 1) *
             Number(amount)
-          ).toFixed(1)
+          ).toFixed(2)
         ).toString()
       );
     },
@@ -61,11 +61,11 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
       >
         {STRINGS.Overview}
       </p>
-      <div className="flex mt-5 justify-evenly gap-3 text-center">
+      <div className="flex mt-5 justify-evenly gap-2 text-center">
         <div>
           <p
             className={clsx(
-              'text-xl md:text-2xl lg:text-3xl font-semibold max-w-max overflow-hidden text-ellipsis whitespace-nowrap',
+              'text-xl md:text-2xl lg:text-3xl font-semibold max-sm:max-w-24 overflow-hidden text-ellipsis whitespace-nowrap',
               theme === 'dark' && 'text-white'
             )}
           >
@@ -82,7 +82,7 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
         <div>
           <p
             className={clsx(
-              'text-xl md:text-2xl lg:text-3xl font-semibold max-w-max overflow-hidden text-ellipsis whitespace-nowrap',
+              'text-xl md:text-2xl lg:text-3xl font-semibold overflow-hidden text-ellipsis whitespace-nowrap',
               theme === 'dark' && 'text-white'
             )}
           >
@@ -99,7 +99,7 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
         <div>
           <p
             className={clsx(
-              'text-xl md:text-2xl lg:text-3xl font-semibold max-w-max overflow-hidden text-ellipsis whitespace-nowrap',
+              'text-xl md:text-2xl lg:text-3xl font-semibold overflow-hidden text-ellipsis whitespace-nowrap',
               theme === 'dark' && 'text-white'
             )}
           >

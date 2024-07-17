@@ -18,6 +18,7 @@ import CustomButton from '../../Components/CustomButton';
 import CreateBudget from '../CreateBudget';
 import DeleteBudgetModal from '../../Components/DeleteBudgetModal/DeleteBudgetModal';
 import useAppTheme from '../../Hooks/themeHook';
+import { useIsMobile, useIsTablet } from '../../Hooks/mobileCheckHook';
 
 function BudgetDetail() {
   const navigate = useNavigate();
@@ -44,15 +45,21 @@ function BudgetDetail() {
   const [modal, setModal] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [theme] = useAppTheme();
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
   return isOpen ? (
     <CreateBudget isEdit setIsOpen={setIsOpen} />
   ) : (
     <div
       className={clsx(
-        'flex-col rounded-lg flex w-full max-w-[420px] pb-5 justify-between sticky top-2 right-2',
-        theme === 'dark' ? 'bg-black' : 'bg-white'
+        'flex-col rounded-lg flex w-full  pb-5 justify-between sticky top-2 right-2',
+        theme === 'dark' ? 'bg-black' : 'bg-white',
+        !isMobile && !isTablet && 'max-w-[450px]'
       )}
-      style={{ height: '95vh' }}
+      style={{
+        height: isMobile || isTablet ? '100vh' : '95vh',
+        // maxWidth: isMobile || isTablet ? '100%' : '450px',
+      }}
     >
       <DeleteBudgetModal
         modal={modal}
@@ -152,7 +159,7 @@ function BudgetDetail() {
                       (
                         conversion.usd[currency!.toLowerCase()] *
                         (Number(budget.limit) - Number(spend))
-                      ).toFixed(1)
+                      ).toFixed(2)
                     ).toString()
                   )}
             </p>

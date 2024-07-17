@@ -8,16 +8,18 @@ import { setUser } from '../../Store/Common';
 import { auth } from '../../Utils/firebaseConfig';
 import CustomButton from '../CustomButton';
 import useAppTheme from '../../Hooks/themeHook';
+import { useIsDesktop } from '../../Hooks/mobileCheckHook';
 
 function LogoutModal({
   modal,
   setModal,
-}: {
+}: Readonly<{
   modal: boolean;
   setModal: React.Dispatch<SetStateAction<boolean>>;
-}) {
+}>) {
   const [appTheme, COLOR] = useAppTheme();
   const dispatch = useDispatch();
+  const isDesktop = useIsDesktop();
   return (
     <Modal
       isOpen={modal}
@@ -26,7 +28,7 @@ function LogoutModal({
       }}
       style={{
         content: {
-          width: 'min-content',
+          width: isDesktop ? '40%' : '80%',
           height: 'min-content',
           margin: 'auto',
           display: 'flex',
@@ -40,18 +42,11 @@ function LogoutModal({
         },
         overlay: {
           backgroundColor: appTheme === 'dark' ? '#ffffff30' : '#00000050',
+          zIndex: '50',
         },
       }}
     >
-      <div
-        style={{
-          width: '30vw',
-          display: 'flex',
-          flexDirection: 'column',
-          textAlign: 'center',
-          padding: '20px 50px',
-        }}
-      >
+      <div className="w-full flex flex-col text-center py-5 px-5 md:px-10">
         <p className="text-3xl mb-6 font-semibold">{STRINGS.Logout}</p>
         <p className="text-lg mb-7">{STRINGS.SureLogout}</p>
         <div className="flex gap-x-8">

@@ -32,7 +32,7 @@ function FilterSection() {
   return (
     <div
       className={clsx(
-        'rounded-lg px-2 sm:px-4 py-4 sticky top-2 right-0 min-w-96 h-fit',
+        'rounded-lg px-2 sm:px-4 py-4 sticky top-2 right-0 min-w-[345px] h-fit',
         theme === 'dark' ? 'bg-black' : 'bg-white'
       )}
     >
@@ -78,7 +78,7 @@ function FilterSection() {
           <button
             key={item}
             type="button"
-            className="py-3 px-6 rounded-3xl"
+            className="py-2 px-4 sm:py-3 sm:px-6 rounded-3xl"
             style={{
               border: `1px solid ${COLORS.LIGHT[20]}`,
               backgroundColor:
@@ -110,7 +110,7 @@ function FilterSection() {
           <button
             key={item}
             type="button"
-            className="py-3 px-6 rounded-3xl"
+            className="py-2 px-4 sm:py-3 sm:px-6 rounded-3xl"
             style={{
               border: `1px solid ${COLORS.LIGHT[20]}`,
               backgroundColor:

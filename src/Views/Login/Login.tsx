@@ -26,6 +26,7 @@ import { EmailEmptyError, PassEmptyError } from '../../Shared/errors';
 import { STRINGS } from '../../Shared/Strings';
 import { FirebaseAuthErrorHandler } from '../../Utils/commonFuncs';
 import useAppTheme from '../../Hooks/themeHook';
+import { useIsDesktop } from '../../Hooks/mobileCheckHook';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -96,6 +97,7 @@ function Login() {
     }
   }, [dispatch]);
   const appTheme = useAppTheme();
+  const isDesktop = useIsDesktop();
   return (
     <div className="w-11/12 sm:w-1/2 py-8 px-5 sm flex flex-col text-center self-center">
       <Modal
@@ -105,7 +107,7 @@ function Login() {
         }}
         style={{
           content: {
-            width: 'min-content',
+            width: isDesktop ? '40%' : '80%',
             height: 'min-content',
             margin: 'auto',
             display: 'flex',
@@ -122,19 +124,11 @@ function Login() {
           },
         }}
       >
-        <div
-          style={{
-            width: '30vw',
-            display: 'flex',
-            flexDirection: 'column',
-            textAlign: 'center',
-            padding: '20px 50px',
-          }}
-        >
-          <p className="text-3xl mb-6 font-semibold">
+        <div className="w-full flex flex-col py-5 px-5 md:px-10 text-center">
+          <p className="text-2xl sm:text-3xl mb-6 font-semibold">
             {STRINGS.PleaseVerifyEmail}
           </p>
-          <p className="text-lg mb-7">{STRINGS.VerifyEmailSent}</p>
+          <p className="text-md sm:text-lg mb-7">{STRINGS.VerifyEmailSent}</p>
           <div className="flex gap-x-8">
             <CustomButton
               flex={1}

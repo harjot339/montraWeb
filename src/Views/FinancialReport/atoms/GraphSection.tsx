@@ -1,0 +1,105 @@
+import { Timestamp } from 'firebase/firestore';
+import React from 'react';
+import clsx from 'clsx';
+import TransactionListItem from '../../../Components/TransactionListItem';
+import Graph from '../../Home/atoms/Graph';
+import { TransactionType } from '../../../Defs/transaction';
+import { useIsDesktop } from '../../../Hooks/mobileCheckHook';
+import { STRINGS } from '../../../Shared/Strings';
+
+function GraphSection({
+  data,
+  month,
+  type,
+  currency,
+  conversion,
+  setType,
+  theme,
+}: Readonly<{
+  month: number;
+  type: 'income' | 'expense';
+  currency: string | undefined;
+  conversion: {
+    [key: string]: {
+      [key: string]: number;
+    };
+  };
+  data: TransactionType[];
+  setType: React.Dispatch<React.SetStateAction<'income' | 'expense'>>;
+  theme: 'light' | 'dark';
+}>) {
+  const isDesktop = useIsDesktop();
+  return (
+    <div>
+      <div className="h-96 mb-5">
+        <Graph data={data} month={month} hideDropdown type={type} />
+      </div>
+      {!isDesktop && (
+        <div
+          className={clsx(
+            'flex w-full h-14 px-2 justify-center items-center rounded-3xl my-3',
+            theme === 'dark' ? `bg-[#161719]` : 'bg-gray-100'
+          )}
+        >
+          <div className="flex rounded-3xl h-11 w-full ">
+            <button
+              type="button"
+              onClick={() => {
+                setType('expense');
+              }}
+              className={clsx(
+                'flex flex-1 justify-center items-center rounded-3xl outline-none',
+                type === 'expense'
+                  ? 'bg-[#7F3DFF] text-white'
+                  : 'bg-transparent',
+                theme === 'dark' && 'text-white'
+              )}
+            >
+              {STRINGS.Expense}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setType('income');
+              }}
+              className={clsx(
+                'flex flex-1 justify-center items-center rounded-3xl outline-none',
+                type === 'income'
+                  ? 'bg-[#7F3DFF] text-white'
+                  : 'bg-transparent',
+                theme === 'dark' && 'text-white'
+              )}
+            >
+              {STRINGS.Income}
+            </button>
+          </div>
+        </div>
+      )}
+      <div className="px-2">
+        {data
+          .slice()
+          .filter((item) => {
+            return (
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                ?.getMonth() === month && item.type === type
+            );
+          })
+          .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
+          .slice(0, 5)
+          .map((item) => (
+            <TransactionListItem
+              disabled
+              item={item}
+              key={item.id}
+              width="full"
+              currency={currency}
+              conversion={conversion}
+            />
+          ))}
+      </div>
+    </div>
+  );
+}
+
+export default React.memo(GraphSection);

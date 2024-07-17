@@ -50,37 +50,39 @@ function RecentSection({ month }: Readonly<{ month: number }>) {
           {STRINGS.SeeAll}
         </button>
       </div>
-      {data.slice().filter((item) => {
-        return (
-          Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-            .toDate()
-            ?.getMonth() === month
-        );
-      }).length === 0 ? (
-        <p className="text-gray-400">{STRINGS.NoRecentTransactions}</p>
-      ) : (
-        data
-          .slice()
-          .filter((item) => {
-            return (
-              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                .toDate()
-                ?.getMonth() === month
-            );
-          })
-          .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
-          .slice(0, 6)
-          .map((item) => (
-            <TransactionListItem
-              disabled
-              item={item}
-              key={item.id}
-              width="full"
-              currency={currency}
-              conversion={conversion}
-            />
-          ))
-      )}
+      <div className="flex flex-col gap-y-2.5 mt-2">
+        {data.slice().filter((item) => {
+          return (
+            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+              .toDate()
+              ?.getMonth() === month
+          );
+        }).length === 0 ? (
+          <p className="text-gray-400">{STRINGS.NoRecentTransactions}</p>
+        ) : (
+          data
+            .slice()
+            .filter((item) => {
+              return (
+                Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                  .toDate()
+                  ?.getMonth() === month
+              );
+            })
+            .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
+            .slice(0, 5)
+            .map((item) => (
+              <TransactionListItem
+                disabled
+                item={item}
+                key={item.id}
+                width="full"
+                currency={currency}
+                conversion={conversion}
+              />
+            ))
+        )}
+      </div>
     </div>
   );
 }

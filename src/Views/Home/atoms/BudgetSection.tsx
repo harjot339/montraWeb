@@ -21,7 +21,7 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
   );
   const [theme] = useAppTheme();
   return (
-    <div className="flex  gap-3">
+    <div className="hidden md:flex gap-3">
       <div
         className={clsx(
           'rounded-lg flex-1 px-4 sm:px-8 py-4 mt-3',
@@ -44,9 +44,9 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
           <table
             className={clsx('w-full mt-4', theme === 'dark' && 'text-white')}
           >
-            <tr className="text-xl border-b-2">
+            <tr className="text-md sm:text-xl border-b-2">
               <th>{STRINGS.Category}</th>
-              <th>{STRINGS.Percentage}</th>
+              <th className="hidden lg:table-cell">{STRINGS.Percentage}</th>
               <th>{STRINGS.Limit}</th>
               <th>{STRINGS.Spent}</th>
               <th>{STRINGS.Left}</th>
@@ -63,8 +63,8 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
                   <tr>
                     <td>‎</td>
                   </tr>
-                  <tr key={key} className="text-center">
-                    <td className="text-xl font-semibold flex justify-between">
+                  <tr key={key} className="text-center text-sm sm:text-lg">
+                    <td className="font-semibold flex justify-between">
                       {val.limit - (spends?.[key] ?? 0) < 0 ? (
                         <img
                           src={Alert}
@@ -78,7 +78,7 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
                       {key[0].toUpperCase() + key.slice(1)}
                       <div />
                     </td>
-                    <td>
+                    <td className="hidden lg:table-cell">
                       <ProgressBar
                         // width="30vw"
                         isLabelVisible={false}
@@ -100,29 +100,29 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
                         }%`}
                       />
                     </td>
-                    <td className="text-xl font-semibold">
+                    <td className="font-semibold">
                       {currencies[currency ?? 'USD'].symbol}
                       {formatWithCommas(
                         Number(
                           (
                             conversion.usd[(currency ?? 'USD').toLowerCase()] *
                             val.limit
-                          ).toFixed(1)
+                          ).toFixed(2)
                         ).toString()
                       )}
                     </td>
-                    <td className="text-xl font-semibold">
+                    <td className="font-semibold">
                       {currencies[currency ?? 'USD'].symbol}
                       {formatWithCommas(
                         Number(
                           (
                             conversion.usd[(currency ?? 'USD').toLowerCase()] *
                             (spends?.[key] ?? 0)
-                          ).toFixed(1)
+                          ).toFixed(2)
                         ).toString()
                       )}
                     </td>
-                    <td className="text-xl font-semibold">
+                    <td className="font-semibold">
                       {currencies[currency ?? 'USD'].symbol}
                       {formatWithCommas(
                         Number(
@@ -131,7 +131,7 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
                             (val.limit - (spends?.[key] ?? 0) < 0
                               ? 0
                               : val.limit - (spends?.[key] ?? 0))
-                          ).toFixed(1)
+                          ).toFixed(2)
                         ).toString()
                       )}
                     </td>

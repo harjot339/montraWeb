@@ -15,7 +15,8 @@ import { ROUTES } from '../../Shared/Constants';
 import CustomButton from '../../Components/CustomButton';
 import AddExpense from '../AddExpense/AddExpense';
 import useAppTheme from '../../Hooks/themeHook';
-import DeleteTransactionModal from '../../Components/DeleteTransactionModal/DeleteTransactionModal';
+import { useIsMobile, useIsTablet } from '../../Hooks/mobileCheckHook';
+import DeleteTransactionModal from '../../Components/DeleteTransactionModal';
 
 function TransactionDetail() {
   const data = useSelector(
@@ -48,7 +49,7 @@ function TransactionDetail() {
             (
               (conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ?? 1) *
               amount
-            ).toFixed(1)
+            ).toFixed(2)
           )
         )
       ) {
@@ -59,16 +60,18 @@ function TransactionDetail() {
           (
             (conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ?? 1) *
             Number(amount)
-          ).toFixed(1)
+          ).toFixed(2)
         ).toString()
       );
     },
     [conversion?.usd, currency]
   );
   const [theme] = useAppTheme();
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
   return isOpen ? (
     <AddExpense
-      height="95vh"
+      height={isMobile || isTablet ? '100vh' : '95vh'}
       isEdit
       pageType={transaction!.type}
       setIsOpen={setIsOpen}
@@ -78,10 +81,11 @@ function TransactionDetail() {
     transaction && (
       <div
         className={clsx(
-          'flex-col rounded-lg flex w-full max-w-[420px] pb-5 justify-between sticky top-2 right-2',
-          theme === 'dark' ? 'bg-black' : 'bg-white'
+          'flex-col rounded-lg flex w-full pb-5 justify-between sticky top-0',
+          theme === 'dark' ? 'bg-black' : 'bg-white',
+          !isMobile && !isTablet && 'max-w-[450px]'
         )}
-        style={{ height: '95vh' }}
+        style={{ height: isMobile || isTablet ? '100vh' : '95vh' }}
       >
         <DeleteTransactionModal
           modal={modal}
@@ -139,29 +143,29 @@ function TransactionDetail() {
               <p className="text-md  font-normal mb-16">
                 {
                   weekData[
-                    Timestamp.fromMillis(transaction!.timeStamp.seconds * 1000)
+                    Timestamp.fromMillis(transaction.timeStamp.seconds * 1000)
                       .toDate()
                       .getDay()
                   ].label
                 }{' '}
-                {Timestamp.fromMillis(transaction!.timeStamp.seconds * 1000)
+                {Timestamp.fromMillis(transaction.timeStamp.seconds * 1000)
                   .toDate()
                   .getDate()}{' '}
                 {
                   monthData[
-                    Timestamp.fromMillis(transaction!.timeStamp.seconds * 1000)
+                    Timestamp.fromMillis(transaction.timeStamp.seconds * 1000)
                       .toDate()
                       .getMonth()
                   ].label
                 }{' '}
-                {Timestamp.fromMillis(transaction!.timeStamp.seconds * 1000)
+                {Timestamp.fromMillis(transaction.timeStamp.seconds * 1000)
                   .toDate()
                   .getFullYear()}{' '}
-                {Timestamp.fromMillis(transaction!.timeStamp.seconds * 1000)
+                {Timestamp.fromMillis(transaction.timeStamp.seconds * 1000)
                   .toDate()
                   .getHours()}
                 :
-                {Timestamp.fromMillis(transaction!.timeStamp.seconds * 1000)
+                {Timestamp.fromMillis(transaction.timeStamp.seconds * 1000)
                   .toDate()
                   .getMinutes()}
               </p>

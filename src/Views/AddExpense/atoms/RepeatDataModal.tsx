@@ -14,6 +14,7 @@ import {
 import { EmptyError } from '../../../Shared/errors';
 import useAppTheme from '../../../Hooks/themeHook';
 import { COLORS } from '../../../Shared/commonStyles';
+import { useIsDesktop } from '../../../Hooks/mobileCheckHook';
 
 function RepeatDataModal({
   modal,
@@ -21,7 +22,7 @@ function RepeatDataModal({
   setChecked,
   repeatData,
   setRepeatData,
-}: {
+}: Readonly<{
   modal: boolean;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
   setChecked: React.Dispatch<React.SetStateAction<boolean>>;
@@ -29,7 +30,7 @@ function RepeatDataModal({
   setRepeatData: React.Dispatch<
     React.SetStateAction<RepeatDataType | undefined>
   >;
-}) {
+}>) {
   const [freq, setFreq] = useState<RepeatDataType['freq']>();
   const [end, setEnd] = useState<RepeatDataType['end']>();
   const [day, setDay] = useState<number>(1);
@@ -54,8 +55,8 @@ function RepeatDataModal({
         daysInMonth = new Date(year, m, 0).getDate();
       }
       const daysArray = [];
-      for (let d = 1; d <= daysInMonth; d += 1) {
-        daysArray.push(d);
+      for (let dd = 1; dd <= daysInMonth; dd += 1) {
+        daysArray.push(dd);
       }
       res.push({
         month: m,
@@ -74,6 +75,7 @@ function RepeatDataModal({
     setDate(repeatData?.date as Date);
   }, [repeatData]);
   const [theme] = useAppTheme();
+  const isDesktop = useIsDesktop();
   return (
     <Modal
       isOpen={modal}
@@ -85,7 +87,7 @@ function RepeatDataModal({
       }}
       style={{
         content: {
-          width: 'min-content',
+          width: isDesktop ? '40%' : '80%',
           height: 'min-content',
           margin: 'auto',
           display: 'flex',
@@ -101,24 +103,21 @@ function RepeatDataModal({
         },
       }}
     >
-      <div
-        style={{
-          width: '30vw',
-          display: 'flex',
-          flexDirection: 'column',
-          backgroundColor:
-            theme === 'dark' ? COLORS.DARK[100] : COLORS.LIGHT[100],
-        }}
-      >
+      <div className="w-full flex flex-col">
         <div className="flex gap-x-4">
           <CustomDropdown
+            menuPlacement="bottom"
             placeholder={STRINGS.Frequency}
             flex={1}
             data={FreqDropdownData}
             onChange={(e) => {
-              setFreq(e.target.value as RepeatDataType['freq']);
+              setFreq(e!.value as RepeatDataType['freq']);
             }}
-            value={freq ?? ''}
+            value={
+              freq
+                ? { label: freq[0].toUpperCase() + freq.slice(1), value: freq }
+                : undefined
+            }
           />
           {freq === 'yearly' && (
             <CustomDropdown
@@ -126,9 +125,13 @@ function RepeatDataModal({
               flex={1}
               data={monthData}
               onChange={(e) => {
-                setMonth(Number(e.target.value));
+                setMonth(Number(e!.value));
               }}
-              value={month}
+              value={
+                month !== undefined
+                  ? { label: monthData[month].label, value: month }
+                  : undefined
+              }
             />
           )}
           {(freq === 'yearly' || freq === 'monthly') && (
@@ -150,9 +153,13 @@ function RepeatDataModal({
                     })
               }
               onChange={(e) => {
-                setDay(Number(e.target.value));
+                setDay(Number(e!.value));
               }}
-              value={day}
+              value={
+                day !== undefined
+                  ? { label: String(day), value: day }
+                  : undefined
+              }
             />
           )}
           {freq === 'weekly' && (
@@ -160,9 +167,13 @@ function RepeatDataModal({
               placeholder={STRINGS.Day}
               data={weekData}
               onChange={(e) => {
-                setWeekDay(Number(e.target.value));
+                setWeekDay(Number(e!.value));
               }}
-              value={weekDay}
+              value={
+                weekDay !== undefined
+                  ? { label: weekData[weekDay].label, value: weekDay }
+                  : undefined
+              }
             />
           )}
         </div>
@@ -176,20 +187,28 @@ function RepeatDataModal({
             placeholder={STRINGS.EndAfter}
             data={EndDropdownData}
             onChange={(e) => {
-              setEnd(e.target.value as RepeatDataType['end']);
+              setEnd(e!.value as RepeatDataType['end']);
             }}
-            value={end ?? ''}
+            value={
+              end
+                ? { label: end[0].toUpperCase() + end.slice(1), value: end }
+                : undefined
+            }
             flex={1}
           />
           {end === 'date' && (
             <input
               type="date"
               className={clsx(
-                'border rounded-lg px-4',
-                theme === 'dark' && 'text-white'
+                'border rounded-lg px-4 bg-transparent min-w-36',
+                theme === 'dark' ? 'text-white' : 'text-black'
               )}
               min={new Date().toISOString().split('T')[0]}
-              value={new Date().toISOString().split('T')[0]}
+              value={
+                date?.toISOString()?.split('T')?.[0] ??
+                new Date().toISOString().split('T')[0]
+              }
+              style={{ colorScheme: theme }}
               onChange={(e) => {
                 setDate(new Date(e.target.value));
               }}

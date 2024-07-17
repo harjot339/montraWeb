@@ -28,14 +28,16 @@ import { db } from '../../Utils/firebaseConfig';
 import { handleOnlineNotify } from '../../Utils/firebaseFuncs';
 import CategoryModal from '../../Components/CategoryModal';
 import useAppTheme from '../../Hooks/themeHook';
+import { useIsMobile, useIsTablet } from '../../Hooks/mobileCheckHook';
+import MoneyInput from '../../Components/MoneyInput';
 
 function CreateBudget({
   setIsOpen,
   isEdit,
-}: {
+}: Readonly<{
   setIsOpen: React.Dispatch<SetStateAction<boolean>>;
   isEdit: boolean;
-}) {
+}>) {
   // constants
   const params = useParams();
   // state
@@ -138,21 +140,35 @@ function CreateBudget({
     if (isEdit) {
       const m = params.id?.split('_')[0];
       const c = params.id?.split('_')[1];
-      setAmount(String(budget![m!][c!].limit));
+      setAmount(
+        formatWithCommas(
+          Number(
+            (
+              (conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ?? 1) *
+              Number(budget![m!][c!].limit)
+            ).toFixed(2)
+          ).toString()
+        )
+      );
       setPercentage(budget![m!][c!].percentage);
       setCat(c!);
       setChecked(budget![m!][c!].alert);
     }
-  }, [budget, isEdit, params]);
+  }, [budget, conversion?.usd, currency, isEdit, params]);
   const [addCategoryModal, setAddCategoryModal] = useState<boolean>(false);
   const [theme] = useAppTheme();
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
   return (
     <div
-      className="hidden sm:flex flex-col rounded-lg flex-1 justify-between"
+      className={clsx(
+        'flex flex-col rounded-lg w-full justify-between',
+        !isMobile && !isTablet && 'max-w-[450px]'
+      )}
       style={{
         backgroundColor: COLORS.VIOLET[100],
-        minWidth: '28vw',
-        minHeight: '90vh',
+        // minWidth: '28vw',
+        height: isMobile || isTablet ? '100vh' : '95vh',
       }}
     >
       <CategoryModal
@@ -183,7 +199,7 @@ function CreateBudget({
         >
           {STRINGS.CreateBudget}
         </p>
-        <div />
+        <div className="w-10" />
       </div>
       <div>
         <p
@@ -194,64 +210,7 @@ function CreateBudget({
         >
           {STRINGS.HowMuch}
         </p>
-        <input
-          onClick={() => {
-            if (amount === '0') {
-              setAmount('');
-            }
-          }}
-          onBlur={() => {
-            if (amount === '') {
-              setAmount('0');
-            }
-          }}
-          value={`$ ${amount}`}
-          className={clsx(
-            'bg-transparent w-full px-4 sm:px-8 h-20 outline-none text-6xl font-semibold',
-            theme === 'dark' ? 'text-black' : 'text-white'
-          )}
-          maxLength={10}
-          onChange={(e) => {
-            const str = e.target.value;
-            let numericValue = str.replace(/[^0-9.]+/g, '');
-            if (str === '.') {
-              return;
-            }
-            const decimalCount = numericValue.split('.').length - 1;
-
-            if (decimalCount > 1) {
-              const parts = numericValue.split('.');
-              numericValue = `${parts[0]}.${parts.slice(1).join('')}`;
-            }
-
-            if (numericValue.length > 0 && numericValue.endsWith('.')) {
-              // Allow only if it is not the only character
-              if (
-                numericValue.length === 1 ||
-                numericValue[numericValue.length - 2] === '.'
-              ) {
-                numericValue = numericValue.slice(0, -1);
-              }
-            }
-
-            // Limit to 2 digits after decimal point
-            if (decimalCount === 1) {
-              const parts = numericValue.split('.');
-              if (parts[1].length > 2) {
-                numericValue = `${parts[0]}.${parts[1].slice(0, 2)}`;
-              }
-            }
-
-            if (decimalCount === 1 && numericValue.length > 9) {
-              // Adjusted to account for the two decimal places
-              numericValue = numericValue.slice(0, 9);
-            } else if (decimalCount === 0 && numericValue.length > 7) {
-              numericValue = numericValue.slice(0, 7);
-            }
-
-            setAmount(formatWithCommas(numericValue));
-          }}
-        />
+        <MoneyInput amount={amount} setAmount={setAmount} theme={theme} />
         <EmptyZeroError
           value={amount}
           errorText={STRINGS.PleaseFillAnAmount}
@@ -267,13 +226,20 @@ function CreateBudget({
             placeholder={STRINGS.Category}
             data={dropdownData}
             onChange={(e) => {
-              if (e.target.value === 'add') {
+              if (e!.value === 'add') {
                 setAddCategoryModal(true);
               } else {
-                setCat(e.target.value);
+                setCat(e!.value as string);
               }
             }}
-            value={cat}
+            value={
+              cat
+                ? {
+                    label: cat[0].toUpperCase() + cat.slice(1),
+                    value: cat,
+                  }
+                : undefined
+            }
           />
           <EmptyError
             errorText={STRINGS.PleaseSelectACategory}

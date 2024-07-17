@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Timestamp, updateDoc, doc } from 'firebase/firestore';
 import { useSelector } from 'react-redux';
 import clsx from 'clsx';
@@ -8,9 +8,11 @@ import { encrypt } from '../../../Utils/encryption';
 import { db } from '../../../Utils/firebaseConfig';
 import { RootState } from '../../../Store';
 import NotificationIcon from '../../../assets/svgs/notifiaction.svg';
-import SidebarButton from '../../../Components/SidebarButton/SidebarButton';
+import SidebarButton from '../../../Components/SidebarButton';
 import useAppTheme from '../../../Hooks/themeHook';
 import CustomDropdown from '../../../Components/CustomDropdown';
+import useOutsideAlerter from '../../../Hooks/outsideClick';
+import { formatAMPM } from '../../../Utils/commonFuncs';
 
 function Header({
   month,
@@ -25,8 +27,14 @@ function Header({
   const uid = useSelector((state: RootState) => state.common.user?.uid);
   const [menu, setMenu] = useState<boolean>(false);
   const [theme] = useAppTheme();
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  useOutsideAlerter(wrapperRef, () => {
+    if (menu) {
+      setMenu(false);
+    }
+  });
   return (
-    <div className="flex justify-between align-middle mb-4">
+    <div className="flex gap-x-3 sm:justify-between align-middle mb-4 items-center flex-wrap gap-y-3">
       <SidebarButton />
       <p
         className={clsx(
@@ -36,11 +44,14 @@ function Header({
       >
         {STRINGS.Dashboard}
       </p>
-      <div className="flex self-center gap-x-5">
+      <div
+        className="flex justify-between w-full sm:w-fit gap-x-5"
+        ref={wrapperRef}
+      >
         {menu && (
           <div
             className={clsx(
-              'rounded-xl shadow absolute top-14 right-7 pt-5 pb-3',
+              'rounded-xl shadow absolute top-24 right-9 sm:top-14 sm:right-7 pt-5 pb-3 z-10',
               theme === 'dark' ? 'bg-black' : 'bg-white'
             )}
           >
@@ -56,7 +67,7 @@ function Header({
                       <div>
                         <p
                           className={clsx(
-                            'text-xl font-semibold',
+                            'text-md sm:text-xl font-semibold',
                             theme === 'dark' && 'text-white'
                           )}
                         >
@@ -70,7 +81,7 @@ function Header({
                                 item.category.slice(1)
                               } Budget Limit Exceeded`}
                         </p>
-                        <p className="text-gray-600">
+                        <p className="text-sm sm:text-lg text-gray-600">
                           {item.type === 'budget-percent'
                             ? `You've exceeded ${item.percentage}% of your ${
                                 item.category[0].toUpperCase() +
@@ -83,19 +94,11 @@ function Header({
                       </div>
                       <div>
                         <p className={clsx(theme === 'dark' && 'text-white')}>
-                          {Timestamp.fromMillis(item.time.seconds * 1000)
-                            .toDate()
-                            .getHours()}
-                          .
-                          {Timestamp.fromMillis(item.time.seconds * 1000)
-                            .toDate()
-                            .getMinutes() < 10
-                            ? `0${Timestamp.fromMillis(item.time.seconds * 1000)
-                                .toDate()
-                                .getMinutes()}`
-                            : Timestamp.fromMillis(item.time.seconds * 1000)
-                                .toDate()
-                                .getMinutes()}
+                          {formatAMPM(
+                            Timestamp.fromMillis(
+                              item.time.seconds * 1000
+                            ).toDate()
+                          )}
                         </p>
                       </div>
                     </div>
@@ -132,10 +135,10 @@ function Header({
         <CustomDropdown
           data={monthData}
           onChange={(e) => {
-            setMonth(Number(e.target.value) - 1);
+            setMonth(Number(e!.value) - 1);
           }}
           placeholder={STRINGS.Month}
-          value={month + 1}
+          value={monthData[month]}
         />
         <button
           type="button"
@@ -180,7 +183,7 @@ function Header({
             .length > 0 && (
             <p
               className={clsx(
-                'text-sm font-bold h-5 text-violet-500 absolute rounded-full flex justify-center items-center w-5 top-11 right-8',
+                'text-sm font-bold h-5 text-violet-500 absolute rounded-full flex justify-center items-center w-5 -translate-x-2 translate-y-3 ',
                 theme === 'dark' ? 'bg-black' : 'bg-white'
               )}
             >

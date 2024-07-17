@@ -13,16 +13,13 @@ import { RootState } from '../../../../Store';
 import { encrypt } from '../../../../Utils/encryption';
 import { setSidebar } from '../../../../Store/Loader';
 import useAppTheme from '../../../../Hooks/themeHook';
-import Sun from '../../../../assets/svgs/sun.svg';
-import Moon from '../../../../assets/svgs/moon.svg';
-import Device from '../../../../assets/svgs/device.svg';
-import DeviceWhite from '../../../../assets/svgs/device-white.svg';
 import Transaction from '../../../../assets/svgs/transaction.svg';
 import Pie from '../../../../assets/svgs/pie-chart.svg';
 import Dashboard from '../../../../assets/svgs/dashboard.svg';
 import Report from '../../../../assets/svgs/report.svg';
 import Logout from '../../../../assets/svgs/logout.svg';
-import LogoutModal from '../../../LogoutModal/LogoutModal';
+import CustomDropdown from '../../../CustomDropdown';
+import LogoutModal from '../../../LogoutModal';
 
 export function SidebarLayout({
   children,
@@ -40,10 +37,16 @@ export function SidebarLayout({
   const [appTheme, COLOR] = useAppTheme();
 
   return (
-    <>
+    <div
+      style={{
+        width: '100vw',
+        height: '100%',
+        position: 'relative',
+      }}
+    >
       <aside
         id="default-sidebar"
-        className="fixed top-0 left-0 z-40 w-48 h-screen transition-transform -translate-x-full sm:translate-x-0"
+        className="fixed top-0 z-40 sm:z-0 left-0 w-48 h-screen transition-transform -translate-x-full sm:translate-x-0"
         aria-label="Sidebar"
       >
         <div
@@ -123,54 +126,44 @@ export function SidebarLayout({
               </li>
             </div>
             <div>
-              <li className="flex gap-2 border justify-center w-fit px-3 py-2 rounded-xl mb-3">
-                {theme === 'light' && <img src={Sun} alt="" width="25px" />}
-                {theme === 'dark' && <img src={Moon} alt="" width="25px" />}
-                {theme === 'device' && appTheme === 'light' && (
-                  <img src={Device} alt="" width="25px" />
-                )}
-                {theme === 'device' && appTheme === 'dark' && (
-                  <img src={DeviceWhite} alt="" width="25px" />
-                )}
-                <select
-                  className={clsx(
-                    'bg-transparent outline-none',
-                    appTheme === 'dark' && 'text-white'
-                  )}
-                  onChange={async (e) => {
-                    await updateDoc(doc(db, 'users', uid!), {
-                      theme: encrypt(e.target.value, uid!),
-                    });
-                  }}
-                  value={theme!}
-                >
-                  {['light', 'dark', 'device'].map((item) => (
-                    <option key={item} value={item}>
-                      {item[0].toUpperCase() + item.slice(1)}
-                    </option>
-                  ))}
-                </select>
-              </li>
-              <li className="flex gap-2 border justify-center w-fit px-3 py-3 rounded-xl mb-5">
-                <select
-                  className={clsx(
-                    'bg-transparent outline-none',
-                    appTheme === 'dark' && 'text-white'
-                  )}
-                  value={currency ?? 'USD'}
-                  onChange={async (e) => {
-                    await updateDoc(doc(db, 'users', uid!), {
-                      currency: encrypt(e.target.value, uid!),
-                    });
-                  }}
-                >
-                  {Object.values(currencies).map((item) => (
-                    <option key={item.code} value={item.code}>
-                      {item.symbol} {item.code}
-                    </option>
-                  ))}
-                </select>
-              </li>
+              <CustomDropdown
+                menuPlacement="top"
+                data={['light', 'dark', 'device'].map((item) => ({
+                  label: item[0].toUpperCase() + item.slice(1),
+                  value: item,
+                }))}
+                placeholder="Theme"
+                value={{
+                  label: theme![0].toUpperCase() + theme!.slice(1),
+                  value: theme!,
+                }}
+                onChange={async (e) => {
+                  await updateDoc(doc(db, 'users', uid!), {
+                    theme: encrypt(e!.value as string, uid!),
+                  });
+                }}
+              />
+              <div className="my-4" />
+              <CustomDropdown
+                menuPlacement="top"
+                data={Object.values(currencies).map((item) => ({
+                  label: `${item.symbol} ${item.code}`,
+                  value: item.code,
+                }))}
+                placeholder="Currency"
+                value={{
+                  label: `${currencies[currency ?? 'USD'].symbol} ${
+                    currencies[currency ?? 'USD'].code
+                  }`,
+                  value: currency ?? 'USD',
+                }}
+                onChange={async (e) => {
+                  await updateDoc(doc(db, 'users', uid!), {
+                    currency: encrypt(e!.value as string, uid!),
+                  });
+                }}
+              />
+              <div className="my-8" />
             </div>
           </ul>
         </div>
@@ -180,7 +173,7 @@ export function SidebarLayout({
           position: 'absolute',
           zIndex: isOpen ? 1 : -1,
           width: '100vw',
-          height: 'fit-content',
+          height: '100%',
           backgroundColor: 'rgba(0,0,0,0.5)',
         }}
         onClick={() => {
@@ -201,7 +194,7 @@ export function SidebarLayout({
       >
         {children}
       </div>
-    </>
+    </div>
   );
 }
 

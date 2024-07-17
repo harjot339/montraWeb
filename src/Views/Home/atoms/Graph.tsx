@@ -1,12 +1,37 @@
-import ReactApexChart from 'react-apexcharts';
 import React, { useState } from 'react';
 import { Timestamp } from 'firebase/firestore';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
 import clsx from 'clsx';
+import { useSelector } from 'react-redux';
 import { TransactionType } from '../../../Defs/transaction';
 import { COLORS } from '../../../Shared/commonStyles';
-import { STRINGS } from '../../../Shared/Strings';
+import { currencies, STRINGS } from '../../../Shared/Strings';
 import useAppTheme from '../../../Hooks/themeHook';
 import CustomDropdown from '../../../Components/CustomDropdown';
+import { formatWithCommas } from '../../../Utils/commonFuncs';
+import { RootState } from '../../../Store';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 function Graph({
   data,
@@ -19,6 +44,10 @@ function Graph({
   hideDropdown?: boolean;
   type?: 'expense' | 'income';
 }>) {
+  const conversion = useSelector((state: RootState) => state.common.conversion);
+  const currency = useSelector(
+    (state: RootState) => state.common.user?.currency
+  );
   const startOfToday = new Date().setHours(0, 0, 0, 0) / 1000;
   const startOfWeek = Math.floor(
     (new Date().setHours(0, 0, 0, 0) - new Date().getDay() * 86400000) / 1000
@@ -47,13 +76,14 @@ function Graph({
       return item.timeStamp.seconds >= startOfYear && item.type === type;
     })
     .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
-    .map((item) => {
-      return {
-        y: item.amount,
-        x: item.timeStamp.seconds,
-      };
-    });
-  //   console.log(graphData)
+    .reduce(
+      (acc: { data: number[]; labels: number[] }, item) => {
+        acc.data.push(item.amount);
+        acc.labels.push(item.timeStamp.seconds);
+        return acc;
+      },
+      { data: [], labels: [] }
+    );
   const [theme] = useAppTheme();
   return (
     <div
@@ -63,10 +93,10 @@ function Graph({
       )}
     >
       {!hideDropdown && (
-        <div className="max-w-36 self-end px-3 py-2">
+        <div className="self-end px-3 py-2">
           <CustomDropdown
             onChange={(e) => {
-              setGraphDay(Number(e.target.value));
+              setGraphDay(Number(e!.value));
             }}
             data={[
               STRINGS.Today,
@@ -77,11 +107,83 @@ function Graph({
               return { label: item, value: i };
             })}
             placeholder=""
-            value={graphDay}
+            value={
+              graphDay !== undefined
+                ? {
+                    value: graphDay,
+                    label: [
+                      STRINGS.Today,
+                      STRINGS.Week,
+                      STRINGS.Month,
+                      STRINGS.Year,
+                    ][graphDay],
+                  }
+                : undefined
+            }
           />
         </div>
       )}
-      <ReactApexChart
+      <div className="h-96 w-full">
+        <Line
+          data={{
+            labels: graphData.labels,
+            datasets: [
+              {
+                data: graphData.data,
+                backgroundColor: [COLORS.VIOLET[20]],
+                borderColor: COLORS.VIOLET[100],
+                borderWidth: 4,
+                pointRadius: 0,
+                fill: 'origin',
+              },
+            ],
+          }}
+          options={{
+            maintainAspectRatio: false,
+            responsive: true,
+            elements: { line: { tension: 0.4 } },
+            plugins: {
+              filler: {
+                propagate: false,
+              },
+              legend: { display: false },
+              tooltip: {
+                displayColors: false,
+                callbacks: {
+                  title: (context) =>
+                    Timestamp.fromMillis(Number(context[0].label) * 1000)
+                      .toDate()
+                      .toLocaleDateString(),
+                  label: (context) => {
+                    const val = context.raw as string;
+                    return (
+                      currencies[currency ?? 'USD'].symbol +
+                      formatWithCommas(
+                        Number(
+                          (
+                            conversion.usd[currency!.toLowerCase()] *
+                            Number(val)
+                          ).toFixed(2)
+                        ).toString()
+                      )
+                    );
+                  },
+                },
+              },
+            },
+            interaction: {
+              intersect: false,
+            },
+            scales: {
+              x: {
+                display: false,
+              },
+              y: { display: false },
+            },
+          }}
+        />
+      </div>
+      {/* <ReactApexChart
         options={{
           chart: {
             toolbar: { show: false },
@@ -97,16 +199,20 @@ function Graph({
             curve: 'smooth',
           },
           xaxis: {
-            type: 'datetime',
-            axisTicks: { show: false },
-            axisBorder: { show: false },
+            type: 'category',
+            // categories: ['1'],
+            // type: 'datetime',
+            // axisTicks: { show: false },
+            // axisBorder: { show: false },
+            // type: 'numeric',
+            // tickAmount: graphData.length,
             labels: {
-              show: false,
-              formatter(value) {
-                return Timestamp.fromMillis(Number(value) * 1000)
-                  .toDate()
-                  .toLocaleDateString();
-              },
+              // show: false,
+              // formatter(value) {
+              //   return Timestamp.fromMillis(Number(value) * 1000)
+              //     .toDate()
+              //     .toLocaleDateString();
+              // },
             },
           },
           yaxis: {
@@ -140,7 +246,7 @@ function Graph({
         ]}
         type="area"
         height={350}
-      />
+      /> */}
     </div>
   );
 }

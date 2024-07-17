@@ -1,6 +1,5 @@
 import React from 'react';
-import clsx from 'clsx';
-import ArrowDown from '../../assets/svgs/arrow down.svg';
+import Select, { ActionMeta, SingleValue } from 'react-select';
 import {
   InputBorderColor,
   PlaceholderTextColor,
@@ -11,50 +10,79 @@ function CustomDropdown({
   data,
   value,
   onChange,
-  flex,
+  // flex,
   placeholder,
   borderColor = InputBorderColor,
+  menuPlacement = 'auto',
 }: Readonly<{
   data: { label: string; value: string | number }[];
-  value: string | number;
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  value: { label: string; value: string | number } | undefined;
+  onChange: (
+    newValue: SingleValue<{
+      label: string;
+      value: string | number;
+    }>,
+    actionMeta: ActionMeta<{
+      label: string;
+      value: string | number;
+    }>
+  ) => void;
   flex?: number;
   placeholder: string;
   borderColor?: string;
+  menuPlacement?: 'top' | 'bottom' | 'auto';
 }>) {
-  const [theme] = useAppTheme();
+  const apptheme = useAppTheme();
   return (
-    <div
-      className={clsx(
-        'flex bg-transparent border h-12 md:h-14 rounded-lg pr-3',
-        theme === 'dark' && 'text-white'
-      )}
-      style={{ borderColor, flex }}
-    >
-      <select
-        className="myDropdown flex-1 bg-transparent outline-none h-12 md:h-14 rounded-lg px-5 appearance-none"
-        value={value}
-        onChange={onChange}
-      >
-        <option
-          value=""
-          style={{ color: PlaceholderTextColor }}
-          disabled
-          selected
-          hidden
-        >
-          {placeholder}
-        </option>
-        {data.map((item) => (
-          <option key={item.value} value={item.value} className="px-10">
-            {item.value === 'add'
+    <Select
+      options={data.map((item) => {
+        return {
+          label:
+            item.value === 'add'
               ? 'Add New Category'
-              : item.label[0].toUpperCase() + item.label.slice(1)}
-          </option>
-        ))}
-      </select>
-      <img src={ArrowDown} width="25px" alt="" />
-    </div>
+              : item.label[0].toUpperCase() + item.label.slice(1),
+          value: item.value,
+        };
+      })}
+      onChange={onChange}
+      placeholder={placeholder}
+      value={value}
+      styles={{
+        control: (baseStyles) => ({
+          ...baseStyles,
+          outline: 'none',
+          borderColor,
+          height: '56px',
+          borderRadius: '8px',
+          padding: '0px 10px',
+          backgroundColor: 'transparent',
+        }),
+        option: (base, state) => ({
+          ...base,
+          backgroundColor:
+            value !== undefined && state.data.value === value.value
+              ? apptheme[1].VIOLET[60]
+              : apptheme[1].LIGHT[100],
+          color: apptheme[1].DARK[100],
+        }),
+        placeholder: (base) => ({
+          ...base,
+          color: PlaceholderTextColor,
+        }),
+        container: (base) => ({
+          ...base,
+          width: '100%',
+        }),
+        menu: (base) => ({
+          ...base,
+          backgroundColor: apptheme[1].LIGHT[100],
+        }),
+        singleValue: (base) => ({ ...base, color: apptheme[1].DARK[100] }),
+        indicatorSeparator: () => ({ display: 'none' }),
+      }}
+      menuPlacement={menuPlacement}
+      isSearchable={false}
+    />
   );
 }
 

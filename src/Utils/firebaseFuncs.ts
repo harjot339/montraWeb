@@ -221,6 +221,7 @@ export async function handleOnlineNotify({
               percentage: totalBudget.percentage,
             },
           });
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const notif = new Notification(
             `${
               category[0].toUpperCase() + category.slice(1)
@@ -231,7 +232,7 @@ export async function handleOnlineNotify({
               )} budget has exceeded the limit`,
             }
           );
-          console.log(notif);
+          // console.log(notif)
         } else if (
           totalSpent >=
           totalBudget.limit * (totalBudget.percentage / 100)
@@ -246,6 +247,7 @@ export async function handleOnlineNotify({
               percentage: totalBudget.percentage,
             },
           });
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const notif = new Notification(
             `Exceeded ${totalBudget.percentage}% of ${
               category[0].toUpperCase() + category.slice(1)
@@ -256,7 +258,7 @@ export async function handleOnlineNotify({
               } budget. Take action to stay on track.`,
             }
           );
-          console.log(notif);
+          // console.log(notif);
         }
       } catch (e) {
         toast.error(e as string);

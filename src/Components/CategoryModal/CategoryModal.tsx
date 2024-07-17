@@ -14,18 +14,19 @@ import { addExpenseCategory, addIncomeCategory } from '../../Store/Common';
 import { encrypt } from '../../Utils/encryption';
 import useAppTheme from '../../Hooks/themeHook';
 import { COLORS } from '../../Shared/commonStyles';
+import { useIsDesktop } from '../../Hooks/mobileCheckHook';
 
 function CategoryModal({
   modal,
   setModal,
   type,
   setMyCategory,
-}: {
+}: Readonly<{
   modal: boolean;
   setModal: React.Dispatch<SetStateAction<boolean>>;
   setMyCategory: React.Dispatch<SetStateAction<string>>;
   type: 'expense' | 'income' | 'transfer';
-}) {
+}>) {
   const [form, setForm] = useState<boolean>(false);
   const [category, setCategory] = useState<string>('');
   const dispatch = useDispatch();
@@ -37,6 +38,7 @@ function CategoryModal({
     (state: RootState) => state.common.user?.incomeCategory
   );
   const [theme, COLOR] = useAppTheme();
+  const isDesktop = useIsDesktop();
   return (
     <Modal
       isOpen={modal}
@@ -47,7 +49,7 @@ function CategoryModal({
       }}
       style={{
         content: {
-          width: 'min-content',
+          width: isDesktop ? '40%' : '80%',
           height: 'min-content',
           margin: 'auto',
           display: 'flex',
@@ -63,7 +65,7 @@ function CategoryModal({
         },
       }}
     >
-      <div style={{ width: '30vw', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
         <CustomInput
           inputColor={COLOR.DARK[100]}
           placeholderText={STRINGS.Category}

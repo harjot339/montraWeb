@@ -14,6 +14,8 @@ import OverviewSection from './atoms/OverviewSection';
 import AddExpense from '../AddExpense/AddExpense';
 import Header from './atoms/Header';
 import useAppTheme from '../../Hooks/themeHook';
+import { useIsMobile, useIsTablet } from '../../Hooks/mobileCheckHook';
+import SpeedDial from '../../Components/SpeedDial';
 
 function Home() {
   const [month, setMonth] = useState(new Date().getMonth());
@@ -21,11 +23,21 @@ function Home() {
   const data = useSelector(
     (state: RootState) => state.transactions.transactions
   );
-
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpenMobile, setIsOpenMobile] = useState<boolean>(false);
   const [pageType, setPageType] = useState<'income' | 'expense' | 'transfer'>();
   const [theme] = useAppTheme();
-  return (
+  return isOpenMobile ? (
+    <div className={clsx(isTablet && 'ml-52')}>
+      <AddExpense
+        isEdit={false}
+        pageType={pageType!}
+        setIsOpen={setIsOpenMobile}
+      />
+    </div>
+  ) : (
     <div className="sm:ml-48 pt-4 pb-2 px-5">
       <Header month={month} setMonth={setMonth} />
       <div className="flex gap-3">
@@ -49,7 +61,7 @@ function Home() {
         {!isOpen && (
           <div
             className={clsx(
-              'hidden sm:flex rounded-lg px-2 sm:px-4 py-4 flex-col gap-y-6',
+              'hidden lg:flex rounded-lg px-2 sm:px-4 py-4 flex-col gap-y-6',
               theme === 'dark' ? 'bg-black' : 'bg-white'
             )}
           >
@@ -98,18 +110,9 @@ function Home() {
           </div>
         )}
       </div>
-      {/* <div className="absolute sm:hidden bg-purple-300 h-14 w-14 text-4xl rounded-full bottom-6 right-8">
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100%',
-          }}
-        >
-          <img src={Close} alt="" />
-        </div>
-      </div> */}
+      {(isTablet || isMobile) && (
+        <SpeedDial openScreen={setIsOpenMobile} setPageType={setPageType} />
+      )}
     </div>
   );
 }
