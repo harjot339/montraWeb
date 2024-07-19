@@ -1,4 +1,4 @@
-import React, { SetStateAction, useMemo, useState } from 'react';
+import React, { SetStateAction, useCallback, useMemo, useState } from 'react';
 import Modal from 'react-modal';
 import { toast } from 'react-toastify';
 import { jsonToCSV } from 'react-papaparse';
@@ -20,16 +20,20 @@ function ExportDataModal({
   modal: boolean;
   setModal: React.Dispatch<SetStateAction<boolean>>;
 }>) {
+  const [theme] = useAppTheme();
+  const isDesktop = useIsDesktop();
+  // state
   const [dataType, setDataType] = useState<
     'all' | 'expense' | 'income' | 'transfer'
   >('all');
   const [dataRange, setDataRange] = useState<7 | 15 | 30>(7);
   const [dataFormat, setDataFormat] = useState<'csv' | 'pdf'>('csv');
+  // redux
   const data = useSelector(
     (state: RootState) => state.transactions.transactions
   );
   const dispatch = useDispatch();
-  // Functions
+  // functions
   const formatExportData = useMemo(() => {
     const daysAgo = new Date();
     daysAgo.setDate(daysAgo.getDate() - dataRange);
@@ -71,8 +75,29 @@ function ExportDataModal({
         };
       });
   }, [data, dataType, dataRange]);
-  const [theme] = useAppTheme();
-  const isDesktop = useIsDesktop();
+  const handleExport = useCallback(async () => {
+    dispatch(setLoading(true));
+    try {
+      setModal(false);
+      const csvData = jsonToCSV(formatExportData);
+      if (csvData === '') {
+        toast.error(STRINGS.NoDataToExport);
+        toast.clearWaitingQueue();
+        dispatch(setLoading(false));
+        return;
+      }
+      window.URL = window.webkitURL || window.URL;
+      const contentType = 'text/csv';
+      const csvFile = new Blob([csvData], { type: contentType });
+      window.open(URL.createObjectURL(csvFile), '_blank');
+      dispatch(setLoading(false));
+    } catch (e) {
+      toast.error(e as string);
+      toast.clearWaitingQueue();
+      dispatch(setLoading(false));
+    }
+  }, [dispatch, formatExportData, setModal]);
+
   return (
     <Modal
       isOpen={modal}
@@ -172,29 +197,7 @@ function ExportDataModal({
           }
         />
         <div className="my-4" />
-        <CustomButton
-          title={STRINGS.Export}
-          onPress={async () => {
-            dispatch(setLoading(true));
-            try {
-              setModal(false);
-              const csvData = jsonToCSV(formatExportData);
-              if (csvData === '') {
-                toast.error(STRINGS.NoDataToExport);
-                dispatch(setLoading(false));
-                return;
-              }
-              window.URL = window.webkitURL || window.URL;
-              const contentType = 'text/csv';
-              const csvFile = new Blob([csvData], { type: contentType });
-              window.open(URL.createObjectURL(csvFile), '_blank');
-              dispatch(setLoading(false));
-            } catch (e) {
-              toast.error(e as string);
-              dispatch(setLoading(false));
-            }
-          }}
-        />
+        <CustomButton title={STRINGS.Export} onPress={handleExport} />
       </div>
     </Modal>
   );

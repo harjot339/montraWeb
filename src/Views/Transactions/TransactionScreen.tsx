@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+// Third Party Libraries
 import { Timestamp } from 'firebase/firestore';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import ReactModal from 'react-modal';
 import clsx from 'clsx';
 import { useSelector } from 'react-redux';
+// Custom Components
 import { TransactionType } from '../../Defs/transaction';
 import { RootState } from '../../Store';
 import TransactionListItem from '../../Components/TransactionListItem';
@@ -20,8 +22,7 @@ import FilterSection from '../../Components/FilterSection';
 import { COLORS } from '../../Shared/commonStyles';
 
 function TransactionScreen() {
-  const [offset] = useState<number>(0);
-  const limit = 100;
+  // redux
   const filters = useSelector((state: RootState) => state.transactions.filters);
   const transaction = useSelector(
     (state: RootState) => state.transactions.transactions
@@ -33,6 +34,8 @@ function TransactionScreen() {
   const navigate = useNavigate();
   const params = useParams();
   // state
+  const [offset] = useState<number>(0);
+  const limit = 100;
   const [month, setMonth] = useState<number>(new Date().getMonth());
   const [filter, setFilter] = useState<boolean>(false);
   // functions
@@ -160,7 +163,13 @@ function TransactionScreen() {
             };
           });
     if (filters.sort === 'oldest') {
-      return x.slice().reverse();
+      return x
+        .slice()
+        .map((item) => ({
+          title: item.title,
+          data: item.data.slice().reverse(),
+        }))
+        .reverse();
     }
     if (filters.sort === 'lowest') {
       return [
@@ -202,6 +211,7 @@ function TransactionScreen() {
     }
     return x;
   }
+  // constants
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
   const isDesktop = useIsDesktop();
@@ -225,7 +235,7 @@ function TransactionScreen() {
           </p>
           <div className="flex justify-between w-full sm:w-fit items-center gap-x-3">
             <CustomDropdown
-              data={monthData}
+              data={monthData.slice(0, new Date().getMonth() + 1)}
               value={monthData[month]}
               placeholder={STRINGS.Month}
               onChange={(e) => {
@@ -293,9 +303,8 @@ function TransactionScreen() {
             },
           }}
         >
-          <FilterSection />
+          <FilterSection setMenu={setFilter} />
         </ReactModal>
-
         {applyFilters(offset).length === 2 &&
         applyFilters(offset)[0].data.length === 0 &&
         applyFilters(offset)[1].data.length === 0 ? (

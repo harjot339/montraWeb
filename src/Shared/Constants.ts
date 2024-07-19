@@ -6,7 +6,7 @@ const ROUTES = {
   Transactions: '/transactions',
   Budgets: '/budgets',
   Report: '/report',
-  // ABOUT: '/about-us',
+  Terms: '/terms',
 };
 
 const WILDCARD_ROUTES = {
@@ -42,6 +42,10 @@ const ROUTES_CONFIG = {
   Report: {
     path: ROUTES.Report,
     title: 'Financial Report',
+  },
+  Terms: {
+    path: ROUTES.Terms,
+    title: 'Terms & Conditions',
   },
 };
 

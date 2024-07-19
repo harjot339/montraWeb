@@ -12,14 +12,12 @@ function RootRouter() {
   const guest = useRoutes(guestRoutes);
   const authenticated = useRoutes(authenticatedRoutes);
   const uid = useSelector((state: RootState) => state?.common?.user?.uid);
-  // console.log('Token', uid);
   const isAuthenticated = !!uid;
   const { data: conversion, isSuccess } = useGetUsdConversionQuery({});
   const dispatch = useDispatch();
   useEffect(() => {
     if (isSuccess) {
       dispatch(setConversionData(conversion));
-      // console.log('Ok')
     }
   }, [conversion, dispatch, isSuccess]);
   return (

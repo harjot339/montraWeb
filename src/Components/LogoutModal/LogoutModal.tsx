@@ -1,7 +1,9 @@
-import { signOut } from 'firebase/auth';
 import React, { SetStateAction } from 'react';
+// Third Party Libraries
+import { signOut } from 'firebase/auth';
 import Modal from 'react-modal';
 import { useDispatch } from 'react-redux';
+// Custom Components
 import { COLORS } from '../../Shared/commonStyles';
 import { STRINGS } from '../../Shared/Strings';
 import { setUser } from '../../Store/Common';
@@ -9,6 +11,7 @@ import { auth } from '../../Utils/firebaseConfig';
 import CustomButton from '../CustomButton';
 import useAppTheme from '../../Hooks/themeHook';
 import { useIsDesktop } from '../../Hooks/mobileCheckHook';
+import { setSidebar } from '../../Store/Loader';
 
 function LogoutModal({
   modal,
@@ -17,9 +20,10 @@ function LogoutModal({
   modal: boolean;
   setModal: React.Dispatch<SetStateAction<boolean>>;
 }>) {
+  // constants
   const [appTheme, COLOR] = useAppTheme();
-  const dispatch = useDispatch();
   const isDesktop = useIsDesktop();
+  const dispatch = useDispatch();
   return (
     <Modal
       isOpen={modal}
@@ -63,6 +67,7 @@ function LogoutModal({
             onPress={async () => {
               await signOut(auth);
               dispatch(setUser(undefined));
+              dispatch(setSidebar(false));
             }}
             backgroundColor={COLORS.VIOLET[20]}
             textColor={COLORS.VIOLET[100]}

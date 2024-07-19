@@ -1,9 +1,11 @@
 import React, { useCallback, useMemo, useState } from 'react';
+// Third Party Libraries
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import clsx from 'clsx';
 import { Timestamp } from 'firebase/firestore';
 import { COLORS } from '../../Shared/commonStyles';
+// Custom Components
 import { RootState } from '../../Store';
 import { currencies, monthData, STRINGS, weekData } from '../../Shared/Strings';
 import ArrowLeft from '../../assets/svgs/arrow left.svg';
@@ -19,6 +21,7 @@ import { useIsMobile, useIsTablet } from '../../Hooks/mobileCheckHook';
 import DeleteTransactionModal from '../../Components/DeleteTransactionModal';
 
 function TransactionDetail() {
+  // redux
   const data = useSelector(
     (state: RootState) => state.transactions.transactions
   );
@@ -27,11 +30,17 @@ function TransactionDetail() {
     (state: RootState) => state.common.user?.currency
   );
   const uid = useSelector((state: RootState) => state.common.user?.uid);
-  const params = useParams();
+  // state
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [modal, setModal] = useState<boolean>(false);
+  // constants
   const navigate = useNavigate();
+  const params = useParams();
   const transaction = data.find((item) => item.id === params.id);
+  const [theme] = useAppTheme();
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+  // functions
   const getBackgroundColor = useMemo(() => {
     if (transaction?.type === 'expense') {
       return COLORS.PRIMARY.RED;
@@ -66,9 +75,7 @@ function TransactionDetail() {
     },
     [conversion?.usd, currency]
   );
-  const [theme] = useAppTheme();
-  const isMobile = useIsMobile();
-  const isTablet = useIsTablet();
+
   return isOpen ? (
     <AddExpense
       height={isMobile || isTablet ? '100vh' : '95vh'}
@@ -85,7 +92,10 @@ function TransactionDetail() {
           theme === 'dark' ? 'bg-black' : 'bg-white',
           !isMobile && !isTablet && 'max-w-[450px]'
         )}
-        style={{ height: isMobile || isTablet ? '100vh' : '95vh' }}
+        style={{
+          minHeight: '95vh',
+          height: isMobile || isTablet ? '100vh' : 'fit-content',
+        }}
       >
         <DeleteTransactionModal
           modal={modal}
@@ -175,24 +185,24 @@ function TransactionDetail() {
             <div className="-translate-y-11">
               <div
                 className={clsx(
-                  'flex w-5/6 border  justify-between mx-auto px-8 py-4 rounded-xl',
+                  'flex w-5/6 border  justify-around mx-auto px-6 py-4 rounded-xl gap-x-3',
                   theme === 'dark' ? 'bg-black text-white' : 'bg-white'
                 )}
               >
-                <div className="text-center">
+                <div className="text-center text-ellipsis overflow-hidden whitespace-nowrap min-w-20">
                   <p className="text-xl font-semibold">{STRINGS.Type}</p>
-                  <p>
+                  <p className="text-ellipsis overflow-hidden whitespace-nowrap">
                     {transaction.type[0].toUpperCase() +
                       transaction.type.slice(1)}
                   </p>
                 </div>
-                <div className="text-center">
+                <div className="text-center text-ellipsis overflow-hidden whitespace-nowrap min-w-32">
                   <p className="text-xl font-semibold">
                     {transaction?.type === 'transfer'
                       ? STRINGS.From
                       : STRINGS.Category}
                   </p>
-                  <p>
+                  <p className="text-ellipsis overflow-hidden whitespace-nowrap">
                     {transaction?.type === 'transfer'
                       ? transaction.from[0].toUpperCase() +
                         transaction.from.slice(1)
@@ -200,18 +210,18 @@ function TransactionDetail() {
                         transaction.category.slice(1)}
                   </p>
                 </div>
-                <div className=" text-center">
+                <div className=" text-center text-ellipsis overflow-hidden whitespace-nowrap min-w-24">
                   <p className="text-xl font-semibold">
                     {transaction?.type === 'transfer'
                       ? STRINGS.To
                       : STRINGS.Wallet}
                   </p>
-                  <p>
+                  <p className="text-ellipsis overflow-hidden whitespace-nowrap">
                     {transaction?.type === 'transfer'
                       ? transaction.to[0].toUpperCase() +
                         transaction.to.slice(1)
-                      : transaction.category[0].toUpperCase() +
-                        transaction.category.slice(1)}
+                      : transaction.wallet[0].toUpperCase() +
+                        transaction.wallet.slice(1)}
                   </p>
                 </div>
               </div>

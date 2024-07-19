@@ -8,6 +8,7 @@ import TransactionDetail from '../Views/TransactionDetail';
 import Budgets from '../Views/Budgets';
 import BudgetDetail from '../Views/BudgetDetail';
 import FinancialReport from '../Views/FinancialReport';
+import TermsScreen from '../Views/TermsScreen';
 
 // eslint-disable-next-line import/prefer-default-export
 export const PRIVATE_ROUTES: Array<CustomRouter> = [
@@ -21,7 +22,7 @@ export const PRIVATE_ROUTES: Array<CustomRouter> = [
     element: <TransactionScreen />,
     title: ROUTES_CONFIG.Transactions.title,
     children: [
-      { element: <FilterSection />, index: true },
+      { element: <FilterSection setMenu={undefined} />, index: true },
       {
         path: ':id',
         element: <TransactionDetail />,
@@ -43,6 +44,11 @@ export const PRIVATE_ROUTES: Array<CustomRouter> = [
     path: ROUTES_CONFIG.Report.path,
     element: <FinancialReport />,
     title: ROUTES_CONFIG.Report.title,
+  },
+  {
+    path: `${ROUTES_CONFIG.Terms.path}`,
+    title: ROUTES_CONFIG.Terms.title,
+    element: <TermsScreen />,
   },
   {
     path: '*',

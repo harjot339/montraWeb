@@ -1,9 +1,6 @@
 import React from 'react';
 import Select, { ActionMeta, SingleValue } from 'react-select';
-import {
-  InputBorderColor,
-  PlaceholderTextColor,
-} from '../../Shared/commonStyles';
+import { COLORS, PlaceholderTextColor } from '../../Shared/commonStyles';
 import useAppTheme from '../../Hooks/themeHook';
 
 function CustomDropdown({
@@ -12,7 +9,7 @@ function CustomDropdown({
   onChange,
   // flex,
   placeholder,
-  borderColor = InputBorderColor,
+  borderColor,
   menuPlacement = 'auto',
 }: Readonly<{
   data: { label: string; value: string | number }[];
@@ -39,7 +36,7 @@ function CustomDropdown({
         return {
           label:
             item.value === 'add'
-              ? 'Add New Category'
+              ? 'ADD NEW CATEGORY'
               : item.label[0].toUpperCase() + item.label.slice(1),
           value: item.value,
         };
@@ -51,7 +48,8 @@ function CustomDropdown({
         control: (baseStyles) => ({
           ...baseStyles,
           outline: 'none',
-          borderColor,
+          borderColor:
+            borderColor ?? (apptheme[0] === 'dark' ? '#7A7E80' : '#bbbbbb'),
           height: '56px',
           borderRadius: '8px',
           padding: '0px 10px',
@@ -63,7 +61,11 @@ function CustomDropdown({
             value !== undefined && state.data.value === value.value
               ? apptheme[1].VIOLET[60]
               : apptheme[1].LIGHT[100],
-          color: apptheme[1].DARK[100],
+          color:
+            value !== undefined && state.data.value === value.value
+              ? 'white'
+              : apptheme[1].DARK[100],
+          fontWeight: state.data.value === 'add' ? 'bolder' : 'normal',
         }),
         placeholder: (base) => ({
           ...base,
@@ -76,6 +78,12 @@ function CustomDropdown({
         menu: (base) => ({
           ...base,
           backgroundColor: apptheme[1].LIGHT[100],
+          boxShadow:
+            apptheme[0] === 'dark' ? '1px 1px 5px white' : '1px 1px 5px gray',
+          scrollbarColor:
+            apptheme[0] === 'dark'
+              ? `${COLORS.DARK[50]} ${COLORS.DARK[75]}`
+              : `${COLORS.LIGHT[20]} ${COLORS.LIGHT[80]}`,
         }),
         singleValue: (base) => ({ ...base, color: apptheme[1].DARK[100] }),
         indicatorSeparator: () => ({ display: 'none' }),

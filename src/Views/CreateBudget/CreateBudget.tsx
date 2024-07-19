@@ -5,6 +5,8 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+import './styles.css';
+// Third Party Libraries
 import ReactSwitch from 'react-switch';
 import ReactSlider from 'react-slider';
 import { toast } from 'react-toastify';
@@ -12,7 +14,8 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import clsx from 'clsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { COLORS } from '../../Shared/commonStyles';
+// Custom Components
+import { COLORS, InputBorderColor } from '../../Shared/commonStyles';
 import { STRINGS } from '../../Shared/Strings';
 import ArrowLeft from '../../assets/svgs/arrow left.svg';
 import ArrowLeftBlack from '../../assets/svgs/arrow left black.svg';
@@ -21,7 +24,6 @@ import { formatWithCommas } from '../../Utils/commonFuncs';
 import CustomButton from '../../Components/CustomButton';
 import CustomDropdown from '../../Components/CustomDropdown/CustomDropdown';
 import { RootState } from '../../Store';
-import './styles.css';
 import { setLoading } from '../../Store/Loader';
 import { encrypt } from '../../Utils/encryption';
 import { db } from '../../Utils/firebaseConfig';
@@ -40,6 +42,9 @@ function CreateBudget({
 }>) {
   // constants
   const params = useParams();
+  const [theme] = useAppTheme();
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
   // state
   const month = new Date().getMonth();
   const [amount, setAmount] = useState<string>('0');
@@ -47,6 +52,7 @@ function CreateBudget({
   const [cat, setCat] = useState<string>('');
   const [checked, setChecked] = useState<boolean>(false);
   const [form, setForm] = useState<boolean>(false);
+  const [addCategoryModal, setAddCategoryModal] = useState<boolean>(false);
   // redux
   const conversion = useSelector((state: RootState) => state.common.conversion);
   const currency = useSelector(
@@ -85,7 +91,7 @@ function CreateBudget({
       amount.replace(/,/g, '') !== '' &&
       Number(amount.replace(/,/g, '')) > 0 &&
       cat !== '' &&
-      (checked === true ? percentage! > 0 : true)
+      (checked === true ? percentage > 0 : true)
     ) {
       try {
         dispatch(setLoading(true));
@@ -105,9 +111,9 @@ function CreateBudget({
           },
         });
         const curr = await getDoc(doc(db, 'users', uid!));
-        const totalSpent = spend?.[cat!] ?? 0;
+        const totalSpent = spend?.[cat] ?? 0;
         await handleOnlineNotify({
-          category: cat!,
+          category: cat,
           month,
           totalSpent,
           uid: uid!,
@@ -117,9 +123,9 @@ function CreateBudget({
         toast.success(STRINGS.BudgetCreatedSuccesfully);
         dispatch(setLoading(false));
         setIsOpen(false);
-        // navigation.pop();
       } catch (e) {
         toast.error(e as string);
+        toast.clearWaitingQueue();
         dispatch(setLoading(false));
       }
     }
@@ -155,10 +161,7 @@ function CreateBudget({
       setChecked(budget![m!][c!].alert);
     }
   }, [budget, conversion?.usd, currency, isEdit, params]);
-  const [addCategoryModal, setAddCategoryModal] = useState<boolean>(false);
-  const [theme] = useAppTheme();
-  const isMobile = useIsMobile();
-  const isTablet = useIsTablet();
+
   return (
     <div
       className={clsx(
@@ -223,6 +226,7 @@ function CreateBudget({
           )}
         >
           <CustomDropdown
+            borderColor={InputBorderColor}
             placeholder={STRINGS.Category}
             data={dropdownData}
             onChange={(e) => {

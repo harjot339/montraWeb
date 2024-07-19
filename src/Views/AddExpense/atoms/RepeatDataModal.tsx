@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
+// Third Party Libraries
 import Modal from 'react-modal';
 import clsx from 'clsx';
+import { Timestamp } from 'firebase/firestore';
+// Custom Components
 import CustomButton from '../../../Components/CustomButton';
 import CustomDropdown from '../../../Components/CustomDropdown/CustomDropdown';
 import { RepeatDataType } from '../../../Defs/transaction';
@@ -31,6 +34,7 @@ function RepeatDataModal({
     React.SetStateAction<RepeatDataType | undefined>
   >;
 }>) {
+  // state
   const [freq, setFreq] = useState<RepeatDataType['freq']>();
   const [end, setEnd] = useState<RepeatDataType['end']>();
   const [day, setDay] = useState<number>(1);
@@ -40,6 +44,8 @@ function RepeatDataModal({
   const [formkey, setFormkey] = useState<boolean>(false);
   // constants
   const year = new Date().getFullYear();
+  const [theme] = useAppTheme();
+  const isDesktop = useIsDesktop();
   // functions
   const daysInYear = useMemo(() => {
     const res = [];
@@ -55,8 +61,8 @@ function RepeatDataModal({
         daysInMonth = new Date(year, m, 0).getDate();
       }
       const daysArray = [];
-      for (let dd = 1; dd <= daysInMonth; dd += 1) {
-        daysArray.push(dd);
+      for (let i = 1; i <= daysInMonth; i += 1) {
+        daysArray.push(i);
       }
       res.push({
         month: m,
@@ -72,10 +78,17 @@ function RepeatDataModal({
     setDay(repeatData?.day ?? 1);
     setWeekDay(repeatData?.weekDay ?? 1);
     setEnd((repeatData?.end as 'date' | 'never') ?? undefined);
-    setDate(repeatData?.date as Date);
+    if ((repeatData?.date as Timestamp)?.seconds !== undefined) {
+      setDate(
+        Timestamp.fromMillis(
+          (repeatData?.date as Timestamp).seconds * 1000
+        ).toDate()
+      );
+    } else {
+      setDate(repeatData?.date as Date);
+    }
   }, [repeatData]);
-  const [theme] = useAppTheme();
-  const isDesktop = useIsDesktop();
+
   return (
     <Modal
       isOpen={modal}
@@ -84,6 +97,13 @@ function RepeatDataModal({
         if (repeatData === undefined) {
           setChecked(false);
         }
+        setFormkey(false);
+        setFreq((repeatData?.freq as RepeatDataType['freq']) ?? undefined);
+        setMonth(repeatData?.month ?? 1);
+        setDay(repeatData?.day ?? 1);
+        setWeekDay(repeatData?.weekDay ?? 1);
+        setEnd((repeatData?.end as 'date' | 'never') ?? undefined);
+        setDate(repeatData?.date as Date);
       }}
       style={{
         content: {
@@ -121,6 +141,7 @@ function RepeatDataModal({
           />
           {freq === 'yearly' && (
             <CustomDropdown
+              menuPlacement="bottom"
               placeholder={STRINGS.Month}
               flex={1}
               data={monthData}
@@ -136,6 +157,7 @@ function RepeatDataModal({
           )}
           {(freq === 'yearly' || freq === 'monthly') && (
             <CustomDropdown
+              menuPlacement="bottom"
               placeholder={STRINGS.Day}
               data={
                 freq === 'monthly'
@@ -164,6 +186,7 @@ function RepeatDataModal({
           )}
           {freq === 'weekly' && (
             <CustomDropdown
+              menuPlacement="bottom"
               placeholder={STRINGS.Day}
               data={weekData}
               onChange={(e) => {
@@ -200,7 +223,7 @@ function RepeatDataModal({
             <input
               type="date"
               className={clsx(
-                'border rounded-lg px-4 bg-transparent min-w-36',
+                'border rounded-lg px-4 bg-transparent min-w-40',
                 theme === 'dark' ? 'text-white' : 'text-black'
               )}
               min={new Date().toISOString().split('T')[0]}
@@ -210,7 +233,14 @@ function RepeatDataModal({
               }
               style={{ colorScheme: theme }}
               onChange={(e) => {
-                setDate(new Date(e.target.value));
+                if (!e.target.value) {
+                  setDate(new Date());
+                } else {
+                  const newDate = new Date(e.target.value);
+                  if (!Number.isNaN(newDate.getTime())) {
+                    setDate(newDate);
+                  }
+                }
               }}
             />
           )}

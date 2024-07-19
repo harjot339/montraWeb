@@ -1,20 +1,29 @@
 import React, { useState } from 'react';
+// Third Party Libraries
 import { useSelector } from 'react-redux';
 import clsx from 'clsx';
-import { monthData, STRINGS } from '../../Shared/Strings';
-import { RootState } from '../../Store';
+// Custom Components
 import CustomDropdown from '../../Components/CustomDropdown';
 import CustomButton from '../../Components/CustomButton';
 import ExportDataModal from './atoms/ExportDataModal';
 import SidebarButton from '../../Components/SidebarButton';
+import { monthData, STRINGS } from '../../Shared/Strings';
+import { RootState } from '../../Store';
 import useAppTheme from '../../Hooks/themeHook';
 import PieSection from './atoms/PieSection';
 import GraphSection from './atoms/GraphSection';
 import { useIsDesktop } from '../../Hooks/mobileCheckHook';
 
 function FinancialReport() {
+  // constants
+  const [theme] = useAppTheme();
+  const isDesktop = useIsDesktop();
+  // state
   const [month, setMonth] = useState(new Date().getMonth());
   const [type, setType] = useState<'income' | 'expense'>('expense');
+  const [modal, setModal] = useState<boolean>(false);
+  const [graph, setGraph] = useState<'line' | 'pie'>('line');
+  // redux
   const data = useSelector(
     (state: RootState) => state.transactions.transactions
   );
@@ -36,12 +45,9 @@ function FinancialReport() {
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
   );
-  const [modal, setModal] = useState<boolean>(false);
-  const [theme] = useAppTheme();
-  const isDesktop = useIsDesktop();
-  const [graph, setGraph] = useState<'line' | 'pie'>('line');
+
   return (
-    <div className="sm:ml-48 pt-4 px-4">
+    <div className="sm:ml-48 py-4 px-4">
       <ExportDataModal modal={modal} setModal={setModal} />
       <div className="flex gap-x-3 sm:justify-between mb-6 items-center flex-wrap">
         <SidebarButton />
@@ -81,7 +87,7 @@ function FinancialReport() {
             />
           )}
           <CustomDropdown
-            data={monthData}
+            data={monthData.slice(0, new Date().getMonth() + 1)}
             placeholder={STRINGS.Month}
             onChange={(e) => {
               setMonth(Number(e!.value) - 1);

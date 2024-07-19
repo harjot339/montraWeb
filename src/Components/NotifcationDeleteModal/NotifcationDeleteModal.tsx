@@ -1,58 +1,41 @@
 import React, { SetStateAction, useCallback } from 'react';
-// Third Party Libraries
-import Modal from 'react-modal';
-import { updateDoc, doc, deleteField } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
+import ReactModal from 'react-modal';
+import { updateDoc, doc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
-import { useDispatch } from 'react-redux';
-// Custom Components
-import CustomButton from '../CustomButton';
 import { COLORS } from '../../Shared/commonStyles';
-import { ROUTES } from '../../Shared/Constants';
 import { STRINGS } from '../../Shared/Strings';
-import { setLoading } from '../../Store/Loader';
-import { db } from '../../Utils/firebaseConfig';
-import useAppTheme from '../../Hooks/themeHook';
+import CustomButton from '../CustomButton';
 import { useIsDesktop } from '../../Hooks/mobileCheckHook';
+import useAppTheme from '../../Hooks/themeHook';
+import { db } from '../../Utils/firebaseConfig';
 
-function DeleteBudgetModal({
+function NotifcationDeleteModal({
   modal,
   setModal,
-  month,
-  selectedCategory,
   uid,
+  setMenu,
 }: Readonly<{
   modal: boolean;
   setModal: React.Dispatch<SetStateAction<boolean>>;
-  month: number;
-  selectedCategory: string;
+  setMenu: React.Dispatch<SetStateAction<boolean>>;
   uid: string | undefined;
 }>) {
-  // constants
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [theme] = useAppTheme();
   const isDesktop = useIsDesktop();
-  // functions
   const handlePress = useCallback(async () => {
     try {
-      dispatch(setLoading(true));
-      setModal(false);
+      setMenu(false);
       await updateDoc(doc(db, 'users', uid!), {
-        [`budget.${month}.${selectedCategory}`]: deleteField(),
+        notification: {},
       });
-      toast.success(STRINGS.BudgetDeletedSuccesfully);
+      setModal(false);
     } catch (e) {
       toast.error(e as string);
       toast.clearWaitingQueue();
-    } finally {
-      setModal(false);
-      navigate(ROUTES.Budgets);
-      dispatch(setLoading(false));
     }
-  }, [dispatch, month, navigate, selectedCategory, setModal, uid]);
+  }, [setMenu, setModal, uid]);
   return (
-    <Modal
+    <ReactModal
       isOpen={modal}
       onRequestClose={() => {
         setModal(false);
@@ -72,13 +55,14 @@ function DeleteBudgetModal({
           color: theme === 'dark' ? COLORS.LIGHT[100] : COLORS.DARK[100],
         },
         overlay: {
+          zIndex: 99999,
           backgroundColor: theme === 'dark' ? '#ffffff30' : '#00000050',
         },
       }}
     >
       <div className="w-full flex flex-col text-center py-5 px-5 md:px-10">
-        <p className="text-3xl mb-6 font-semibold">{STRINGS.Removebudget}</p>
-        <p className="text-lg mb-7">{STRINGS.SureRemoveBudgetNo}</p>
+        <p className="text-3xl mb-6 font-semibold">{STRINGS.AreYouSure}</p>
+        <p className="text-lg mb-7">{STRINGS.AreYouSureDelete}</p>
         <div className="flex gap-x-8">
           <CustomButton
             flex={1}
@@ -96,8 +80,8 @@ function DeleteBudgetModal({
           />
         </div>
       </div>
-    </Modal>
+    </ReactModal>
   );
 }
 
-export default React.memo(DeleteBudgetModal);
+export default React.memo(NotifcationDeleteModal);

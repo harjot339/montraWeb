@@ -1,22 +1,27 @@
 import React, { useState } from 'react';
+// Third Party Libraries
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { useDispatch } from 'react-redux';
 import { collection, getDocs } from 'firebase/firestore';
 import { toast } from 'react-toastify';
+// Custom Components
+import CustomInput from '../../Components/CustomInput';
+import CustomButton from '../../Components/CustomButton';
 import { EmailEmptyError } from '../../Shared/errors';
 import { auth, db } from '../../Utils/firebaseConfig';
-import CustomButton from '../../Components/CustomButton';
-import CustomInput from '../../Components/CustomInput';
 import { setLoading } from '../../Store/Loader';
 import { decrypt } from '../../Utils/encryption';
 import { STRINGS } from '../../Shared/Strings';
 import useAppTheme from '../../Hooks/themeHook';
 
 function Forgotpassword() {
+  const appTheme = useAppTheme();
+  // state
   const [email, setEmail] = useState('');
   const [form, setForm] = useState(false);
-  const appTheme = useAppTheme();
+  // redux
   const dispatch = useDispatch();
+  // functions
   async function isUserExist(currentEmail: string) {
     try {
       const snapshot = await getDocs(collection(db, 'users'));
@@ -27,7 +32,6 @@ function Forgotpassword() {
       });
       return res.length !== 0;
     } catch (e) {
-      // console.log(e);
       return false;
     }
   }
@@ -44,6 +48,7 @@ function Forgotpassword() {
         }
       } catch (error) {
         toast.error(error as string);
+        toast.clearWaitingQueue();
       } finally {
         dispatch(setLoading(false));
       }

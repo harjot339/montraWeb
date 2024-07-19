@@ -1,10 +1,12 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useState } from 'react';
+// Third Party Libraries
 import { useDispatch, useSelector } from 'react-redux';
 import clsx from 'clsx';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { doc, updateDoc } from 'firebase/firestore';
+// Custom Components
+import CustomDropdown from '../../../CustomDropdown';
+import LogoutModal from '../../../LogoutModal';
 import { COLORS } from '../../../../Shared/commonStyles';
 import { db } from '../../../../Utils/firebaseConfig';
 import { ROUTES } from '../../../../Shared/Constants';
@@ -18,24 +20,24 @@ import Pie from '../../../../assets/svgs/pie-chart.svg';
 import Dashboard from '../../../../assets/svgs/dashboard.svg';
 import Report from '../../../../assets/svgs/report.svg';
 import Logout from '../../../../assets/svgs/logout.svg';
-import CustomDropdown from '../../../CustomDropdown';
-import LogoutModal from '../../../LogoutModal';
 
 export function SidebarLayout({
   children,
 }: Readonly<{ children: React.JSX.Element }>) {
-  const isOpen = useSelector((state: RootState) => state.loader.sidebar);
+  // constants
   const dispatch = useDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
+  const [appTheme, COLOR] = useAppTheme();
+  // redux
+  const isOpen = useSelector((state: RootState) => state.loader.sidebar);
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
   );
-  const [modal, setModal] = useState<boolean>(false);
   const theme = useSelector((state: RootState) => state.common.user?.theme);
   const uid = useSelector((state: RootState) => state.common.user?.uid);
-  const navigate = useNavigate();
-  const [appTheme, COLOR] = useAppTheme();
-
+  // state
+  const [modal, setModal] = useState<boolean>(false);
   return (
     <div
       style={{
@@ -168,7 +170,8 @@ export function SidebarLayout({
           </ul>
         </div>
       </aside>
-      <div
+      <button
+        type="button"
         style={{
           position: 'absolute',
           zIndex: isOpen ? 1 : -1,
@@ -182,7 +185,9 @@ export function SidebarLayout({
             .getElementById('default-sidebar')!
             .classList.toggle('-translate-x-full');
         }}
-      />
+      >
+        {' '}
+      </button>
       <LogoutModal modal={modal} setModal={setModal} />
       <div
         style={{

@@ -8,12 +8,9 @@ const useAppTheme: () => ['dark' | 'light', typeof COLORS] = () => {
   const [light, setLight] = useState<boolean>();
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: light)');
-
     if (mq.matches) {
       setLight(true);
     }
-
-    // This callback will fire if the perferred color scheme changes without a reload
     mq.addEventListener('change', (evt) => setLight(evt.matches));
   }, []);
   if (theme === 'device' || theme === undefined) {

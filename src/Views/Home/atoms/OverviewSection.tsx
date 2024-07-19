@@ -1,6 +1,8 @@
 import React, { useCallback } from 'react';
+// Third Party Librarires
 import { useSelector } from 'react-redux';
 import clsx from 'clsx';
+// Custom Components
 import { COLORS } from '../../../Shared/commonStyles';
 import { RootState } from '../../../Store';
 import { formatWithCommas } from '../../../Utils/commonFuncs';
@@ -8,6 +10,7 @@ import { currencies, STRINGS } from '../../../Shared/Strings';
 import useAppTheme from '../../../Hooks/themeHook';
 
 function OverviewSection({ month }: Readonly<{ month: number }>) {
+  // redux
   const spends = useSelector(
     (state: RootState) => state.common.user?.spend?.[month]
   );
@@ -20,6 +23,7 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
   const conversion = useSelector((state: RootState) => state.common.conversion);
   const totalSpend = Object.values(spends ?? []).reduce((a, b) => a + b, 0);
   const totalIncome = Object.values(incomes ?? []).reduce((a, b) => a + b, 0);
+  // functions
   const currencyConvert = useCallback(
     (amount: number) => {
       if (

@@ -1,6 +1,8 @@
 import React from 'react';
+// Third party Libraries
 import { Timestamp } from 'firebase/firestore';
 import clsx from 'clsx';
+// Custom Components
 import {
   catIcons,
   formatAMPM,
@@ -34,6 +36,7 @@ function TransactionListItem({
   disabled?: boolean;
   selected?: boolean;
 }>) {
+  // functions
   const getAmtSymbol = (x: TransactionType) => {
     if (x.type === 'expense') {
       return '-';
@@ -65,7 +68,6 @@ function TransactionListItem({
       style={{
         width: '100%',
         maxWidth: width === 'half' ? '400px' : '',
-        // minWidth: width === 'half' ? '200px' : undefined,
         backgroundColor: selected ? COLORS.VIOLET[20] : '',
       }}
       key={item.id}

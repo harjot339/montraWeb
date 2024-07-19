@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
+// Third Party Libraries
 import { useSelector } from 'react-redux';
 import clsx from 'clsx';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import { monthData, STRINGS } from '../../Shared/Strings';
-import { RootState } from '../../Store';
+// Custom Components
 import BudgetItem from './atoms/BudgetItem';
-import CustomDropdown from '../../Components/CustomDropdown/CustomDropdown';
-import { COLORS } from '../../Shared/commonStyles';
 import CustomButton from '../../Components/CustomButton';
 import CreateBudget from '../CreateBudget';
+import SidebarButton from '../../Components/SidebarButton';
+import { monthData, STRINGS } from '../../Shared/Strings';
+import { RootState } from '../../Store';
+import CustomDropdown from '../../Components/CustomDropdown/CustomDropdown';
 import { getMyColor } from '../../Utils/commonFuncs';
 import useAppTheme from '../../Hooks/themeHook';
 import {
@@ -16,15 +18,19 @@ import {
   useIsTablet,
   useIsDesktop,
 } from '../../Hooks/mobileCheckHook';
-import SidebarButton from '../../Components/SidebarButton';
 
 function Budgets() {
   const navigate = useNavigate();
   const params = useParams();
+  const [theme] = useAppTheme();
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+  const isDesktop = useIsDesktop();
   // state
   const [month, setMonth] = useState<number>(new Date().getMonth());
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
+  const [catColors, setCatColors] = useState<{ [key: string]: string }>();
   // redux
   const budgets = useSelector(
     (state: RootState) => state.common.user?.budget[month]
@@ -35,11 +41,7 @@ function Budgets() {
   const conversion = useSelector((state: RootState) => state.common.conversion);
   const spend =
     useSelector((state: RootState) => state.common.user?.spend[month]) ?? {};
-  const [theme] = useAppTheme();
-  const isMobile = useIsMobile();
-  const isTablet = useIsTablet();
-  const isDesktop = useIsDesktop();
-  const [catColors, setCatColors] = useState<{ [key: string]: string }>();
+
   useEffect(() => {
     setCatColors(
       Object.entries(budgets ?? {}).reduce(
@@ -94,7 +96,6 @@ function Budgets() {
                     </div>
                   )}
                 <CustomDropdown
-                  borderColor={COLORS.LIGHT[20]}
                   data={monthData.slice(0, new Date().getMonth() + 1)}
                   value={month !== undefined ? monthData[month] : undefined}
                   onChange={(e) => {

@@ -1,34 +1,38 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
+// Third Party Libraries
 import { useSelector } from 'react-redux';
-import { RootState } from '../../Store';
-import { COLORS } from '../../Shared/commonStyles';
+// Custom Components
 import Graph from './atoms/Graph';
 import Income from '../../assets/svgs/income.svg';
 import Expense from '../../assets/svgs/expense.svg';
 import Transfer from '../../assets/svgs/currency-exchange.svg';
-// import Close from '../../assets/svgs/close.svg'
 import BudgetSection from './atoms/BudgetSection';
 import RecentSection from './atoms/RecentSection';
 import OverviewSection from './atoms/OverviewSection';
 import AddExpense from '../AddExpense/AddExpense';
 import Header from './atoms/Header';
 import useAppTheme from '../../Hooks/themeHook';
+import { RootState } from '../../Store';
+import { COLORS } from '../../Shared/commonStyles';
 import { useIsMobile, useIsTablet } from '../../Hooks/mobileCheckHook';
 import SpeedDial from '../../Components/SpeedDial';
 
 function Home() {
+  // state
   const [month, setMonth] = useState(new Date().getMonth());
-
-  const data = useSelector(
-    (state: RootState) => state.transactions.transactions
-  );
-  const isMobile = useIsMobile();
-  const isTablet = useIsTablet();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isOpenMobile, setIsOpenMobile] = useState<boolean>(false);
   const [pageType, setPageType] = useState<'income' | 'expense' | 'transfer'>();
+  // redux
+  const data = useSelector(
+    (state: RootState) => state.transactions.transactions
+  );
+  // constants
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
   const [theme] = useAppTheme();
+
   return isOpenMobile ? (
     <div className={clsx(isTablet && 'ml-52')}>
       <AddExpense

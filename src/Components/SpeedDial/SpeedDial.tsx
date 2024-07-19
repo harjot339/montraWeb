@@ -7,12 +7,12 @@ import Transfer from '../../assets/svgs/currency-exchange.svg';
 function SpeedDial({
   openScreen,
   setPageType,
-}: {
+}: Readonly<{
   openScreen: React.Dispatch<SetStateAction<boolean>>;
   setPageType: React.Dispatch<
     SetStateAction<'income' | 'expense' | 'transfer' | undefined>
   >;
-}) {
+}>) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {

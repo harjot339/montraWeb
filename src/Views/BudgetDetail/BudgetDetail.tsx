@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
+// Third Party Libraries
 import ProgressBar from '@ramonak/react-progress-bar';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import clsx from 'clsx';
+// Custom Components
+import CustomButton from '../../Components/CustomButton';
+import CreateBudget from '../CreateBudget';
 import { ROUTES } from '../../Shared/Constants';
 import ArrowLeftBlack from '../../assets/svgs/arrow left black.svg';
 import ArrowLeft from '../../assets/svgs/arrow left.svg';
@@ -14,17 +18,20 @@ import { currencies, STRINGS } from '../../Shared/Strings';
 import { catIcons, formatWithCommas } from '../../Utils/commonFuncs';
 import { RootState } from '../../Store';
 import { COLORS } from '../../Shared/commonStyles';
-import CustomButton from '../../Components/CustomButton';
-import CreateBudget from '../CreateBudget';
 import DeleteBudgetModal from '../../Components/DeleteBudgetModal/DeleteBudgetModal';
 import useAppTheme from '../../Hooks/themeHook';
 import { useIsMobile, useIsTablet } from '../../Hooks/mobileCheckHook';
 
 function BudgetDetail() {
+  // constants
   const navigate = useNavigate();
   const params = useParams();
   const month = params.id!.split('_')[0];
   const selectedCategory = params.id!.split('_')[1];
+  const [theme] = useAppTheme();
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+  // redux
   const budgets = useSelector(
     (state: RootState) => state.common.user?.budget[month]
   );
@@ -42,11 +49,10 @@ function BudgetDetail() {
     percentage: 0,
   };
   const spend = spends?.[selectedCategory] ?? 0;
+  // state
   const [modal, setModal] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [theme] = useAppTheme();
-  const isMobile = useIsMobile();
-  const isTablet = useIsTablet();
+
   return isOpen ? (
     <CreateBudget isEdit setIsOpen={setIsOpen} />
   ) : (
@@ -58,7 +64,6 @@ function BudgetDetail() {
       )}
       style={{
         height: isMobile || isTablet ? '100vh' : '95vh',
-        // maxWidth: isMobile || isTablet ? '100%' : '450px',
       }}
     >
       <DeleteBudgetModal

@@ -47,6 +47,7 @@ export async function singupUser({
   } catch (e) {
     const error: AuthError = e as AuthError;
     toast.error(FirebaseAuthErrorHandler(error.code));
+    toast.clearWaitingQueue();
     return false;
   }
   return false;
@@ -232,7 +233,7 @@ export async function handleOnlineNotify({
               )} budget has exceeded the limit`,
             }
           );
-          // console.log(notif)
+          // console.log(notif);
         } else if (
           totalSpent >=
           totalBudget.limit * (totalBudget.percentage / 100)
@@ -262,6 +263,7 @@ export async function handleOnlineNotify({
         }
       } catch (e) {
         toast.error(e as string);
+        toast.clearWaitingQueue();
       }
     }
   }

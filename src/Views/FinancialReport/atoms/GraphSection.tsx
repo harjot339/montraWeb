@@ -1,11 +1,16 @@
-import { Timestamp } from 'firebase/firestore';
 import React from 'react';
+// Third Party Libraries
+import { Timestamp } from 'firebase/firestore';
 import clsx from 'clsx';
+import { useNavigate } from 'react-router-dom';
+// Custom Components
 import TransactionListItem from '../../../Components/TransactionListItem';
 import Graph from '../../Home/atoms/Graph';
 import { TransactionType } from '../../../Defs/transaction';
 import { useIsDesktop } from '../../../Hooks/mobileCheckHook';
 import { STRINGS } from '../../../Shared/Strings';
+import { COLORS } from '../../../Shared/commonStyles';
+import { ROUTES_CONFIG } from '../../../Shared/Constants';
 
 function GraphSection({
   data,
@@ -29,6 +34,7 @@ function GraphSection({
   theme: 'light' | 'dark';
 }>) {
   const isDesktop = useIsDesktop();
+  const navigate = useNavigate();
   return (
     <div>
       <div className="h-96 mb-5">
@@ -75,29 +81,60 @@ function GraphSection({
           </div>
         </div>
       )}
-      <div className="px-2">
-        {data
-          .slice()
-          .filter((item) => {
-            return (
-              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                .toDate()
-                ?.getMonth() === month && item.type === type
-            );
-          })
-          .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
-          .slice(0, 5)
-          .map((item) => (
-            <TransactionListItem
-              disabled
-              item={item}
-              key={item.id}
-              width="full"
-              currency={currency}
-              conversion={conversion}
-            />
-          ))}
-      </div>
+      {data.slice().filter((item) => {
+        return (
+          Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+            .toDate()
+            ?.getMonth() === month && item.type === type
+        );
+      }).length !== 0 && (
+        <div className="px-2">
+          <div className="flex justify-between pt-3">
+            <p
+              className={clsx(
+                'text-2xl md:text-3xl lg:text-4xl font-bold mb-4 items-center',
+                theme === 'dark' && 'text-white'
+              )}
+            >
+              {`${STRINGS.Transaction}s`}
+            </p>
+            <button
+              type="button"
+              className="rounded-2xl px-4 h-8 text-sm sm:text-base font-semibold"
+              style={{
+                backgroundColor: COLORS.VIOLET[20],
+                color: COLORS.VIOLET[100],
+              }}
+              onClick={() => {
+                navigate(ROUTES_CONFIG.Transactions.path);
+              }}
+            >
+              {STRINGS.SeeAll}
+            </button>
+          </div>
+          {data
+            .slice()
+            .filter((item) => {
+              return (
+                Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                  .toDate()
+                  ?.getMonth() === month && item.type === type
+              );
+            })
+            .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
+            .slice(0, 5)
+            .map((item) => (
+              <TransactionListItem
+                disabled
+                item={item}
+                key={item.id}
+                width="full"
+                currency={currency}
+                conversion={conversion}
+              />
+            ))}
+        </div>
+      )}
     </div>
   );
 }

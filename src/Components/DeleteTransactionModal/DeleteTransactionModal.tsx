@@ -1,18 +1,29 @@
-import React, { SetStateAction } from 'react';
+import React, { SetStateAction, useCallback } from 'react';
+// Third Party Libraries
 import Modal from 'react-modal';
-import { deleteDoc, doc } from 'firebase/firestore';
+import {
+  deleteDoc,
+  doc,
+  getDoc,
+  Timestamp,
+  updateDoc,
+} from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+// Custom Components
+import CustomButton from '../CustomButton';
 import { COLORS } from '../../Shared/commonStyles';
 import { ROUTES } from '../../Shared/Constants';
 import { STRINGS } from '../../Shared/Strings';
 import { setLoading } from '../../Store/Loader';
 import { db } from '../../Utils/firebaseConfig';
-import CustomButton from '../CustomButton';
 import useAppTheme from '../../Hooks/themeHook';
 import { TransactionType } from '../../Defs/transaction';
 import { useIsDesktop } from '../../Hooks/mobileCheckHook';
+import { UserType } from '../../Defs/user';
+import { encrypt } from '../../Utils/encryption';
+import { UserFromJson } from '../../Utils/userFuncs';
 
 function DeleteTransactionModal({
   modal,
@@ -25,10 +36,49 @@ function DeleteTransactionModal({
   uid: string | undefined;
   transaction: TransactionType | undefined;
 }>) {
+  // constants
   const [theme, COLOR] = useAppTheme();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isDesktop = useIsDesktop();
+  // functions
+  const handlePress = useCallback(async () => {
+    try {
+      dispatch(setLoading(true));
+      setModal(false);
+      const curr = await getDoc(doc(db, 'users', uid!));
+      const month = Timestamp.fromMillis(transaction!.timeStamp.seconds * 1000)
+        .toDate()
+        .getMonth();
+      const { category } = transaction!;
+      if (transaction!.type === 'income') {
+        const finalAmount =
+          (UserFromJson(curr.data() as UserType)?.income?.[month]?.[category] ??
+            0) - transaction!.amount;
+        await updateDoc(doc(db, 'users', uid!), {
+          [`income.${month}.${category}`]: encrypt(String(finalAmount), uid!),
+        });
+      } else {
+        const finalAmount =
+          (UserFromJson(curr.data() as UserType)?.spend?.[month]?.[category] ??
+            0) - transaction!.amount;
+        await updateDoc(doc(db, 'users', uid!), {
+          [`spend.${month}.${
+            transaction!.type === 'transfer' ? 'transfer' : category
+          }`]: encrypt(String(finalAmount), uid!),
+        });
+      }
+      await deleteDoc(doc(db, 'users', uid!, 'transactions', transaction!.id));
+      toast.success(STRINGS.TransactionDeletedSuccesfully);
+    } catch (e) {
+      toast.error(e as string);
+      toast.clearWaitingQueue();
+    } finally {
+      setModal(false);
+      navigate(ROUTES.Transactions);
+      dispatch(setLoading(false));
+    }
+  }, [dispatch, navigate, setModal, transaction, uid]);
   return (
     <Modal
       isOpen={modal}
@@ -70,21 +120,7 @@ function DeleteTransactionModal({
           <CustomButton
             flex={1}
             title={STRINGS.Yes}
-            onPress={async () => {
-              try {
-                dispatch(setLoading(true));
-                await deleteDoc(
-                  doc(db, 'users', uid!, 'transactions', transaction!.id)
-                );
-                toast.success(STRINGS.TransactionDeletedSuccesfully);
-              } catch (e) {
-                toast.error(e as string);
-              } finally {
-                setModal(false);
-                navigate(ROUTES.Transactions);
-                dispatch(setLoading(false));
-              }
-            }}
+            onPress={handlePress}
             backgroundColor={COLORS.VIOLET[20]}
             textColor={COLORS.VIOLET[100]}
           />

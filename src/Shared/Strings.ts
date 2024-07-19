@@ -14,6 +14,8 @@ export const passRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\s])[A-Za-z\d@$!%*?&\s]{8,}$/;
 
 export const STRINGS = {
+  PopupClosedByUser: 'Authentication process canceled. Please try again.',
+  Categories: 'Categories',
   Filters: 'Filters',
   Percentage: 'Percentage',
   Limit: 'Limit',
@@ -56,7 +58,7 @@ export const STRINGS = {
   Or: 'Or',
   SignupWithGoogle: 'Sign Up with Google',
   AlreadyHaveAccount: 'Already have an Account?',
-  SignupSuccesful: 'A verification email has been sent to your account.',
+  EmailVerificationSent: 'A verification email has been sent to your account.',
   CategoryName: 'Category Name',
   Add: 'Add',
   Home: 'Home',
@@ -205,7 +207,7 @@ export const STRINGS = {
   LeaveWithoutSettingPin:
     'Are you sure you want to leave without setting up your pin?',
   EmailAdressAlreadyUsed:
-    'The email address is already in use by another account.',
+    'The email address is already in used by another account.',
   CredentialMalformed:
     'The supplied auth credential is malformed or has expired.',
   NetworkError:

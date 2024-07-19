@@ -10,6 +10,7 @@ function CustomButton({
   borderColor,
   component,
   flex,
+  disabled,
 }: Readonly<{
   backgroundColor?: string;
   title: string;
@@ -19,13 +20,15 @@ function CustomButton({
   borderColor?: string;
   component?: React.ReactNode;
   flex?: number;
+  disabled?: boolean;
 }>) {
   return (
     <button
+      disabled={disabled ?? false}
       type="button"
-      className="flex justify-center min-h-12 md:h-14 hover:opacity-90 items-center"
+      className="flex justify-center min-h-12 md:h-14 hover:opacity-90 items-center disabled:opacity-100"
       style={{
-        backgroundColor,
+        backgroundColor: disabled ? '#bababa' : backgroundColor,
         borderWidth,
         borderColor,
         columnGap: '10px',

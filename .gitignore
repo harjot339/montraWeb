@@ -27,3 +27,4 @@ bricks
 # env files
 .env*
 .firebase
+.scannerwork

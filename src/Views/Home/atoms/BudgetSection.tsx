@@ -1,7 +1,9 @@
 import React from 'react';
+// Third Party Libraries
 import clsx from 'clsx';
 import { useSelector } from 'react-redux';
 import ProgressBar from '@ramonak/react-progress-bar';
+// Custom Components
 import { RootState } from '../../../Store';
 import { formatWithCommas, getMyColor } from '../../../Utils/commonFuncs';
 import { currencies, STRINGS } from '../../../Shared/Strings';
@@ -9,6 +11,7 @@ import useAppTheme from '../../../Hooks/themeHook';
 import Alert from '../../../assets/svgs/alert.svg';
 
 function BudgetSection({ month }: Readonly<{ month: number }>) {
+  // redux
   const budgets = useSelector(
     (state: RootState) => state.common.user?.budget?.[month]
   );
@@ -19,7 +22,9 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
   );
+  // constants
   const [theme] = useAppTheme();
+
   return (
     <div className="hidden md:flex gap-3">
       <div
@@ -78,7 +83,35 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
                       {key[0].toUpperCase() + key.slice(1)}
                       <div />
                     </td>
-                    <td className="hidden lg:table-cell">
+                    <td
+                      className="hidden lg:table-cell"
+                      onMouseOver={() => {}}
+                      onFocus={() => {}}
+                      title={`${
+                        currencies[currency ?? 'USD'].symbol +
+                        formatWithCommas(
+                          Number(
+                            (
+                              conversion.usd[
+                                (currency ?? 'USD').toLowerCase()
+                              ] * (spends?.[key] ?? 0)
+                            ).toFixed(2)
+                          ).toString()
+                        )
+                      } of ${
+                        currencies[currency ?? 'USD'].symbol
+                      }${formatWithCommas(
+                        Number(
+                          (
+                            conversion.usd[(currency ?? 'USD').toLowerCase()] *
+                            val.limit
+                          ).toFixed(2)
+                        ).toString()
+                      )}`}
+                    >
+                      {/* <div className="absolute m-auto border">
+                        {spends?.[key] ?? 0}
+                      </div> */}
                       <ProgressBar
                         // width="30vw"
                         isLabelVisible={false}
@@ -98,6 +131,7 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
                                 ).toFixed(0)
                               )
                         }%`}
+                        borderRadius="9999999999px"
                       />
                     </td>
                     <td className="font-semibold">

@@ -6,11 +6,11 @@ function MoneyInput({
   amount,
   setAmount,
   theme,
-}: {
+}: Readonly<{
   amount: string;
   setAmount: React.Dispatch<SetStateAction<string>>;
   theme: 'light' | 'dark';
-}) {
+}>) {
   return (
     <input
       // type="number"
@@ -29,7 +29,7 @@ function MoneyInput({
         'bg-transparent w-full px-4 sm:px-8 h-20 outline-none text-6xl font-semibold',
         theme === 'dark' ? 'text-black' : 'text-white'
       )}
-      maxLength={10}
+      maxLength={12}
       onChange={(e) => {
         const str = e.target.value;
         let numericValue = str.replace(/[^0-9.]+/g, '');
