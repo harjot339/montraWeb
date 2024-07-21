@@ -1,15 +1,18 @@
 import React, { SetStateAction } from 'react';
 import clsx from 'clsx';
 import { formatWithCommas } from '../../Utils/commonFuncs';
+import { currencies } from '../../Shared/Strings';
 
 function MoneyInput({
   amount,
   setAmount,
   theme,
+  currency,
 }: Readonly<{
   amount: string;
   setAmount: React.Dispatch<SetStateAction<string>>;
   theme: 'light' | 'dark';
+  currency: string | undefined;
 }>) {
   return (
     <input
@@ -24,7 +27,7 @@ function MoneyInput({
           setAmount('0');
         }
       }}
-      value={`$ ${amount}`}
+      value={`${currencies[currency ?? 'USD'].symbol} ${amount}`}
       className={clsx(
         'bg-transparent w-full px-4 sm:px-8 h-20 outline-none text-6xl font-semibold',
         theme === 'dark' ? 'text-black' : 'text-white'

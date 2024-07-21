@@ -270,7 +270,12 @@ function AddExpense({
         >
           {STRINGS.HowMuch}
         </p>
-        <MoneyInput amount={amount} setAmount={setAmount} theme={theme} />
+        <MoneyInput
+          amount={amount}
+          setAmount={setAmount}
+          theme={theme}
+          currency={user?.currency}
+        />
         <EmptyZeroError
           value={amount}
           errorText={STRINGS.PleaseFillAnAmount}
