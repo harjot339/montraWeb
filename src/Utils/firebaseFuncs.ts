@@ -128,7 +128,12 @@ export function createTransaction({
   return {
     amount: encrypt(
       String(
-        (Number(amount) / conversion.usd[currency.toLowerCase()]).toFixed(10)
+        (
+          Number(amount) /
+          (isEdit ? transaction.conversion : conversion).usd[
+            currency.toLowerCase()
+          ]
+        ).toFixed(10)
       ),
       uid
     ),

@@ -101,19 +101,26 @@ function CreateBudget({
               String(
                 (
                   Number(amount.replace(/,/g, '')) /
-                  conversion.usd[currency!.toLowerCase()]
+                  (isEdit
+                    ? budget![params.id!.split('_')[0]][
+                        params.id!.split('_')[1]
+                      ].conversion
+                    : conversion
+                  ).usd[currency!.toLowerCase()]
                 ).toFixed(10)
               ),
               uid!
             ),
             alert: checked,
             percentage: encrypt(String(percentage), uid!),
-            conversion,
+            conversion: isEdit
+              ? budget![params.id!.split('_')[0]][params.id!.split('_')[1]]
+                  .conversion
+              : conversion,
           },
         });
         const curr = await getDoc(doc(db, 'users', uid!));
-        const totalSpent =
-          spend?.[cat]?.[currency?.toUpperCase() ?? 'USD'] ?? 0;
+        const totalSpent = spend?.[cat]?.USD ?? 0;
         await handleNotify({
           category: cat,
           month,
@@ -137,6 +144,7 @@ function CreateBudget({
     }
   }, [
     amount,
+    budget,
     cat,
     checked,
     conversion,
@@ -144,6 +152,7 @@ function CreateBudget({
     dispatch,
     isEdit,
     month,
+    params.id,
     percentage,
     setIsOpen,
     spend,
@@ -157,8 +166,9 @@ function CreateBudget({
         formatWithCommas(
           Number(
             (
-              (conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ?? 1) *
-              Number(budget![m!][c!].limit)
+              (budget![m!][c!].conversion?.usd?.[
+                currency?.toLowerCase() ?? 'usd'
+              ] ?? 1) * Number(budget![m!][c!].limit)
             ).toFixed(2)
           ).toString()
         )

@@ -42,12 +42,7 @@ function BudgetDetail() {
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
   );
-  const budget = budgets?.[selectedCategory] ?? {
-    alert: false,
-    limit: 0,
-    percentage: 0,
-    conversion: {},
-  };
+  const budget = budgets?.[selectedCategory];
   // state
   const [modal, setModal] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -156,8 +151,7 @@ function BudgetDetail() {
               )}
             >
               {currencies[currency!].symbol}
-              {budget.limit - (spends?.[selectedCategory]?.USD ?? 0) < 0 ||
-              spends?.[selectedCategory]?.USD === undefined
+              {budget.limit - (spends?.[selectedCategory]?.USD ?? 0) < 0
                 ? '0'
                 : formatWithCommas(
                     Number(
@@ -167,9 +161,9 @@ function BudgetDetail() {
                         ] *
                           Number(budget.limit) -
                         Number(
-                          spends?.[selectedCategory][
+                          spends?.[selectedCategory]?.[
                             currency?.toUpperCase() ?? 'USD'
-                          ]
+                          ] ?? 0
                         )
                       ).toFixed(2)
                     ).toString()

@@ -25,7 +25,7 @@ function AuthLayout({ children }: Readonly<{ children: React.JSX.Element }>) {
   return (
     <div
       className={clsx(
-        'w-full min-w-[100vw]  min-h-[100vh] h-full border flex justify-center items-center',
+        'w-full min-w-[100vw]  min-h-[100vh] h-full flex justify-center items-center',
         theme === 'dark' ? 'bg-[#161719]' : 'bg-[#f2f4f5]'
       )}
     >
