@@ -38,7 +38,7 @@ function Budgets() {
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
   );
-  const conversion = useSelector((state: RootState) => state.common.conversion);
+  // const conversion = useSelector((state: RootState) => state.common.conversion);
   const spend =
     useSelector((state: RootState) => state.common.user?.spend[month]) ?? {};
 
@@ -130,7 +130,7 @@ function Budgets() {
                       }}
                       key={item[0]}
                       item={item}
-                      conversion={conversion}
+                      // conversion={conversion}
                       currency={currency}
                       spend={spend}
                     />

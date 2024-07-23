@@ -16,7 +16,6 @@ function RecentSection({ month }: Readonly<{ month: number }>) {
   const data = useSelector(
     (state: RootState) => state.transactions.transactions
   );
-  const conversion = useSelector((state: RootState) => state.common.conversion);
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
   );
@@ -93,7 +92,6 @@ function RecentSection({ month }: Readonly<{ month: number }>) {
                 key={item.id}
                 width="full"
                 currency={currency}
-                conversion={conversion}
               />
             ))
         )}

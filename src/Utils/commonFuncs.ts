@@ -67,5 +67,8 @@ export function FirebaseAuthErrorHandler(code: string) {
   if (code === 'auth/popup-closed-by-user') {
     return STRINGS.PopupClosedByUser;
   }
-  return STRINGS.UnknownError;
+  if (code === 'auth/too-many-requests') {
+    return STRINGS.ToManyRequestError;
+  }
+  return `${STRINGS.UnknownError}(${code})`;
 }

@@ -39,7 +39,6 @@ function BudgetDetail() {
     (state: RootState) => state.common.user?.spend[month]
   );
   const uid = useSelector((state: RootState) => state.common.user?.uid);
-  const conversion = useSelector((state: RootState) => state.common.conversion);
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
   );
@@ -47,8 +46,8 @@ function BudgetDetail() {
     alert: false,
     limit: 0,
     percentage: 0,
+    conversion: {},
   };
-  const spend = spends?.[selectedCategory] ?? 0;
   // state
   const [modal, setModal] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -157,13 +156,21 @@ function BudgetDetail() {
               )}
             >
               {currencies[currency!].symbol}
-              {budget.limit - spend < 0 || spend === undefined
+              {budget.limit - (spends?.[selectedCategory]?.USD ?? 0) < 0 ||
+              spends?.[selectedCategory]?.USD === undefined
                 ? '0'
                 : formatWithCommas(
                     Number(
                       (
-                        conversion.usd[currency!.toLowerCase()] *
-                        (Number(budget.limit) - Number(spend))
+                        budget.conversion.usd[
+                          currency?.toLowerCase() ?? 'usd'
+                        ] *
+                          Number(budget.limit) -
+                        Number(
+                          spends?.[selectedCategory][
+                            currency?.toUpperCase() ?? 'USD'
+                          ]
+                        )
                       ).toFixed(2)
                     ).toString()
                   )}
@@ -171,12 +178,15 @@ function BudgetDetail() {
             <div className="px-10">
               <ProgressBar
                 completed={
-                  spend / budget.limit > 1 ? 100 : (spend / budget.limit) * 100
+                  (spends?.[selectedCategory]?.USD ?? 0) / budget.limit > 1
+                    ? 100
+                    : ((spends?.[selectedCategory]?.USD ?? 0) / budget.limit) *
+                      100
                 }
                 isLabelVisible={false}
               />
             </div>
-            {(spend ?? 0) >= budget.limit && (
+            {(spends?.[selectedCategory]?.USD ?? 0) >= budget.limit && (
               <div className="self-center flex items-center gap-x-3 bg-red-500 mt-16 px-6 py-3 rounded-3xl">
                 <img src={Alert} width="30px" alt="" />
                 <p className="text-white text-lg font-semibold">

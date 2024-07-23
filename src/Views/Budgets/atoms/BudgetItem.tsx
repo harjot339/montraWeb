@@ -10,7 +10,7 @@ function BudgetItem({
   item,
   spend,
   currency,
-  conversion,
+  // conversion,
   onClick,
   color,
 }: Readonly<{
@@ -20,17 +20,24 @@ function BudgetItem({
       alert: boolean;
       limit: number;
       percentage: number;
+      conversion: {
+        [key: string]: {
+          [key: string]: number;
+        };
+      };
     },
   ];
   spend: {
-    [key: string]: number;
-  };
-  currency: string | undefined;
-  conversion: {
-    [key: string]: {
-      [key: string]: number;
+    [category: string]: {
+      [currency: string]: number;
     };
   };
+  currency: string | undefined;
+  // conversion: {
+  //   [key: string]: {
+  //     [key: string]: number;
+  //   };
+  // };
   onClick: () => void;
   color: string;
 }>) {
@@ -43,18 +50,20 @@ function BudgetItem({
       },
       key: string
     ) => {
-      if (val.limit - spend[key] < 0) {
+      if (spend?.[key]?.USD === undefined) {
+        return (
+          item[1].conversion.usd[currency?.toLowerCase() ?? 'usd'] * val.limit
+        ).toFixed(2);
+      }
+      if (val.limit - (spend?.[key]?.USD ?? 0) < 0) {
         return '0';
       }
-      if (spend[key] === undefined) {
-        return (conversion.usd[currency!.toLowerCase()] * val.limit).toFixed(2);
-      }
       return (
-        conversion.usd[currency!.toLowerCase()] *
-        (val.limit - (spend[key] ?? 0))
+        val.limit * item[1].conversion.usd[currency?.toLowerCase() ?? 'usd'] -
+        (spend?.[key]?.[currency?.toUpperCase() ?? 'USD'] ?? 0)
       ).toFixed(2);
     },
-    [conversion.usd, currency, spend]
+    [currency, item, spend]
   );
   const key = item[0];
   const val = item[1];
@@ -77,7 +86,7 @@ function BudgetItem({
           />
           <p>{key[0].toUpperCase() + key.slice(1)}</p>
         </div>
-        {(spend[key] ?? 0) >= val.limit && (
+        {(spend?.[key]?.USD ?? 0) >= val.limit && (
           <img src={Alert} width="30px" alt="" />
         )}
       </div>
@@ -90,9 +99,9 @@ function BudgetItem({
           width="100%"
           bgColor={color}
           completed={
-            (spend?.[key] ?? 0) / val.limit > 1
+            (spend?.[key]?.USD ?? 0) / val.limit > 1
               ? 100
-              : ((spend?.[key] ?? 0) / val.limit) * 100
+              : ((spend?.[key]?.USD ?? 0) / val.limit) * 100
           }
           isLabelVisible={false}
         />
@@ -101,19 +110,20 @@ function BudgetItem({
         {currencies[currency!].symbol}
         {formatWithCommas(
           Number(
-            (
-              conversion.usd[currency!.toLowerCase()] * (spend[key] ?? 0)
-            ).toFixed(2)
+            (spend?.[key]?.[currency?.toUpperCase() ?? 'USD'] ?? 0).toFixed(2)
           ).toString()
         )}{' '}
         of {currencies[currency!].symbol}
         {formatWithCommas(
           Number(
-            (conversion.usd[currency!.toLowerCase()] * val.limit).toFixed(2)
+            (
+              (item[1]?.conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ??
+                0) * val.limit
+            ).toFixed(2)
           ).toString()
         )}
       </p>
-      {(spend[key] ?? 0) >= val.limit && (
+      {(spend?.[key]?.USD ?? 0) >= val.limit && (
         <p className="text-red-500">{STRINGS.LimitExceeded}</p>
       )}
     </button>

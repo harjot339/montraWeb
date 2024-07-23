@@ -25,7 +25,7 @@ import { setLoading } from '../../Store/Loader';
 import { ROUTES } from '../../Shared/Constants';
 import { auth, db } from '../../Utils/firebaseConfig';
 import { UserFromJson, UserToJson } from '../../Utils/userFuncs';
-import { setUser } from '../../Store/Common';
+import { setTheme, setUser } from '../../Store/Common';
 import { FirebaseAuthErrorHandler } from '../../Utils/commonFuncs';
 import useAppTheme from '../../Hooks/themeHook';
 
@@ -100,7 +100,7 @@ function Signup() {
       const creds = await signInWithPopup(auth, provider);
       if (creds) {
         const res = await getDoc(doc(db, 'users', creds.user.uid));
-        if (!res.exists) {
+        if (!res.exists()) {
           const user = UserToJson({
             name: creds.user.displayName!,
             email: creds.user.email!,
@@ -109,11 +109,13 @@ function Signup() {
           });
           await setDoc(doc(db, 'users', creds.user.uid), user);
           dispatch(setUser(user));
+          dispatch(setTheme(undefined));
         } else {
           const data = res;
           const user = UserFromJson(data.data()!);
           if (user) {
             dispatch(setUser(user));
+            dispatch(setTheme(undefined));
           }
         }
       }
@@ -177,6 +179,7 @@ function Signup() {
           id="checkbox"
           className={clsx(
             'h-7 w-7 rounded-full',
+            appTheme[0] === 'dark' ? 'bg-[#3b3b3b] ' : 'bg-white',
             form.terms &&
               !checked &&
               'outline-red-500 outline-2 outline outline-offset-1'

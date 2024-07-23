@@ -27,7 +27,6 @@ function TransactionScreen() {
   const transaction = useSelector(
     (state: RootState) => state.transactions.transactions
   );
-  const conversion = useSelector((state: RootState) => state.common.conversion);
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
   );
@@ -337,7 +336,6 @@ function TransactionScreen() {
                       item={item}
                       key={item.id}
                       width="half"
-                      conversion={conversion}
                       currency={currency}
                       onClick={() => {
                         navigate(item.id, {

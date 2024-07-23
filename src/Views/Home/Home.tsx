@@ -73,15 +73,15 @@ function Home() {
               type="button"
               className="h-14 min-w-14 rounded-lg hover:opacity-85 flex justify-center items-center"
               style={{
-                backgroundColor: COLORS.RED[100],
+                backgroundColor: COLORS.GREEN[100],
               }}
               onClick={() => {
-                setPageType('expense');
+                setPageType('income');
                 setIsOpen(true);
               }}
-              title="Expense"
+              title="Income"
             >
-              <img src={Expense} alt="" width="35px" />
+              <img src={Income} alt="" width="35px" />
             </button>
             <button
               type="button"
@@ -101,15 +101,15 @@ function Home() {
               type="button"
               className="h-14 min-w-14 rounded-lg hover:opacity-85 flex justify-center items-center"
               style={{
-                backgroundColor: COLORS.GREEN[100],
+                backgroundColor: COLORS.RED[100],
               }}
               onClick={() => {
-                setPageType('income');
+                setPageType('expense');
                 setIsOpen(true);
               }}
-              title="Income"
+              title="Expense"
             >
-              <img src={Income} alt="" width="35px" />
+              <img src={Expense} alt="" width="35px" />
             </button>
           </div>
         )}

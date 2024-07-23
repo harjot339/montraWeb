@@ -15,6 +15,7 @@ function Loader({ children }: Readonly<{ children: React.JSX.Element }>) {
           position: 'fixed',
           flex: 1,
           top: 0,
+          zIndex: 99999,
           height: '100%',
           width: '100%',
           justifyContent: 'center',

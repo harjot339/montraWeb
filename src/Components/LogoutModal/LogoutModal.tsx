@@ -2,16 +2,17 @@ import React, { SetStateAction } from 'react';
 // Third Party Libraries
 import { signOut } from 'firebase/auth';
 import Modal from 'react-modal';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 // Custom Components
 import { COLORS } from '../../Shared/commonStyles';
 import { STRINGS } from '../../Shared/Strings';
-import { setUser } from '../../Store/Common';
+import { setTheme, setUser } from '../../Store/Common';
 import { auth } from '../../Utils/firebaseConfig';
 import CustomButton from '../CustomButton';
 import useAppTheme from '../../Hooks/themeHook';
 import { useIsDesktop } from '../../Hooks/mobileCheckHook';
 import { setSidebar } from '../../Store/Loader';
+import { RootState } from '../../Store';
 
 function LogoutModal({
   modal,
@@ -24,6 +25,9 @@ function LogoutModal({
   const [appTheme, COLOR] = useAppTheme();
   const isDesktop = useIsDesktop();
   const dispatch = useDispatch();
+  const authTheme = useSelector(
+    (state: RootState) => state.common?.user?.theme
+  );
   return (
     <Modal
       isOpen={modal}
@@ -60,17 +64,18 @@ function LogoutModal({
             onPress={() => {
               setModal(false);
             }}
+            backgroundColor={COLORS.VIOLET[20]}
+            textColor={COLORS.VIOLET[100]}
           />
           <CustomButton
-            flex={1}
             title={STRINGS.Yes}
             onPress={async () => {
               await signOut(auth);
+              dispatch(setTheme(authTheme));
               dispatch(setUser(undefined));
               dispatch(setSidebar(false));
             }}
-            backgroundColor={COLORS.VIOLET[20]}
-            textColor={COLORS.VIOLET[100]}
+            flex={1}
           />
         </div>
       </div>

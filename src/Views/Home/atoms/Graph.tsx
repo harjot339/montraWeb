@@ -47,7 +47,6 @@ function Graph({
   type?: 'expense' | 'income';
 }>) {
   // redux
-  const conversion = useSelector((state: RootState) => state.common.conversion);
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
   );
@@ -92,13 +91,14 @@ function Graph({
     .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)
     .reduce(
       (acc: { data: number[]; labels: number[] }, item) => {
-        acc.data.push(item.amount);
+        acc.data.push(
+          item.amount * item.conversion.usd[currency?.toLowerCase() ?? 'usd']
+        );
         acc.labels.push(item.timeStamp.seconds);
         return acc;
       },
       { data: [], labels: [] }
     );
-
   return (
     <div
       className={clsx(
@@ -190,12 +190,7 @@ function Graph({
                       return (
                         currencies[currency ?? 'USD'].symbol +
                         formatWithCommas(
-                          Number(
-                            (
-                              conversion.usd[currency!.toLowerCase()] *
-                              Number(val)
-                            ).toFixed(2)
-                          ).toString()
+                          Number(Number(val).toFixed(2)).toString()
                         )
                       );
                     },

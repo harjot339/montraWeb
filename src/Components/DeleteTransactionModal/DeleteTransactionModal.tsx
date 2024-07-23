@@ -1,29 +1,26 @@
 import React, { SetStateAction, useCallback } from 'react';
 // Third Party Libraries
 import Modal from 'react-modal';
-import {
-  deleteDoc,
-  doc,
-  getDoc,
-  Timestamp,
-  updateDoc,
-} from 'firebase/firestore';
+import { doc, getDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { deleteObject, ref } from 'firebase/storage';
 // Custom Components
 import CustomButton from '../CustomButton';
 import { COLORS } from '../../Shared/commonStyles';
 import { ROUTES } from '../../Shared/Constants';
 import { STRINGS } from '../../Shared/Strings';
 import { setLoading } from '../../Store/Loader';
-import { db } from '../../Utils/firebaseConfig';
+import { db, storage } from '../../Utils/firebaseConfig';
 import useAppTheme from '../../Hooks/themeHook';
 import { TransactionType } from '../../Defs/transaction';
 import { useIsDesktop } from '../../Hooks/mobileCheckHook';
-import { UserType } from '../../Defs/user';
-import { encrypt } from '../../Utils/encryption';
-import { UserFromJson } from '../../Utils/userFuncs';
+import {
+  handleExpenseUpdate,
+  handleIncomeUpdate,
+} from '../../Utils/firebaseFuncs';
+import { RootState } from '../../Store';
 
 function DeleteTransactionModal({
   modal,
@@ -41,6 +38,9 @@ function DeleteTransactionModal({
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isDesktop = useIsDesktop();
+  const currency = useSelector(
+    (state: RootState) => state.common.user?.currency
+  );
   // functions
   const handlePress = useCallback(async () => {
     try {
@@ -52,23 +52,33 @@ function DeleteTransactionModal({
         .getMonth();
       const { category } = transaction!;
       if (transaction!.type === 'income') {
-        const finalAmount =
-          (UserFromJson(curr.data() as UserType)?.income?.[month]?.[category] ??
-            0) - transaction!.amount;
-        await updateDoc(doc(db, 'users', uid!), {
-          [`income.${month}.${category}`]: encrypt(String(finalAmount), uid!),
+        await handleIncomeUpdate({
+          curr,
+          uid: uid!,
+          amount: 0,
+          category,
+          currency: currency!,
+          month,
+          transaction: transaction!,
         });
       } else {
-        const finalAmount =
-          (UserFromJson(curr.data() as UserType)?.spend?.[month]?.[category] ??
-            0) - transaction!.amount;
-        await updateDoc(doc(db, 'users', uid!), {
-          [`spend.${month}.${
-            transaction!.type === 'transfer' ? 'transfer' : category
-          }`]: encrypt(String(finalAmount), uid!),
+        await handleExpenseUpdate({
+          curr,
+          uid: uid!,
+          amount: 0,
+          category,
+          currency: currency!,
+          month,
+          transaction: transaction!,
         });
       }
-      await deleteDoc(doc(db, 'users', uid!, 'transactions', transaction!.id));
+      if (transaction?.attachementType !== 'none') {
+        await deleteObject(ref(storage, transaction?.attachement));
+      }
+      await updateDoc(doc(db, 'users', uid!, 'transactions', transaction!.id), {
+        deleted: true,
+      });
+      // deleteDoc(doc(db, 'users', uid!, 'transactions', transaction!.id));
       toast.success(STRINGS.TransactionDeletedSuccesfully);
     } catch (e) {
       toast.error(e as string);
@@ -78,7 +88,7 @@ function DeleteTransactionModal({
       navigate(ROUTES.Transactions);
       dispatch(setLoading(false));
     }
-  }, [dispatch, navigate, setModal, transaction, uid]);
+  }, [currency, dispatch, navigate, setModal, transaction, uid]);
   return (
     <Modal
       isOpen={modal}

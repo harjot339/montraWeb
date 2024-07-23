@@ -9,11 +9,24 @@ export type UserType = {
   incomeCategory: string[];
   budget: {
     [month: string]: {
-      [key: string]: { alert: boolean; limit: number; percentage: number };
+      [key: string]: {
+        alert: boolean;
+        limit: number;
+        percentage: number;
+        conversion: {
+          [key: string]: {
+            [key: string]: number;
+          };
+        };
+      };
     };
   };
-  spend: { [month: string]: { [key: string]: number } };
-  income: { [month: string]: { [key: string]: number } };
+  spend: {
+    [month: string]: { [category: string]: { [currency: string]: number } };
+  };
+  income: {
+    [month: string]: { [category: string]: { [currency: string]: number } };
+  };
   notification: {
     [id: string]: {
       category: string;

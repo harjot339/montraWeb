@@ -19,7 +19,6 @@ function TransactionListItem({
   item,
   width,
   currency,
-  conversion,
   disabled = false,
   onClick,
   selected = false,
@@ -27,11 +26,6 @@ function TransactionListItem({
   item: TransactionType;
   width: 'full' | 'half';
   currency: string | undefined;
-  conversion: {
-    [key: string]: {
-      [key: string]: number;
-    };
-  };
   onClick?: () => void;
   disabled?: boolean;
   selected?: boolean;
@@ -126,7 +120,8 @@ function TransactionListItem({
           {formatWithCommas(
             Number(
               (
-                conversion.usd[(currency ?? 'USD').toLowerCase()] * item.amount
+                item.conversion.usd[(currency ?? 'USD').toLowerCase()] *
+                item.amount
               ).toFixed(2)
             ).toString()
           )}

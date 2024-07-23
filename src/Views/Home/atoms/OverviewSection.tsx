@@ -21,34 +21,19 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
     (state: RootState) => state.common.user?.currency
   );
   const conversion = useSelector((state: RootState) => state.common.conversion);
-  const totalSpend = Object.values(spends ?? []).reduce((a, b) => a + b, 0);
-  const totalIncome = Object.values(incomes ?? []).reduce((a, b) => a + b, 0);
+  const totalSpend = Object.values(spends ?? []).reduce((a, b) => {
+    return a + (b?.[currency?.toUpperCase() ?? 'USD'] ?? 0);
+  }, 0);
+  const totalIncome = Object.values(incomes ?? []).reduce((a, b) => {
+    return a + (b[currency?.toUpperCase() ?? 'USD'] ?? 0);
+  }, 0);
   // functions
-  const currencyConvert = useCallback(
-    (amount: number) => {
-      if (
-        Number.isNaN(
-          Number(
-            (
-              (conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ?? 1) *
-              amount
-            ).toFixed(2)
-          )
-        )
-      ) {
-        return 0;
-      }
-      return formatWithCommas(
-        Number(
-          (
-            (conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ?? 1) *
-            Number(amount)
-          ).toFixed(2)
-        ).toString()
-      );
-    },
-    [conversion?.usd, currency]
-  );
+  const currencyConvert = useCallback((amount: number) => {
+    if (Number.isNaN(Number(amount.toFixed(2)))) {
+      return 0;
+    }
+    return formatWithCommas(Number(Number(amount).toFixed(2)).toString());
+  }, []);
   const [theme] = useAppTheme();
   return (
     <div
@@ -65,7 +50,7 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
       >
         {STRINGS.Overview}
       </p>
-      <div className="flex mt-5 justify-evenly gap-2 text-center">
+      <div className="flex mt-5 justify-evenly gap-3 text-center">
         <div>
           <p
             className={clsx(
@@ -74,7 +59,11 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
             )}
           >
             {currencies[currency ?? 'USD'].symbol}
-            {currencyConvert(9400)}
+            {Number(
+              (9400 * conversion.usd[currency?.toLowerCase() ?? 'usd']).toFixed(
+                2
+              )
+            ).toString()}
           </p>
           <p
             className="text-md md:text-lg font-normal"

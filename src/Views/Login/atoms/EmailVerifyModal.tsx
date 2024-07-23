@@ -88,7 +88,7 @@ function EmailVerifyModal({
           />
           <CustomButton
             flex={1}
-            title={STRINGS.Ok}
+            title={STRINGS.Ok.toUpperCase()}
             onPress={() => {
               setIsOpen(false);
             }}

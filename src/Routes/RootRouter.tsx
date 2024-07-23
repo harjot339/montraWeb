@@ -7,6 +7,7 @@ import AppLayout from '../Components/Layouts/AppLayout';
 import type { RootState } from '../Store';
 import { useGetUsdConversionQuery } from '../Services/Api/module/converApi';
 import { setConversionData } from '../Store/Common';
+import { currencies } from '../Shared/Strings';
 
 function RootRouter() {
   const guest = useRoutes(guestRoutes);
@@ -17,7 +18,20 @@ function RootRouter() {
   const dispatch = useDispatch();
   useEffect(() => {
     if (isSuccess) {
-      dispatch(setConversionData(conversion));
+      const myCurrencies: { [key: string]: number } = {};
+      Object.entries(conversion.usd as { [key: string]: number }).forEach(
+        ([key, val]) => {
+          if (currencies[key.toUpperCase()] !== undefined) {
+            myCurrencies[key] = val;
+          }
+        }
+      );
+      dispatch(
+        setConversionData({
+          date: conversion.date,
+          usd: myCurrencies,
+        })
+      );
     }
   }, [conversion, dispatch, isSuccess]);
   return (

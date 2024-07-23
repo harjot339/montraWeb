@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 // Third Party Libraries
 import { useSelector } from 'react-redux';
+import { Timestamp } from 'firebase/firestore';
 import clsx from 'clsx';
 // Custom Components
 import CustomDropdown from '../../Components/CustomDropdown';
@@ -30,22 +31,18 @@ function FinancialReport() {
   const spends = useSelector(
     (state: RootState) => state.common.user?.spend[month]
   );
-  const totalSpend = Object.values(spends ?? {}).reduce(
-    (acc, curr) => acc + curr,
-    0
-  );
-  const income = useSelector(
-    (state: RootState) => state.common.user?.income[month]
-  );
-  const totalIncome = Object.values(income ?? {}).reduce(
-    (acc, curr) => acc + curr,
-    0
-  );
-  const conversion = useSelector((state: RootState) => state.common.conversion);
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
   );
-
+  const totalSpend = Object.values(spends ?? []).reduce((a, b) => {
+    return a + (b?.[currency?.toUpperCase() ?? 'USD'] ?? 0);
+  }, 0);
+  const income = useSelector(
+    (state: RootState) => state.common.user?.income[month]
+  );
+  const totalIncome = Object.values(income ?? []).reduce((a, b) => {
+    return a + (b[currency?.toUpperCase() ?? 'USD'] ?? 0);
+  }, 0);
   return (
     <div className="sm:ml-48 py-4 px-4">
       <ExportDataModal modal={modal} setModal={setModal} />
@@ -102,34 +99,48 @@ function FinancialReport() {
           theme === 'dark' ? 'bg-black' : 'bg-white'
         )}
       >
-        {isDesktop && (
-          <>
-            <div className="w-1/2">
-              <GraphSection
-                conversion={conversion}
-                currency={currency}
-                data={data}
-                month={month}
-                type={type}
-                setType={setType}
-                theme={theme}
-              />
+        {isDesktop &&
+          (data.filter(
+            (item) =>
+              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                .toDate()
+                .getMonth() === month && item.type === type
+          ).length < 2 &&
+          Object.values((type === 'income' ? income : spends) ?? {}).reduce(
+            (acc, curr) => acc + curr[currency?.toUpperCase() ?? 'USD'],
+            0
+          ) === 0 ? (
+            <div className="flex w-full h-[500px] justify-center items-center">
+              <p className="text-gray-400 text-2xl font-semibold">
+                {STRINGS.NotEnoughData}
+              </p>
             </div>
-            <div className="w-1/2">
-              <PieSection
-                conversion={conversion}
-                currency={currency}
-                income={income}
-                spends={spends}
-                theme={theme}
-                totalIncome={totalIncome}
-                totalSpend={totalSpend}
-                type={type}
-                setType={setType}
-              />
-            </div>
-          </>
-        )}
+          ) : (
+            <>
+              <div className="w-1/2">
+                <GraphSection
+                  currency={currency}
+                  data={data}
+                  month={month}
+                  type={type}
+                  setType={setType}
+                  theme={theme}
+                />
+              </div>
+              <div className="w-1/2">
+                <PieSection
+                  currency={currency}
+                  income={income}
+                  spends={spends}
+                  theme={theme}
+                  totalIncome={totalIncome}
+                  totalSpend={totalSpend}
+                  type={type}
+                  setType={setType}
+                />
+              </div>
+            </>
+          ))}
         {!isDesktop && (
           <div className="w-full">
             <div className="flex w-full justify-end">
@@ -189,7 +200,6 @@ function FinancialReport() {
             {graph === 'line' ? (
               <div className="w-full">
                 <GraphSection
-                  conversion={conversion}
                   currency={currency}
                   data={data}
                   month={month}
@@ -201,7 +211,6 @@ function FinancialReport() {
             ) : (
               <div className="w-full">
                 <PieSection
-                  conversion={conversion}
                   currency={currency}
                   income={income}
                   spends={spends}

@@ -10,12 +10,16 @@ function CategoryItem({
   catColors,
   type,
   currency,
-  conversion,
   theme,
   totalSpend,
   totalIncome,
 }: Readonly<{
-  item: [string, number];
+  item: [
+    string,
+    {
+      [currency: string]: number;
+    },
+  ];
   catColors:
     | {
         [key: string]: string;
@@ -23,11 +27,6 @@ function CategoryItem({
     | undefined;
   type: 'income' | 'expense';
   currency: string | undefined;
-  conversion: {
-    [key: string]: {
-      [key: string]: number;
-    };
-  };
   theme: 'light' | 'dark';
   totalSpend: number;
   totalIncome: number;
@@ -60,16 +59,14 @@ function CategoryItem({
           {type === 'expense' ? '- ' : '+ '}
           {currencies[currency!].symbol}
           {formatWithCommas(
-            Number(
-              (conversion.usd[currency!.toLowerCase()] * item[1]).toFixed(2)
-            ).toString()
+            Number(item[1][currency ?? 'USD'].toFixed(2)).toString()
           )}
         </p>
       </div>
       <ProgressBar
         isLabelVisible={false}
         completed={(
-          (item[1] /
+          (item[1][currency ?? 'USD'] /
             (type === 'expense' ? Number(totalSpend) : Number(totalIncome))) *
           100
         ).toFixed(0)}

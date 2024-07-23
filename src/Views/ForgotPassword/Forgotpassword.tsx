@@ -4,6 +4,7 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 import { useDispatch } from 'react-redux';
 import { collection, getDocs } from 'firebase/firestore';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 // Custom Components
 import CustomInput from '../../Components/CustomInput';
 import CustomButton from '../../Components/CustomButton';
@@ -13,8 +14,10 @@ import { setLoading } from '../../Store/Loader';
 import { decrypt } from '../../Utils/encryption';
 import { STRINGS } from '../../Shared/Strings';
 import useAppTheme from '../../Hooks/themeHook';
+import { ROUTES } from '../../Shared/Constants';
 
 function Forgotpassword() {
+  const navigate = useNavigate();
   const appTheme = useAppTheme();
   // state
   const [email, setEmail] = useState('');
@@ -43,6 +46,7 @@ function Forgotpassword() {
         if (await isUserExist(email)) {
           await sendPasswordResetEmail(auth, email);
           toast.success(STRINGS.EmailSent);
+          navigate(ROUTES.LOGIN);
         } else {
           toast.error(STRINGS.EmailNotRegistered);
         }

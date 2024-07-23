@@ -33,44 +33,60 @@ const decryptNotifications = (json: DocumentData) => {
   );
 };
 const decryptIncome = (json: DocumentData) => {
+  const income: UserType['spend'] = json?.income;
   return (
     Object.fromEntries(
-      Object.entries<{ [key: string]: string }>(json?.income ?? {}).map(
-        ([key, value]) => {
-          return [
-            key,
-            Object.assign(
-              {},
-              ...Object.entries(value ?? {}).map(([subkey, subval]) => {
-                return {
-                  [subkey]: Number(decrypt(subval, json.uid)),
-                };
-              })
-            ),
-          ];
-        }
-      )
+      Object.entries(income ?? {}).map(([month, categories]) => {
+        return [
+          month,
+          Object.fromEntries(
+            Object.entries(categories ?? {}).map(([category, currencies]) => {
+              return [
+                category,
+                Object.fromEntries(
+                  Object.entries(currencies ?? {}).map(
+                    ([currency, encryptedValue]) => {
+                      return [
+                        currency,
+                        Number(decrypt(String(encryptedValue), json.uid)),
+                      ];
+                    }
+                  )
+                ),
+              ];
+            })
+          ),
+        ];
+      })
     ) ?? {}
   );
 };
 const decryptExpense = (json: DocumentData) => {
+  const spend: UserType['spend'] = json?.spend;
   return (
     Object.fromEntries(
-      Object.entries<{ [key: string]: string }>(json?.spend ?? {}).map(
-        ([key, value]) => {
-          return [
-            key,
-            Object.assign(
-              {},
-              ...Object.entries(value ?? {}).map(([subkey, subval]) => {
-                return {
-                  [subkey]: Number(decrypt(subval, json.uid)),
-                };
-              })
-            ),
-          ];
-        }
-      )
+      Object.entries(spend ?? {}).map(([month, categories]) => {
+        return [
+          month,
+          Object.fromEntries(
+            Object.entries(categories ?? {}).map(([category, currencies]) => {
+              return [
+                category,
+                Object.fromEntries(
+                  Object.entries(currencies ?? {}).map(
+                    ([currency, encryptedValue]) => {
+                      return [
+                        currency,
+                        Number(decrypt(String(encryptedValue), json.uid)),
+                      ];
+                    }
+                  )
+                ),
+              ];
+            })
+          ),
+        ];
+      })
     ) ?? {}
   );
 };
@@ -78,7 +94,16 @@ const decryptBudget = (json: DocumentData) => {
   return (
     Object.fromEntries(
       Object.entries<{
-        [key: string]: { alert: boolean; limit: string; percentage: string };
+        [key: string]: {
+          alert: boolean;
+          limit: string;
+          percentage: string;
+          conversion: {
+            [key: string]: {
+              [key: string]: number;
+            };
+          };
+        };
       }>(json?.budget ?? {}).map(([key, value]) => {
         return [
           key,
@@ -90,6 +115,7 @@ const decryptBudget = (json: DocumentData) => {
                   alert: subValue.alert,
                   limit: Number(decrypt(subValue.limit, json.uid)),
                   percentage: Number(decrypt(subValue.percentage, json.uid)),
+                  conversion: subValue.conversion,
                 },
               };
             })

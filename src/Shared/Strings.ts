@@ -14,6 +14,10 @@ export const passRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\s])[A-Za-z\d@$!%*?&\s]{8,}$/;
 
 export const STRINGS = {
+  ClearRepeatTransaction:
+    'Clearing Repeating Transaction Frequency \nAre you sure you want to clear the repeating transaction frequency?',
+  ToManyRequestError:
+    'A verification email has been sent. Please wait two minutes before requesting again.',
   PopupClosedByUser: 'Authentication process canceled. Please try again.',
   Categories: 'Categories',
   Filters: 'Filters',
@@ -71,6 +75,7 @@ export const STRINGS = {
   Yes: 'Yes',
   BudgetDeletedSuccesfully: 'Budget Deleted Successfully',
   BudgetCreatedSuccesfully: 'Budget Created Successfully',
+  BudgetUpdatedSuccesfully: 'Budget Updated Successfully',
   RemovethisTransaction: 'Remove this Transaction?',
   sureRemoveTransaction: 'Are you sure you want to remove this transaction?',
   TransactionDeletedSuccesfully: 'Transaction Deleted Successfully',

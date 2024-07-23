@@ -17,18 +17,12 @@ function GraphSection({
   month,
   type,
   currency,
-  conversion,
   setType,
   theme,
 }: Readonly<{
   month: number;
   type: 'income' | 'expense';
   currency: string | undefined;
-  conversion: {
-    [key: string]: {
-      [key: string]: number;
-    };
-  };
   data: TransactionType[];
   setType: React.Dispatch<React.SetStateAction<'income' | 'expense'>>;
   theme: 'light' | 'dark';
@@ -130,7 +124,6 @@ function GraphSection({
                 key={item.id}
                 width="full"
                 currency={currency}
-                conversion={conversion}
               />
             ))}
         </div>

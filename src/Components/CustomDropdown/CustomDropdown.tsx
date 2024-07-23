@@ -84,9 +84,14 @@ function CustomDropdown({
             apptheme[0] === 'dark'
               ? `${COLORS.DARK[50]} ${COLORS.DARK[75]}`
               : `${COLORS.LIGHT[20]} ${COLORS.LIGHT[80]}`,
+          position: 'absolute',
         }),
         singleValue: (base) => ({ ...base, color: apptheme[1].DARK[100] }),
         indicatorSeparator: () => ({ display: 'none' }),
+        dropdownIndicator: (base) => ({
+          ...base,
+          color: apptheme[0] === 'dark' ? COLORS.LIGHT[20] : COLORS.DARK[50],
+        }),
       }}
       menuPlacement={menuPlacement}
       isSearchable={false}

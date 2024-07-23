@@ -211,6 +211,7 @@ function AddExpense({
       setRepeatData(
         prevTransaction?.freq === null ? undefined : prevTransaction?.freq
       );
+      setChecked(prevTransaction?.freq !== null);
       setFrom(prevTransaction!.from);
       setTo(prevTransaction!.to);
     }
@@ -330,6 +331,7 @@ function AddExpense({
                     setFrom(e.target.value);
                   }}
                   style={{ color: COLOR.DARK[100] }}
+                  maxLength={20}
                 />
                 <img src={Transfer} alt="" width="28px" />
                 <input
@@ -340,6 +342,7 @@ function AddExpense({
                   }}
                   value={to}
                   style={{ color: COLOR.DARK[100] }}
+                  maxLength={20}
                 />
               </div>
               <CompundEmptyError
@@ -383,7 +386,7 @@ function AddExpense({
               <EmptyError
                 errorText={STRINGS.PleaseSelectAWallet}
                 formKey={form}
-                value={cat}
+                value={wallet}
               />
             </>
           )}
@@ -414,8 +417,16 @@ function AddExpense({
                     setChecked(c);
                     if (c) {
                       setModal(true);
-                    } else {
-                      setRepeatData(undefined);
+                    } else if (repeatData !== undefined) {
+                      // eslint-disable-next-line no-alert
+                      const res = window.confirm(
+                        STRINGS.ClearRepeatTransaction
+                      );
+                      if (res) {
+                        setRepeatData(undefined);
+                      } else {
+                        setChecked(true);
+                      }
                     }
                   }}
                   checkedIcon={false}

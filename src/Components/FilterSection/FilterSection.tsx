@@ -1,17 +1,11 @@
-import React, {
-  useState,
-  useRef,
-  useCallback,
-  SetStateAction,
-  useEffect,
-} from 'react';
+import React, { useState, useCallback, SetStateAction, useEffect } from 'react';
 // Third Party Libraries
 import { useSelector, useDispatch } from 'react-redux';
 import clsx from 'clsx';
-import Multiselect from 'multiselect-react-dropdown';
+import Select from 'react-select';
 // Custom Components
 import CustomButton from '../CustomButton';
-import { COLORS } from '../../Shared/commonStyles';
+import { COLORS, PlaceholderTextColor } from '../../Shared/commonStyles';
 import { STRINGS } from '../../Shared/Strings';
 import {
   setFilters,
@@ -33,8 +27,6 @@ function FilterSection({
   const [incomeCategory, setIncomeCategory] = useState<string[]>([]);
   const [expenseCategory, setExpenseCategory] = useState<string[]>([]);
   // ref
-  const multiRef1 = useRef<Multiselect>(null);
-  const multiRef2 = useRef<Multiselect>(null);
   // redux
   const incomeCategories = useSelector(
     (state: RootState) => state.common.user?.incomeCategory
@@ -48,8 +40,6 @@ function FilterSection({
   const [theme, COLOR] = useAppTheme();
   // functions
   const handleReset = useCallback(async () => {
-    await multiRef1.current?.resetSelectedValues();
-    await multiRef2.current?.resetSelectedValues();
     setFilter(-1);
     setSort(-1);
     dispatch(setFilters(-1));
@@ -198,39 +188,73 @@ function FilterSection({
         >
           {STRINGS.Income}
         </p>
-        <Multiselect
-          ref={multiRef1}
-          selectedValues={incomeCategory.map((item) => {
-            return { cat: item, key: item[0].toUpperCase() + item.slice(1) };
-          })}
-          placeholder="Income Categories"
-          displayValue="key"
-          style={{
-            searchBox: {
-              borderRadius: '8px',
-            },
-            option: {
-              backgroundColor: theme === 'dark' ? 'black' : 'white',
-              color: theme === 'dark' ? 'white' : 'black',
-            },
-          }}
-          onKeyPressFn={() => {}}
-          onRemove={(_, item) => {
-            setIncomeCategory((cat) => {
-              return cat.filter(
-                (i) => i.toLowerCase() !== item.key.toLowerCase()
-              );
-            });
-          }}
-          onSearch={() => {}}
-          onSelect={(_, item) => {
-            setIncomeCategory((cat) => {
-              return [...cat, item.key.toLowerCase()];
-            });
-          }}
+        <Select
+          menuPlacement="top"
+          isMulti
           options={incomeCategories?.slice(1).map((item) => {
-            return { cat: item, key: item[0].toUpperCase() + item.slice(1) };
+            return {
+              value: item,
+              label: item[0].toUpperCase() + item.slice(1),
+            };
           })}
+          onChange={(data) => {
+            setIncomeCategory(data.map((item) => item.value));
+          }}
+          placeholder="Income Categories"
+          value={incomeCategory.map((item) => {
+            return {
+              value: item,
+              label: item[0].toUpperCase() + item.slice(1),
+            };
+          })}
+          styles={{
+            control: (baseStyles) => ({
+              ...baseStyles,
+              outline: 'none',
+              borderColor: theme === 'dark' ? '#7A7E80' : '#bbbbbb',
+              minHeight: '56px',
+              borderRadius: '8px',
+              padding: '0px 10px',
+              backgroundColor: 'transparent',
+            }),
+            option: (base) => ({
+              ...base,
+              backgroundColor: COLOR.LIGHT[100],
+              color: COLOR.DARK[100],
+            }),
+            placeholder: (base) => ({
+              ...base,
+              color: PlaceholderTextColor,
+            }),
+            container: (base) => ({
+              ...base,
+              width: '100%',
+            }),
+            menu: (base) => ({
+              ...base,
+              backgroundColor: COLOR.LIGHT[100],
+              boxShadow:
+                theme === 'dark' ? '1px 1px 5px white' : '1px 1px 5px gray',
+              scrollbarColor:
+                theme === 'dark'
+                  ? `${COLORS.DARK[50]} ${COLORS.DARK[75]}`
+                  : `${COLORS.LIGHT[20]} ${COLORS.LIGHT[80]}`,
+            }),
+            dropdownIndicator: (base) => ({
+              ...base,
+              color: theme === 'dark' ? COLORS.LIGHT[20] : COLORS.DARK[50],
+            }),
+            multiValue: (base) => ({
+              ...base,
+              backgroundColor: COLOR.LIGHT[40],
+              color: COLOR.DARK[100],
+            }),
+            multiValueLabel: (base) => ({
+              ...base,
+              backgroundColor: COLOR.LIGHT[40],
+              color: COLOR.DARK[100],
+            }),
+          }}
         />
         <p
           className={clsx(
@@ -240,39 +264,73 @@ function FilterSection({
         >
           {STRINGS.Expense}
         </p>
-        <Multiselect
-          ref={multiRef2}
-          selectedValues={expenseCategory.map((item) => {
-            return { cat: item, key: item[0].toUpperCase() + item.slice(1) };
-          })}
-          placeholder="Expense Categories"
-          displayValue="key"
-          style={{
-            searchBox: {
-              borderRadius: '8px',
-            },
-            option: {
-              backgroundColor: theme === 'dark' ? 'black' : 'white',
-              color: theme === 'dark' ? 'white' : 'black',
-            },
-          }}
-          onKeyPressFn={() => {}}
-          onRemove={(_, item) => {
-            setExpenseCategory((cat) => {
-              return cat.filter(
-                (i) => i.toLowerCase() !== item.key.toLowerCase()
-              );
-            });
-          }}
-          onSearch={() => {}}
-          onSelect={(_, item) => {
-            setExpenseCategory((cat) => {
-              return [...cat, item.key.toLowerCase()];
-            });
-          }}
+        <Select
+          menuPlacement="top"
+          isMulti
           options={expenseCategories?.slice(1).map((item) => {
-            return { cat: item, key: item[0].toUpperCase() + item.slice(1) };
+            return {
+              value: item,
+              label: item[0].toUpperCase() + item.slice(1),
+            };
           })}
+          onChange={(data) => {
+            setExpenseCategory(data.map((item) => item.value));
+          }}
+          placeholder="Expense Categories"
+          value={expenseCategory.map((item) => {
+            return {
+              value: item,
+              label: item[0].toUpperCase() + item.slice(1),
+            };
+          })}
+          styles={{
+            control: (baseStyles) => ({
+              ...baseStyles,
+              outline: 'none',
+              borderColor: theme === 'dark' ? '#7A7E80' : '#bbbbbb',
+              minHeight: '56px',
+              borderRadius: '8px',
+              padding: '0px 10px',
+              backgroundColor: 'transparent',
+            }),
+            option: (base) => ({
+              ...base,
+              backgroundColor: COLOR.LIGHT[100],
+              color: COLOR.DARK[100],
+            }),
+            placeholder: (base) => ({
+              ...base,
+              color: PlaceholderTextColor,
+            }),
+            container: (base) => ({
+              ...base,
+              width: '100%',
+            }),
+            menu: (base) => ({
+              ...base,
+              backgroundColor: COLOR.LIGHT[100],
+              boxShadow:
+                theme === 'dark' ? '1px 1px 5px white' : '1px 1px 5px gray',
+              scrollbarColor:
+                theme === 'dark'
+                  ? `${COLORS.DARK[50]} ${COLORS.DARK[75]}`
+                  : `${COLORS.LIGHT[20]} ${COLORS.LIGHT[80]}`,
+            }),
+            dropdownIndicator: (base) => ({
+              ...base,
+              color: theme === 'dark' ? COLORS.LIGHT[20] : COLORS.DARK[50],
+            }),
+            multiValue: (base) => ({
+              ...base,
+              backgroundColor: COLOR.LIGHT[40],
+              color: COLOR.DARK[100],
+            }),
+            multiValueLabel: (base) => ({
+              ...base,
+              backgroundColor: COLOR.LIGHT[40],
+              color: COLOR.DARK[100],
+            }),
+          }}
         />
       </div>
       <div className="flex mt-7">

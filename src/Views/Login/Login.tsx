@@ -18,7 +18,7 @@ import Google from '../../assets/svgs/google.svg';
 import { COLORS, InputBorderColor } from '../../Shared/commonStyles';
 import CustomPassInput from '../../Components/CustomPassInput';
 import { setLoading } from '../../Store/Loader';
-import { setUser } from '../../Store/Common';
+import { setTheme, setUser } from '../../Store/Common';
 import { auth, db } from '../../Utils/firebaseConfig';
 import { UserToJson, UserFromJson } from '../../Utils/userFuncs';
 import { EmailEmptyError, PassEmptyError } from '../../Shared/errors';
@@ -52,6 +52,7 @@ function Login() {
           const data = await getDoc(doc(db, 'users', creds.user.uid));
           const user = UserFromJson(data.data()!);
           dispatch(setUser(user));
+          dispatch(setTheme(undefined));
         } else {
           setIsOpen(true);
           setUserCreds(creds);
@@ -72,7 +73,7 @@ function Login() {
       const creds = await signInWithPopup(auth, provider);
       if (creds) {
         const res = await getDoc(doc(db, 'users', creds.user.uid));
-        if (!res.exists) {
+        if (!res.exists()) {
           const user = UserToJson({
             name: creds.user.displayName!,
             email: creds.user.email!,
@@ -81,11 +82,13 @@ function Login() {
           });
           await setDoc(doc(db, 'users', creds.user.uid), user);
           dispatch(setUser(user));
+          dispatch(setTheme(undefined));
         } else {
-          const data = res;
+          const data = await getDoc(doc(db, 'users', creds.user.uid));
           const user = UserFromJson(data.data()!);
           if (user) {
             dispatch(setUser(user));
+            dispatch(setTheme(undefined));
           }
         }
       }

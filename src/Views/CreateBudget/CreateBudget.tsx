@@ -27,7 +27,7 @@ import { RootState } from '../../Store';
 import { setLoading } from '../../Store/Loader';
 import { encrypt } from '../../Utils/encryption';
 import { db } from '../../Utils/firebaseConfig';
-import { handleOnlineNotify } from '../../Utils/firebaseFuncs';
+import { handleNotify } from '../../Utils/firebaseFuncs';
 import CategoryModal from '../../Components/CategoryModal';
 import useAppTheme from '../../Hooks/themeHook';
 import { useIsMobile, useIsTablet } from '../../Hooks/mobileCheckHook';
@@ -108,11 +108,13 @@ function CreateBudget({
             ),
             alert: checked,
             percentage: encrypt(String(percentage), uid!),
+            conversion,
           },
         });
         const curr = await getDoc(doc(db, 'users', uid!));
-        const totalSpent = spend?.[cat] ?? 0;
-        await handleOnlineNotify({
+        const totalSpent =
+          spend?.[cat]?.[currency?.toUpperCase() ?? 'USD'] ?? 0;
+        await handleNotify({
           category: cat,
           month,
           totalSpent,
@@ -120,7 +122,11 @@ function CreateBudget({
           curr,
         });
 
-        toast.success(STRINGS.BudgetCreatedSuccesfully);
+        toast.success(
+          isEdit
+            ? STRINGS.BudgetUpdatedSuccesfully
+            : STRINGS.BudgetCreatedSuccesfully
+        );
         dispatch(setLoading(false));
         setIsOpen(false);
       } catch (e) {
@@ -133,14 +139,15 @@ function CreateBudget({
     amount,
     cat,
     checked,
-    percentage,
-    dispatch,
-    uid,
-    month,
-    conversion.usd,
+    conversion,
     currency,
-    spend,
+    dispatch,
+    isEdit,
+    month,
+    percentage,
     setIsOpen,
+    spend,
+    uid,
   ]);
   useEffect(() => {
     if (isEdit) {

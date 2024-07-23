@@ -18,7 +18,6 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
   const spends = useSelector(
     (state: RootState) => state.common.user?.spend?.[month]
   );
-  const conversion = useSelector((state: RootState) => state.common.conversion);
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
   );
@@ -60,118 +59,132 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
               .sort(
                 (a, b) =>
                   a[1].limit -
-                  (spends?.[a[0]] ?? 0) -
-                  (b[1].limit - (spends?.[b[0]] ?? 0))
+                  (spends?.[a[0]][currency?.toUpperCase() ?? 'USD'] ?? 0) -
+                  (b[1].limit -
+                    (spends?.[b[0]][currency?.toUpperCase() ?? 'USD'] ?? 0))
               )
-              .map(([key, val]) => (
-                <>
-                  <tr>
-                    <td>‎</td>
-                  </tr>
-                  <tr key={key} className="text-center text-sm sm:text-lg">
-                    <td className="font-semibold flex justify-between">
-                      {val.limit - (spends?.[key] ?? 0) < 0 ? (
-                        <img
-                          src={Alert}
-                          width="25px"
-                          alt=""
-                          title="Budget Exceeded"
-                        />
-                      ) : (
+              .map(([key, val]) => {
+                return (
+                  <>
+                    <tr>
+                      <td>‎</td>
+                    </tr>
+                    <tr key={key} className="text-center text-sm sm:text-lg">
+                      <td className="font-semibold flex justify-between">
+                        {val.limit - (spends?.[key]?.USD ?? 0) < 0 ? (
+                          <img
+                            src={Alert}
+                            width="25px"
+                            alt=""
+                            title="Budget Exceeded"
+                          />
+                        ) : (
+                          <div />
+                        )}
+                        {key[0].toUpperCase() + key.slice(1)}
                         <div />
-                      )}
-                      {key[0].toUpperCase() + key.slice(1)}
-                      <div />
-                    </td>
-                    <td
-                      className="hidden lg:table-cell"
-                      onMouseOver={() => {}}
-                      onFocus={() => {}}
-                      title={`${
-                        currencies[currency ?? 'USD'].symbol +
-                        formatWithCommas(
+                      </td>
+                      <td
+                        className="hidden lg:table-cell"
+                        onMouseOver={() => {}}
+                        onFocus={() => {}}
+                        title={`${
+                          currencies[currency ?? 'USD'].symbol +
+                          formatWithCommas(
+                            Number(
+                              (
+                                spends?.[key]?.[
+                                  currency?.toUpperCase() ?? 'USD'
+                                ] ?? 0
+                              ).toFixed(2)
+                            ).toString()
+                          )
+                        } of ${
+                          currencies[currency ?? 'USD'].symbol
+                        }${formatWithCommas(
                           Number(
                             (
-                              conversion.usd[
+                              val.conversion.usd[
                                 (currency ?? 'USD').toLowerCase()
-                              ] * (spends?.[key] ?? 0)
+                              ] * val.limit
                             ).toFixed(2)
                           ).toString()
-                        )
-                      } of ${
-                        currencies[currency ?? 'USD'].symbol
-                      }${formatWithCommas(
-                        Number(
-                          (
-                            conversion.usd[(currency ?? 'USD').toLowerCase()] *
-                            val.limit
-                          ).toFixed(2)
-                        ).toString()
-                      )}`}
-                    >
-                      {/* <div className="absolute m-auto border">
-                        {spends?.[key] ?? 0}
-                      </div> */}
-                      <ProgressBar
-                        // width="30vw"
-                        isLabelVisible={false}
-                        bgColor={getMyColor()}
-                        completed={
-                          (spends?.[key] ?? 0) / val.limit > 1
-                            ? 100
-                            : ((spends?.[key] ?? 0) / val.limit) * 100
-                        }
-                        customLabel={`${
-                          (spends?.[key] ?? 0) / val.limit > 1
-                            ? String(100)
-                            : String(
-                                (
-                                  ((spends?.[key] ?? 0) / val.limit) *
-                                  100
-                                ).toFixed(0)
-                              )
-                        }%`}
-                        borderRadius="9999999999px"
-                      />
-                    </td>
-                    <td className="font-semibold">
-                      {currencies[currency ?? 'USD'].symbol}
-                      {formatWithCommas(
-                        Number(
-                          (
-                            conversion.usd[(currency ?? 'USD').toLowerCase()] *
-                            val.limit
-                          ).toFixed(2)
-                        ).toString()
-                      )}
-                    </td>
-                    <td className="font-semibold">
-                      {currencies[currency ?? 'USD'].symbol}
-                      {formatWithCommas(
-                        Number(
-                          (
-                            conversion.usd[(currency ?? 'USD').toLowerCase()] *
-                            (spends?.[key] ?? 0)
-                          ).toFixed(2)
-                        ).toString()
-                      )}
-                    </td>
-                    <td className="font-semibold">
-                      {currencies[currency ?? 'USD'].symbol}
-                      {formatWithCommas(
-                        Number(
-                          (
-                            conversion.usd[(currency ?? 'USD').toLowerCase()] *
-                            (val.limit - (spends?.[key] ?? 0) < 0
+                        )}`}
+                      >
+                        <ProgressBar
+                          // width="30vw"
+                          isLabelVisible={false}
+                          bgColor={getMyColor()}
+                          completed={
+                            (spends?.[key]?.USD ?? 0) / val.limit > 1
+                              ? 100
+                              : ((spends?.[key]?.USD ?? 0) / val.limit) * 100
+                          }
+                          customLabel={`${
+                            (spends?.[key]?.[
+                              currency?.toUpperCase() ?? 'USD'
+                            ] ?? 0) /
+                              val.limit >
+                            1
+                              ? String(100)
+                              : String(
+                                  (
+                                    ((spends?.[key]?.[
+                                      currency?.toUpperCase() ?? 'USD'
+                                    ] ?? 0) /
+                                      val.limit) *
+                                    100
+                                  ).toFixed(0)
+                                )
+                          }%`}
+                          borderRadius="9999999999px"
+                        />
+                      </td>
+                      <td className="font-semibold">
+                        {currencies[currency ?? 'USD'].symbol}
+                        {formatWithCommas(
+                          Number(
+                            (
+                              val.conversion.usd[
+                                (currency ?? 'USD').toLowerCase()
+                              ] * val.limit
+                            ).toFixed(2)
+                          ).toString()
+                        )}
+                      </td>
+                      <td className="font-semibold">
+                        {currencies[currency ?? 'USD'].symbol}
+                        {formatWithCommas(
+                          Number(
+                            (
+                              spends?.[key]?.[
+                                currency?.toUpperCase() ?? 'USD'
+                              ] ?? 0
+                            ).toFixed(2)
+                          ).toString()
+                        )}
+                      </td>
+                      <td className="font-semibold">
+                        {currencies[currency ?? 'USD'].symbol}
+                        {formatWithCommas(
+                          Number(
+                            (val.limit - (spends?.[key]?.USD ?? 0) < 0
                               ? 0
-                              : val.limit - (spends?.[key] ?? 0))
-                          ).toFixed(2)
-                        ).toString()
-                      )}
-                    </td>
-                  </tr>
-                </>
-              ))}
+                              : val.limit *
+                                  val.conversion.usd[
+                                    currency?.toLowerCase() ?? 'usd'
+                                  ] -
+                                (spends?.[key]?.[
+                                  currency?.toUpperCase() ?? 'USD'
+                                ] ?? 0)
+                            ).toFixed(2)
+                          ).toString()
+                        )}
+                      </td>
+                    </tr>
+                  </>
+                );
+              })}
           </table>
         )}
       </div>

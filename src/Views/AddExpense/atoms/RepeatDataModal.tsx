@@ -88,7 +88,6 @@ function RepeatDataModal({
       setDate(repeatData?.date as Date);
     }
   }, [repeatData]);
-
   return (
     <Modal
       isOpen={modal}
@@ -103,7 +102,15 @@ function RepeatDataModal({
         setDay(repeatData?.day ?? 1);
         setWeekDay(repeatData?.weekDay ?? 1);
         setEnd((repeatData?.end as 'date' | 'never') ?? undefined);
-        setDate(repeatData?.date as Date);
+        if ((repeatData?.date as Timestamp)?.seconds !== undefined) {
+          setDate(
+            Timestamp.fromMillis(
+              (repeatData?.date as Timestamp).seconds * 1000
+            ).toDate()
+          );
+        } else {
+          setDate(repeatData?.date as Date);
+        }
       }}
       style={{
         content: {
@@ -133,6 +140,7 @@ function RepeatDataModal({
             onChange={(e) => {
               setFreq(e!.value as RepeatDataType['freq']);
             }}
+            // menuIsOpen
             value={
               freq
                 ? { label: freq[0].toUpperCase() + freq.slice(1), value: freq }
@@ -148,11 +156,7 @@ function RepeatDataModal({
               onChange={(e) => {
                 setMonth(Number(e!.value));
               }}
-              value={
-                month !== undefined
-                  ? { label: monthData[month].label, value: month }
-                  : undefined
-              }
+              value={month !== undefined ? monthData[month - 1] : undefined}
             />
           )}
           {(freq === 'yearly' || freq === 'monthly') && (

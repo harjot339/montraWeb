@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 // Third Party Libraries
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -25,7 +25,6 @@ function TransactionDetail() {
   const data = useSelector(
     (state: RootState) => state.transactions.transactions
   );
-  const conversion = useSelector((state: RootState) => state.common.conversion);
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
   );
@@ -56,8 +55,9 @@ function TransactionDetail() {
         Number.isNaN(
           Number(
             (
-              (conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ?? 1) *
-              amount
+              (transaction?.conversion?.usd?.[
+                currency?.toLowerCase() ?? 'usd'
+              ] ?? 1) * amount
             ).toFixed(2)
           )
         )
@@ -67,14 +67,19 @@ function TransactionDetail() {
       return formatWithCommas(
         Number(
           (
-            (conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ?? 1) *
-            Number(amount)
+            (transaction?.conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ??
+              1) * Number(amount)
           ).toFixed(2)
         ).toString()
       );
     },
-    [conversion?.usd, currency]
+    [currency, transaction]
   );
+  useEffect(() => {
+    if (isOpen) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
 
   return isOpen ? (
     <AddExpense
@@ -247,14 +252,20 @@ function TransactionDetail() {
                       {STRINGS.Attachement}
                     </p>
                     {transaction?.attachementType === 'image' ? (
-                      <img
-                        src={transaction.attachement}
-                        alt=""
-                        style={{
-                          height: '300px',
-                          overflow: 'hidden',
-                        }}
-                      />
+                      <a
+                        href={transaction?.attachement}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <img
+                          src={transaction.attachement}
+                          alt=""
+                          style={{
+                            height: '300px',
+                            overflow: 'hidden',
+                          }}
+                        />
+                      </a>
                     ) : (
                       <a
                         className="flex mt-4"
@@ -283,6 +294,7 @@ function TransactionDetail() {
             flex={1}
             onPress={() => {
               setIsOpen(true);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
           />
         </div>

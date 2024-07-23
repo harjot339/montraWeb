@@ -149,7 +149,7 @@ export function SidebarLayout({
               <CustomDropdown
                 menuPlacement="top"
                 data={Object.values(currencies).map((item) => ({
-                  label: `${item.symbol} ${item.code}`,
+                  label: `${item.name} (${item.code})`,
                   value: item.code,
                 }))}
                 placeholder="Currency"

@@ -43,9 +43,11 @@ export default function useInitialSetup() {
           orderBy('timeStamp', 'desc')
         ),
         (snapshot: QuerySnapshot) => {
-          const data: TransactionType[] = snapshot.docs.map((x) =>
-            TransFromJson(x.data(), uid)
-          );
+          const data: TransactionType[] = snapshot.docs
+            .map((x) => TransFromJson(x.data(), uid))
+            .filter((item) => {
+              return !item.deleted;
+            });
           dispatch(setTransactions(data));
         }
       );

@@ -1,6 +1,7 @@
 import React, { SetStateAction, useCallback } from 'react';
 import ReactModal from 'react-modal';
 import { updateDoc, doc } from 'firebase/firestore';
+import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import { COLORS } from '../../Shared/commonStyles';
 import { STRINGS } from '../../Shared/Strings';
@@ -8,6 +9,7 @@ import CustomButton from '../CustomButton';
 import { useIsDesktop } from '../../Hooks/mobileCheckHook';
 import useAppTheme from '../../Hooks/themeHook';
 import { db } from '../../Utils/firebaseConfig';
+import { setLoading } from '../../Store/Loader';
 
 function NotifcationDeleteModal({
   modal,
@@ -22,9 +24,11 @@ function NotifcationDeleteModal({
 }>) {
   const [theme] = useAppTheme();
   const isDesktop = useIsDesktop();
+  const dispatch = useDispatch();
   const handlePress = useCallback(async () => {
     try {
       setMenu(false);
+      dispatch(setLoading(true));
       await updateDoc(doc(db, 'users', uid!), {
         notification: {},
       });
@@ -32,8 +36,10 @@ function NotifcationDeleteModal({
     } catch (e) {
       toast.error(e as string);
       toast.clearWaitingQueue();
+    } finally {
+      dispatch(setLoading(false));
     }
-  }, [setMenu, setModal, uid]);
+  }, [dispatch, setMenu, setModal, uid]);
   return (
     <ReactModal
       isOpen={modal}
