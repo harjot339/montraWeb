@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 // Third Party Libraries
 import { useSelector } from 'react-redux';
@@ -15,7 +15,11 @@ import Header from './atoms/Header';
 import useAppTheme from '../../Hooks/themeHook';
 import { RootState } from '../../Store';
 import { COLORS } from '../../Shared/commonStyles';
-import { useIsMobile, useIsTablet } from '../../Hooks/mobileCheckHook';
+import {
+  useIsDesktop,
+  useIsMobile,
+  useIsTablet,
+} from '../../Hooks/mobileCheckHook';
 import SpeedDial from '../../Components/SpeedDial';
 
 function Home() {
@@ -24,6 +28,7 @@ function Home() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isOpenMobile, setIsOpenMobile] = useState<boolean>(false);
   const [pageType, setPageType] = useState<'income' | 'expense' | 'transfer'>();
+  const [fullGraph, setFullGraph] = useState<boolean>(true);
   // redux
   const data = useSelector(
     (state: RootState) => state.transactions.transactions
@@ -31,8 +36,19 @@ function Home() {
   // constants
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
+  const isDesktop = useIsDesktop();
   const [theme] = useAppTheme();
-
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 1200) {
+        setFullGraph(true);
+      } else {
+        setFullGraph(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   return isOpenMobile ? (
     <div className={clsx(isTablet && 'ml-52')}>
       <AddExpense
@@ -47,7 +63,14 @@ function Home() {
       <div className="flex gap-3">
         <div className="flex flex-col flex-1">
           <div className="flex gap-3 flex-wrap">
-            <div className="flex flex-col flex-1 gap-2">
+            <div
+              className={clsx(
+                'flex flex-col flex-1 gap-2',
+                isDesktop &&
+                  !isOpen &&
+                  (fullGraph ? 'max-w-[40vw]' : 'max-w-[29vw]')
+              )}
+            >
               <OverviewSection month={month} />
               <Graph data={data} month={month} />
             </div>

@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Modal from 'react-modal';
 import clsx from 'clsx';
 import { Timestamp } from 'firebase/firestore';
+import { toast } from 'react-toastify';
 // Custom Components
 import CustomButton from '../../../Components/CustomButton';
 import CustomDropdown from '../../../Components/CustomDropdown/CustomDropdown';
@@ -42,10 +43,13 @@ function RepeatDataModal({
   const [weekDay, setWeekDay] = useState<number>(1);
   const [month, setMonth] = useState<number>(1);
   const [formkey, setFormkey] = useState<boolean>(false);
+  const [myDate, setMyDate] = useState<Date>();
   // constants
   const year = new Date().getFullYear();
   const [theme] = useAppTheme();
   const isDesktop = useIsDesktop();
+  const today = new Date();
+  today.setHours(0);
   // functions
   const daysInYear = useMemo(() => {
     const res = [];
@@ -88,6 +92,11 @@ function RepeatDataModal({
       setDate(repeatData?.date as Date);
     }
   }, [repeatData]);
+  useEffect(() => {
+    const x = new Date(`${new Date().getFullYear()}-${month}-${day}`);
+    x.setDate(x.getDate() + 1);
+    setMyDate(x);
+  }, [month, day]);
   return (
     <Modal
       isOpen={modal}
@@ -228,12 +237,23 @@ function RepeatDataModal({
               type="date"
               className={clsx(
                 'border rounded-lg px-4 bg-transparent min-w-40',
+                formkey &&
+                  end === 'date' &&
+                  (date! < today || date! < myDate!) &&
+                  'outline-red-500 outline outline-2 outline-offset-2',
                 theme === 'dark' ? 'text-white' : 'text-black'
               )}
-              min={new Date().toISOString().split('T')[0]}
+              min={
+                freq === 'yearly' || freq === 'monthly'
+                  ? myDate!.toISOString().split('T')[0]
+                  : new Date().toISOString().split('T')[0]
+              }
+              max={new Date('2050-1-1').toISOString().split('T')[0]}
               value={
                 date?.toISOString()?.split('T')?.[0] ??
-                new Date().toISOString().split('T')[0]
+                (freq === 'yearly' || freq === 'monthly'
+                  ? myDate!.toISOString().split('T')[0]
+                  : new Date().toISOString().split('T')[0])
               }
               style={{ colorScheme: theme }}
               onChange={(e) => {
@@ -255,9 +275,21 @@ function RepeatDataModal({
           value={end ?? ''}
         />
         <CustomButton
-          title="Continue"
+          title={STRINGS.Continue}
           onPress={() => {
             setFormkey(true);
+            if (end === 'date' && date! < new Date()) {
+              toast.error(
+                "The selected end date must be later than today's date."
+              );
+              return;
+            }
+            if (end === 'date' && date! < myDate!) {
+              toast.error(
+                "The selected end date must be later than selected frequency's date."
+              );
+              return;
+            }
             if (freq && end) {
               setRepeatData({
                 freq: freq ?? 'daily',

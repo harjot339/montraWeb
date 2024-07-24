@@ -95,6 +95,7 @@ function CustomDropdown({
       }}
       menuPlacement={menuPlacement}
       isSearchable={false}
+      menuPosition="fixed"
     />
   );
 }

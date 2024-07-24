@@ -20,6 +20,7 @@ import Pie from '../../../../assets/svgs/pie-chart.svg';
 import Dashboard from '../../../../assets/svgs/dashboard.svg';
 import Report from '../../../../assets/svgs/report.svg';
 import Logout from '../../../../assets/svgs/logout.svg';
+import ProfileImage from '../../../../assets/images/profileImg.jpeg';
 
 export function SidebarLayout({
   children,
@@ -36,6 +37,7 @@ export function SidebarLayout({
   );
   const theme = useSelector((state: RootState) => state.common.user?.theme);
   const uid = useSelector((state: RootState) => state.common.user?.uid);
+  const username = useSelector((state: RootState) => state.common.user?.name);
   // state
   const [modal, setModal] = useState<boolean>(false);
   return (
@@ -59,6 +61,27 @@ export function SidebarLayout({
         >
           <ul className="space-y-2 font-medium flex flex-col justify-between h-full">
             <div>
+              <li>
+                <div className="flex gap-x-3 border-b-2 pb-4 mb-3 items-center">
+                  <div
+                    className="rounded-full  h-14 w-14 min-h-14 min-w-14 bg-cover outline-[#7F3DFF] outline-1 outline outline-offset-2"
+                    style={{
+                      backgroundImage: `url(${ProfileImage})`,
+                    }}
+                  />
+                  <div>
+                    <p className="text-sm text-gray-500">{STRINGS.Username}</p>
+                    <p
+                      className={clsx(
+                        'text-xl font-semibold',
+                        appTheme === 'dark' && 'text-white'
+                      )}
+                    >
+                      {username}
+                    </p>
+                  </div>
+                </div>
+              </li>
               {[
                 {
                   name: 'Dashboard',

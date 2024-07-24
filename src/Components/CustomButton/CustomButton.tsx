@@ -26,7 +26,7 @@ function CustomButton({
     <button
       disabled={disabled ?? false}
       type="button"
-      className="flex justify-center min-h-12 md:h-14 hover:opacity-90 items-center disabled:opacity-100"
+      className="flex justify-center min-h-12 md:h-14 hover:opacity-90 items-center disabled:opacity-100 active:opacity-80"
       style={{
         backgroundColor: disabled ? '#bababa' : backgroundColor,
         borderWidth,

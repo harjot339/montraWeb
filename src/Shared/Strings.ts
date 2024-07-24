@@ -16,8 +16,7 @@ export const passRegex =
 export const STRINGS = {
   ClearRepeatTransaction:
     'Clearing Repeating Transaction Frequency \nAre you sure you want to clear the repeating transaction frequency?',
-  ToManyRequestError:
-    'A verification email has been sent. Please wait two minutes before requesting again.',
+  ToManyRequestError: 'Too many requests. Please try again after sometime.',
   PopupClosedByUser: 'Authentication process canceled. Please try again.',
   Categories: 'Categories',
   Filters: 'Filters',

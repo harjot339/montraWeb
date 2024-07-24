@@ -59,9 +59,9 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
               .sort(
                 (a, b) =>
                   a[1].limit -
-                  (spends?.[a[0]][currency?.toUpperCase() ?? 'USD'] ?? 0) -
+                  (spends?.[a[0]]?.[currency?.toUpperCase() ?? 'USD'] ?? 0) -
                   (b[1].limit -
-                    (spends?.[b[0]][currency?.toUpperCase() ?? 'USD'] ?? 0))
+                    (spends?.[b[0]]?.[currency?.toUpperCase() ?? 'USD'] ?? 0))
               )
               .map(([key, val]) => {
                 return (
