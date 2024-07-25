@@ -112,7 +112,9 @@ export function EmptyZeroError({
   formKey: boolean;
   errorText: string;
 }>) {
-  return (value === '' || Number(value) <= 0 || value.trim() === '.') &&
+  return (value === '' ||
+    Number(value.replace(/,/g, '')) <= 0 ||
+    value.trim() === '.') &&
     formKey ? (
     <p
       className="pl-4 sm:pl-8"

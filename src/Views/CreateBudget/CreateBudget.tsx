@@ -188,7 +188,7 @@ function CreateBudget({
       style={{
         backgroundColor: COLORS.VIOLET[100],
         // minWidth: '28vw',
-        height: isMobile || isTablet ? '100vh' : '95vh',
+        height: isMobile || isTablet ? '100dvh' : '95vh',
       }}
     >
       <CategoryModal
@@ -238,7 +238,12 @@ function CreateBudget({
         />
         <EmptyZeroError
           value={amount}
-          errorText={STRINGS.PleaseFillAnAmount}
+          errorText={
+            (Number(amount.replace(/,/g, '')) > 0 || amount.trim() !== '.') &&
+            amount.trim() === ''
+              ? STRINGS.PleaseFillAnAmount
+              : STRINGS.PleaseFillValidAmount
+          }
           formKey={form}
         />
         <div

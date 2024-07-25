@@ -279,7 +279,12 @@ function AddExpense({
         />
         <EmptyZeroError
           value={amount}
-          errorText={STRINGS.PleaseFillAnAmount}
+          errorText={
+            (Number(amount.replace(/,/g, '')) > 0 || amount.trim() !== '.') &&
+            amount.trim() === ''
+              ? STRINGS.PleaseFillAnAmount
+              : STRINGS.PleaseFillValidAmount
+          }
           formKey={form}
         />
         <div
@@ -328,7 +333,9 @@ function AddExpense({
                   placeholder={STRINGS.From}
                   value={from}
                   onChange={(e) => {
-                    setFrom(e.target.value);
+                    const str = e.target.value;
+                    const value = str.replace(/[^a-zA-Z]/g, '');
+                    setFrom(value);
                   }}
                   style={{ color: COLOR.DARK[100] }}
                   maxLength={20}
@@ -338,7 +345,9 @@ function AddExpense({
                   className="w-[45%] inline border-b border-r border-l border-t rounded-lg bg-transparent border-[#F1F1FA] px-3 h-12 md:h-14 outline-none hover:border-gray-400 ml-1"
                   placeholder={STRINGS.To}
                   onChange={(e) => {
-                    setTo(e.target.value);
+                    const str = e.target.value;
+                    const value = str.replace(/[^a-zA-Z]/g, '');
+                    setTo(value);
                   }}
                   value={to}
                   style={{ color: COLOR.DARK[100] }}

@@ -104,7 +104,10 @@ function FinancialReport() {
             (item) =>
               Timestamp.fromMillis(item.timeStamp.seconds * 1000)
                 .toDate()
-                .getMonth() === month && item.type === type
+                .getMonth() === month &&
+              (type === 'expense'
+                ? item.type === 'expense' || item.type === 'transfer'
+                : item.type === 'income')
           ).length < 2 &&
           Object.values((type === 'income' ? income : spends) ?? {}).reduce(
             (acc, curr) => acc + curr[currency?.toUpperCase() ?? 'USD'],

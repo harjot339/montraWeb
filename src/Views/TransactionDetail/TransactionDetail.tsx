@@ -83,7 +83,7 @@ function TransactionDetail() {
 
   return isOpen ? (
     <AddExpense
-      height={isMobile || isTablet ? '100vh' : '95vh'}
+      height={isMobile || isTablet ? '100dvh' : '95vh'}
       isEdit
       pageType={transaction!.type}
       setIsOpen={setIsOpen}
@@ -99,7 +99,7 @@ function TransactionDetail() {
         )}
         style={{
           minHeight: '95vh',
-          height: isMobile || isTablet ? '100vh' : 'fit-content',
+          height: isMobile || isTablet ? '100dvh' : 'fit-content',
         }}
       >
         <DeleteTransactionModal
@@ -147,8 +147,14 @@ function TransactionDetail() {
                 )}
               </button>
             </div>
-            <div className="self-center items-center flex flex-col">
-              <p className="text-5xl  font-bold mb-4">
+            <div className="self-center items-center flex flex-col max-w-[90%]">
+              <p
+                className="text-5xl  font-bold mb-4 text-ellipsis overflow-hidden whitespace-nowrap "
+                title={
+                  (currencies[currency!].symbol ?? '$') +
+                  currencyConvert(transaction.amount)
+                }
+              >
                 {currencies[currency!].symbol ?? '$'}{' '}
                 {currencyConvert(transaction.amount)}
               </p>
@@ -190,18 +196,18 @@ function TransactionDetail() {
             <div className="-translate-y-11">
               <div
                 className={clsx(
-                  'flex w-5/6 border  justify-around mx-auto px-6 py-4 rounded-xl gap-x-3',
+                  'flex w-5/6 border  justify-between mx-auto px-6 py-4 rounded-xl gap-x-3',
                   theme === 'dark' ? 'bg-black text-white' : 'bg-white'
                 )}
               >
-                <div className="text-center text-ellipsis overflow-hidden whitespace-nowrap min-w-20">
+                <div className="text-center text-ellipsis overflow-hidden whitespace-nowrap  max-w-[30%]">
                   <p className="text-xl font-semibold">{STRINGS.Type}</p>
-                  <p className="text-ellipsis overflow-hidden whitespace-nowrap">
+                  <p className="text-md text-ellipsis overflow-hidden whitespace-nowrap">
                     {transaction.type[0].toUpperCase() +
                       transaction.type.slice(1)}
                   </p>
                 </div>
-                <div className="text-center text-ellipsis overflow-hidden whitespace-nowrap min-w-32">
+                <div className="text-center text-ellipsis overflow-hidden whitespace-nowrap  max-w-[30%]">
                   <p className="text-xl font-semibold">
                     {transaction?.type === 'transfer'
                       ? STRINGS.From
@@ -215,7 +221,7 @@ function TransactionDetail() {
                         transaction.category.slice(1)}
                   </p>
                 </div>
-                <div className=" text-center text-ellipsis overflow-hidden whitespace-nowrap min-w-24">
+                <div className=" text-center text-ellipsis overflow-hidden whitespace-nowrap max-w-[30%]">
                   <p className="text-xl font-semibold">
                     {transaction?.type === 'transfer'
                       ? STRINGS.To
@@ -238,7 +244,7 @@ function TransactionDetail() {
                     </p>
                     <p
                       className={clsx(
-                        'text-lg mt-3',
+                        'text-lg mt-3 text-ellipsis break-words',
                         theme === 'dark' && 'text-white'
                       )}
                     >

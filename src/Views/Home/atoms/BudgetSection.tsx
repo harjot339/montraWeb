@@ -79,7 +79,7 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
                             title="Budget Exceeded"
                           />
                         ) : (
-                          <div />
+                          <div style={{ width: '25px' }} />
                         )}
                         {key[0].toUpperCase() + key.slice(1)}
                         <div />

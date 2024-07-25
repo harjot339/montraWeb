@@ -51,7 +51,17 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
         {STRINGS.Overview}
       </p>
       <div className="flex mt-5 justify-evenly gap-3 text-center">
-        <div>
+        <div
+          className="max-w-[30%]"
+          title={
+            currencies[currency ?? 'USD'].symbol +
+            Number(
+              (9400 * conversion.usd[currency?.toLowerCase() ?? 'usd']).toFixed(
+                2
+              )
+            ).toString()
+          }
+        >
           <p
             className={clsx(
               'text-xl md:text-2xl lg:text-3xl font-semibold max-sm:max-w-24 overflow-hidden text-ellipsis whitespace-nowrap',
@@ -72,7 +82,12 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
             {STRINGS.AccountBalance}
           </p>
         </div>
-        <div>
+        <div
+          className="max-w-[30%]"
+          title={
+            currencies[currency ?? 'USD'].symbol + currencyConvert(totalSpend)
+          }
+        >
           <p
             className={clsx(
               'text-xl md:text-2xl lg:text-3xl font-semibold overflow-hidden text-ellipsis whitespace-nowrap',
@@ -89,7 +104,12 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
             {STRINGS.Expense}
           </p>
         </div>
-        <div>
+        <div
+          className="max-w-[30%]"
+          title={
+            currencies[currency ?? 'USD'].symbol + currencyConvert(totalIncome)
+          }
+        >
           <p
             className={clsx(
               'text-xl md:text-2xl lg:text-3xl font-semibold overflow-hidden text-ellipsis whitespace-nowrap',

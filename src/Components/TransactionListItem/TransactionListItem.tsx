@@ -14,6 +14,7 @@ import Money from '../../assets/svgs/money-bag.svg';
 import Transfer from '../../assets/svgs/currency-exchange.svg';
 import { currencies } from '../../Shared/Strings';
 import useAppTheme from '../../Hooks/themeHook';
+import { useIsDesktop } from '../../Hooks/mobileCheckHook';
 
 function TransactionListItem({
   item,
@@ -50,6 +51,7 @@ function TransactionListItem({
     return COLORS.PRIMARY.BLUE;
   };
   const [theme] = useAppTheme();
+  const isDesktop = useIsDesktop();
   return (
     <button
       onClick={onClick}
@@ -61,7 +63,7 @@ function TransactionListItem({
       )}
       style={{
         width: '100%',
-        maxWidth: width === 'half' ? '400px' : '',
+        maxWidth: width === 'half' ? '400px' : undefined,
         backgroundColor: selected ? COLORS.VIOLET[20] : '',
       }}
       key={item.id}
@@ -88,7 +90,12 @@ function TransactionListItem({
           />
         )}
       </div>
-      <div className="w-full overflow-hidden">
+      <div
+        className={clsx(
+          'w-full overflow-hidden ',
+          isDesktop && 'max-w-[9vw] xl:max-w-[10vw]  2xl:max-w-[20vw]'
+        )}
+      >
         <p
           className={clsx(
             'text-ellipsis overflow-hidden text-lg sm:text-xl font-semibold',
@@ -104,17 +111,28 @@ function TransactionListItem({
         </p>
         <p
           className={clsx(
-            'text-sm sm:text-lg text-ellipsis overflow-hidden whitespace-nowrap',
+            'text-sm sm:text-lg text-ellipsis overflow-hidden whitespace-nowrap break-words ',
             theme === 'dark' && 'text-white'
           )}
         >
           {item.desc}
         </p>
       </div>
-      <div className="min-w-20 text-end w-full">
+      <div className="min-w-20 text-end w-full ">
         <p
           style={{ color: getAmtColor(item) }}
           className="font-semibold text-lg sm:text-xl overflow-hidden whitespace-nowrap text-ellipsis"
+          title={
+            currencies[currency ?? 'USD'].symbol +
+            formatWithCommas(
+              Number(
+                (
+                  item.conversion.usd[(currency ?? 'USD').toLowerCase()] *
+                  item.amount
+                ).toFixed(2)
+              ).toString()
+            )
+          }
         >
           {getAmtSymbol(item)} {currencies[currency ?? 'USD'].symbol}
           {formatWithCommas(

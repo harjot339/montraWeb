@@ -107,7 +107,7 @@ function Header({
         {menu && (
           <div
             className={clsx(
-              'rounded-xl shadow absolute top-24 right-9 sm:top-14 sm:right-7 pt-5 pb-3 z-10 max-h-[400px]  overflow-auto',
+              'rounded-xl shadow absolute top-24 right-9 sm:top-14 sm:right-7 pt-5 pb-3 z-10 ',
               theme === 'dark' ? 'bg-black shadow-gray-50' : 'bg-white'
             )}
           >
@@ -117,79 +117,83 @@ function Header({
               </p>
             ) : (
               <>
-                {Object.values(notifications!)
-                  .sort((a, b) => b.time.seconds - a.time.seconds)
-                  .map((item, i, arr) => (
-                    <div key={item.id}>
-                      <div className="flex justify-between items-center px-6 gap-x-5 ">
-                        <div>
-                          <p
-                            className={clsx(
-                              'text-md sm:text-xl font-semibold',
-                              theme === 'dark' && 'text-white'
-                            )}
-                          >
-                            {item.type === 'budget-percent'
-                              ? `Exceeded ${item.percentage}% of ${
-                                  item.category[0].toUpperCase() +
-                                  item.category.slice(1)
-                                } budget`
-                              : `${
-                                  item.category[0].toUpperCase() +
-                                  item.category.slice(1)
-                                } Budget Limit Exceeded`}
-                          </p>
-                          <p className="text-sm sm:text-lg text-gray-600">
-                            {item.type === 'budget-percent'
-                              ? `You've exceeded ${item.percentage}% of your ${
-                                  item.category[0].toUpperCase() +
-                                  item.category.slice(1)
-                                } budget. Take action to stay on track.`
-                              : `Your ${item.category[0].toUpperCase()}${item.category.slice(
-                                  1
-                                )} ${STRINGS.BudgetExceed}`}
-                          </p>
-                        </div>
-                        <div className="flex flex-col items-end text-gray-600 text-sm font-semibold">
-                          <div className="flex justify-end">
-                            <button
-                              type="button"
-                              className="bg-[#EEE5FF] text-[#7F3DFF] rounded-full w-5 h-5 text-[12px] font-bold"
-                              onClick={async () => {
-                                await handleSingleDelete(item);
-                              }}
+                <div className="max-h-[400px] overflow-auto">
+                  {Object.values(notifications!)
+                    .sort((a, b) => b.time.seconds - a.time.seconds)
+                    .map((item, i, arr) => (
+                      <div key={item.id}>
+                        <div className="flex justify-between items-center px-6 gap-x-5 ">
+                          <div>
+                            <p
+                              className={clsx(
+                                'text-md sm:text-xl font-semibold',
+                                theme === 'dark' && 'text-white'
+                              )}
                             >
-                              X
-                            </button>
+                              {item.type === 'budget-percent'
+                                ? `Exceeded ${item.percentage}% of ${
+                                    item.category[0].toUpperCase() +
+                                    item.category.slice(1)
+                                  } budget`
+                                : `${
+                                    item.category[0].toUpperCase() +
+                                    item.category.slice(1)
+                                  } Budget Limit Exceeded`}
+                            </p>
+                            <p className="text-sm sm:text-lg text-gray-600">
+                              {item.type === 'budget-percent'
+                                ? `You've exceeded ${
+                                    item.percentage
+                                  }% of your ${
+                                    item.category[0].toUpperCase() +
+                                    item.category.slice(1)
+                                  } budget. Take action to stay on track.`
+                                : `Your ${item.category[0].toUpperCase()}${item.category.slice(
+                                    1
+                                  )} ${STRINGS.BudgetExceed}`}
+                            </p>
                           </div>
-                          <p>
-                            {formatAMPM(
-                              Timestamp.fromMillis(
-                                item.time.seconds * 1000
-                              ).toDate()
-                            )}
-                          </p>
-                          <p>
-                            {`${Timestamp.fromMillis(item.time.seconds * 1000)
-                              ?.toDate()
-                              ?.getDate()} ${
-                              monthData[
-                                Timestamp.fromMillis(item.time.seconds * 1000)
-                                  ?.toDate()
-                                  ?.getMonth()
-                              ].label
-                            } ${Timestamp.fromMillis(item.time.seconds * 1000)
-                              ?.toDate()
-                              ?.getFullYear()}`}
-                          </p>
+                          <div className="flex flex-col items-end text-gray-600 text-sm font-semibold text-end">
+                            <div className="flex justify-end">
+                              <button
+                                type="button"
+                                className="bg-[#EEE5FF] text-[#7F3DFF] rounded-full w-5 h-5 text-[12px] font-bold"
+                                onClick={async () => {
+                                  await handleSingleDelete(item);
+                                }}
+                              >
+                                X
+                              </button>
+                            </div>
+                            <p>
+                              {formatAMPM(
+                                Timestamp.fromMillis(
+                                  item.time.seconds * 1000
+                                ).toDate()
+                              )}
+                            </p>
+                            <p>
+                              {`${Timestamp.fromMillis(item.time.seconds * 1000)
+                                ?.toDate()
+                                ?.getDate()} ${
+                                monthData[
+                                  Timestamp.fromMillis(item.time.seconds * 1000)
+                                    ?.toDate()
+                                    ?.getMonth()
+                                ].label
+                              } ${Timestamp.fromMillis(item.time.seconds * 1000)
+                                ?.toDate()
+                                ?.getFullYear()}`}
+                            </p>
+                          </div>
                         </div>
+                        {i < arr.length - 1 && (
+                          <div className="w-full bg-gray-200 my-3 h-px" />
+                        )}
                       </div>
-                      {i < arr.length - 1 && (
-                        <div className="w-full bg-gray-200 my-3 h-px" />
-                      )}
-                    </div>
-                  ))}
-                <div className="flex mt-4 px-6 justify-end">
+                    ))}
+                </div>
+                <div className="flex mt-2 px-6 justify-end bg-white">
                   <button
                     type="button"
                     className={clsx(

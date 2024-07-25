@@ -79,7 +79,10 @@ function GraphSection({
         return (
           Timestamp.fromMillis(item.timeStamp.seconds * 1000)
             .toDate()
-            ?.getMonth() === month && item.type === type
+            ?.getMonth() === month &&
+          (type === 'expense'
+            ? item.type === 'expense' || item.type === 'transfer'
+            : item.type === 'income')
         );
       }).length !== 0 && (
         <div className="px-2">
@@ -112,7 +115,10 @@ function GraphSection({
               return (
                 Timestamp.fromMillis(item.timeStamp.seconds * 1000)
                   .toDate()
-                  ?.getMonth() === month && item.type === type
+                  ?.getMonth() === month &&
+                (type === 'expense'
+                  ? item.type === 'expense' || item.type === 'transfer'
+                  : item.type === 'income')
               );
             })
             .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)

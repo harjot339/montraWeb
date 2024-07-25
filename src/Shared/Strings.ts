@@ -101,6 +101,7 @@ export const STRINGS = {
   Date: 'Date',
   Next: 'Next',
   PleaseFillAnAmount: 'Please fill an amount',
+  PleaseFillValidAmount: 'Please fill a valid amount',
   PleaseSelectACategory: 'Please select a category',
   Description: 'Description',
   Wallet: 'Wallet',

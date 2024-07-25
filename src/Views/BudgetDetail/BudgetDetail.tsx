@@ -57,7 +57,7 @@ function BudgetDetail() {
         !isMobile && !isTablet && 'max-w-[450px]'
       )}
       style={{
-        height: isMobile || isTablet ? '100vh' : '95vh',
+        height: isMobile || isTablet ? '100dvh' : '95vh',
       }}
     >
       <DeleteBudgetModal

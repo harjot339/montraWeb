@@ -16,7 +16,6 @@ function MoneyInput({
 }>) {
   return (
     <input
-      // type="number"
       onClick={() => {
         if (amount === '0') {
           setAmount('');
@@ -29,10 +28,13 @@ function MoneyInput({
       }}
       value={`${currencies[currency ?? 'USD'].symbol} ${amount}`}
       className={clsx(
-        'bg-transparent w-full px-4 sm:px-8 h-20 outline-none text-6xl font-semibold',
+        'bg-transparent w-full px-4 sm:px-8 h-20 outline-none  font-semibold',
+        currencies[currency ?? 'USD'].symbol.length + amount.length > 10
+          ? 'text-[44px]'
+          : 'text-6xl',
         theme === 'dark' ? 'text-black' : 'text-white'
       )}
-      maxLength={12}
+      maxLength={12 + currencies[currency ?? 'USD'].symbol.length + 1}
       onChange={(e) => {
         const str = e.target.value;
         let numericValue = str.replace(/[^0-9.]+/g, '');
@@ -66,7 +68,7 @@ function MoneyInput({
 
         if (decimalCount === 1 && numericValue.length > 9) {
           // Adjusted to account for the two decimal places
-          numericValue = numericValue.slice(0, 9);
+          numericValue = numericValue.slice(0, 10);
         } else if (decimalCount === 0 && numericValue.length > 7) {
           numericValue = numericValue.slice(0, 7);
         }
@@ -77,4 +79,4 @@ function MoneyInput({
   );
 }
 
-export default MoneyInput;
+export default React.memo(MoneyInput);

@@ -66,26 +66,47 @@ function Graph({
     .filter((item) => {
       if (!hideDropdown) {
         if (graphDay === 0) {
-          return item.timeStamp.seconds >= startOfToday && item.type === type;
+          return (
+            item.timeStamp.seconds >= startOfToday &&
+            (type === 'expense'
+              ? item.type === 'expense' || item.type === 'transfer'
+              : item.type === 'income')
+          );
         }
         if (graphDay === 1) {
-          return item.timeStamp.seconds >= startOfWeek && item.type === type;
+          return (
+            item.timeStamp.seconds >= startOfWeek &&
+            (type === 'expense'
+              ? item.type === 'expense' || item.type === 'transfer'
+              : item.type === 'income')
+          );
         }
         if (graphDay === 2) {
           return (
             Timestamp.fromMillis(item.timeStamp.seconds * 1000)
               .toDate()
-              .getMonth() === month && item.type === type
+              .getMonth() === month &&
+            (type === 'expense'
+              ? item.type === 'expense' || item.type === 'transfer'
+              : item.type === 'income')
           );
         }
         if (graphDay === 3) {
-          return item.timeStamp.seconds >= startOfYear && item.type === type;
+          return (
+            item.timeStamp.seconds >= startOfYear &&
+            (type === 'expense'
+              ? item.type === 'expense' || item.type === 'transfer'
+              : item.type === 'income')
+          );
         }
       }
       return (
         Timestamp.fromMillis(item.timeStamp.seconds * 1000)
           .toDate()
-          .getMonth() === month && item.type === type
+          .getMonth() === month &&
+        (type === 'expense'
+          ? item.type === 'expense' || item.type === 'transfer'
+          : item.type === 'income')
       );
     })
     .sort((a, b) => a.timeStamp.seconds - b.timeStamp.seconds)

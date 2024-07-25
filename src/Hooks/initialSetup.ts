@@ -22,7 +22,7 @@ export default function useInitialSetup() {
   const uid = useSelector((state: RootState) => state.common.user?.uid);
   const dispatch = useDispatch();
   useEffect(() => {
-    Notification.requestPermission();
+    // Notification.requestPermission();
     if (uid) {
       const unsubscribe = onSnapshot(
         doc(db, 'users', uid),
