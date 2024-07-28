@@ -3,7 +3,7 @@ import React from 'react';
 function TermsScreen() {
   const email = 'harjot.singh@chicmic.co.in';
   return (
-    <div className="overflow-scroll max-h-[90vh] w-full mx-3 overflow-x-hidden">
+    <div className="w-full px-3 sm:px-6 py-3">
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Terms and Conditions</h1>
 

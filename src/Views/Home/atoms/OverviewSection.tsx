@@ -50,7 +50,7 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
       >
         {STRINGS.Overview}
       </p>
-      <div className="flex mt-5 justify-evenly gap-3 text-center">
+      <div className="flex mt-5 justify-evenly text-center flex-wrap">
         <div
           className="max-w-[30%]"
           title={
@@ -64,19 +64,21 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
         >
           <p
             className={clsx(
-              'text-xl md:text-2xl lg:text-3xl font-semibold max-sm:max-w-24 overflow-hidden text-ellipsis whitespace-nowrap',
+              'text-lg md:text-xl lg:text-2xl font-semibold  overflow-hidden text-ellipsis whitespace-nowrap',
               theme === 'dark' && 'text-white'
             )}
           >
             {currencies[currency ?? 'USD'].symbol}
-            {Number(
-              (9400 * conversion.usd[currency?.toLowerCase() ?? 'usd']).toFixed(
-                2
-              )
-            ).toString()}
+            {formatWithCommas(
+              Number(
+                (
+                  9400 * conversion.usd[currency?.toLowerCase() ?? 'usd']
+                ).toFixed(2)
+              ).toString()
+            )}
           </p>
           <p
-            className="text-md md:text-lg font-normal"
+            className="text-sm md:text-md font-normal"
             style={{ color: COLORS.DARK[25] }}
           >
             {STRINGS.AccountBalance}
@@ -90,7 +92,7 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
         >
           <p
             className={clsx(
-              'text-xl md:text-2xl lg:text-3xl font-semibold overflow-hidden text-ellipsis whitespace-nowrap',
+              'text-lg md:text-xl lg:text-2xl font-semibold overflow-hidden text-ellipsis whitespace-nowrap',
               theme === 'dark' && 'text-white'
             )}
           >
@@ -98,7 +100,7 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
             {currencyConvert(totalSpend)}
           </p>
           <p
-            className="text-md md:text-lg font-normal"
+            className="text-sm md:text-md font-normal"
             style={{ color: COLORS.DARK[25] }}
           >
             {STRINGS.Expense}
@@ -112,7 +114,7 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
         >
           <p
             className={clsx(
-              'text-xl md:text-2xl lg:text-3xl font-semibold overflow-hidden text-ellipsis whitespace-nowrap',
+              'text-lg md:text-xl lg:text-2xl font-semibold overflow-hidden text-ellipsis whitespace-nowrap',
               theme === 'dark' && 'text-white'
             )}
           >
@@ -120,7 +122,7 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
             {currencyConvert(totalIncome)}
           </p>
           <p
-            className="text-md md:text-lg font-normal"
+            className="text-sm md:text-md font-normal"
             style={{ color: COLORS.DARK[25] }}
           >
             {STRINGS.Income}

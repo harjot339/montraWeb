@@ -76,14 +76,10 @@ function NotifcationDeleteModal({
             onPress={() => {
               setModal(false);
             }}
-          />
-          <CustomButton
-            flex={1}
-            title={STRINGS.Yes}
-            onPress={handlePress}
             backgroundColor={COLORS.VIOLET[20]}
             textColor={COLORS.VIOLET[100]}
           />
+          <CustomButton flex={1} title={STRINGS.Yes} onPress={handlePress} />
         </div>
       </div>
     </ReactModal>

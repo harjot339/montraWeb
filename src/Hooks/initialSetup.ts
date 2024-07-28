@@ -9,6 +9,7 @@ import {
   query,
   QuerySnapshot,
 } from 'firebase/firestore';
+import { toast } from 'react-toastify';
 import { UserType } from '../Defs/user';
 import { UserFromJson } from '../Utils/userFuncs';
 import { RootState } from '../Store';
@@ -22,7 +23,14 @@ export default function useInitialSetup() {
   const uid = useSelector((state: RootState) => state.common.user?.uid);
   const dispatch = useDispatch();
   useEffect(() => {
-    // Notification.requestPermission();
+    try {
+      if ('Notification' in window) {
+        Notification.requestPermission();
+        // console.log('Notification permission:', Notification.permission)
+      }
+    } catch (e) {
+      toast.error(`Notification error:${e as string}`);
+    }
     if (uid) {
       const unsubscribe = onSnapshot(
         doc(db, 'users', uid),

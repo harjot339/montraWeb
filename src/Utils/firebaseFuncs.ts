@@ -224,7 +224,9 @@ export async function handleNotify({
     ) {
       try {
         const notificationId = uuidv4();
-        await Notification.requestPermission();
+        if ('Notification' in window) {
+          await Notification.requestPermission();
+        }
         if (totalSpent >= totalBudget.limit) {
           await updateDoc(doc(db, 'users', uid), {
             [`notification.${notificationId}`]: {
@@ -236,18 +238,20 @@ export async function handleNotify({
               percentage: totalBudget.percentage,
             },
           });
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const notif = new Notification(
-            `${
-              category[0].toUpperCase() + category.slice(1)
-            } Budget Limit Exceeded`,
-            {
-              body: `Your ${category[0].toUpperCase()}${category.slice(
-                1
-              )} budget has exceeded the limit`,
-            }
-          );
-          // console.log(notif);
+          if ('Notification' in window) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const notif = new Notification(
+              `${
+                category[0].toUpperCase() + category.slice(1)
+              } Budget Limit Exceeded`,
+              {
+                body: `Your ${category[0].toUpperCase()}${category.slice(
+                  1
+                )} budget has exceeded the limit`,
+              }
+            );
+            // console.log(notif);
+          }
         } else if (
           totalSpent >=
           totalBudget.limit * (totalBudget.percentage / 100)
@@ -262,18 +266,20 @@ export async function handleNotify({
               percentage: totalBudget.percentage,
             },
           });
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const notif = new Notification(
-            `Exceeded ${totalBudget.percentage}% of ${
-              category[0].toUpperCase() + category.slice(1)
-            } budget`,
-            {
-              body: `You've exceeded ${totalBudget.percentage}% of your ${
+          if ('Notification' in window) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const notif = new Notification(
+              `Exceeded ${totalBudget.percentage}% of ${
                 category[0].toUpperCase() + category.slice(1)
-              } budget. Take action to stay on track.`,
-            }
-          );
-          // console.log(notif);
+              } budget`,
+              {
+                body: `You've exceeded ${totalBudget.percentage}% of your ${
+                  category[0].toUpperCase() + category.slice(1)
+                } budget. Take action to stay on track.`,
+              }
+            );
+            // console.log(notif);
+          }
         }
       } catch (e) {
         toast.error(e as string);

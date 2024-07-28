@@ -62,7 +62,7 @@ function RecentSection({ month }: Readonly<{ month: number }>) {
           </button>
         )}
       </div>
-      <div className="flex flex-col gap-y-2.5 mt-2">
+      <div className="flex flex-col gap-y-2.5 mt-2 items-center">
         {data.slice().filter((item) => {
           return (
             Timestamp.fromMillis(item.timeStamp.seconds * 1000)
@@ -87,11 +87,14 @@ function RecentSection({ month }: Readonly<{ month: number }>) {
             .slice(0, 5)
             .map((item) => (
               <TransactionListItem
-                disabled
+                // disabled
                 item={item}
                 key={item.id}
                 width="full"
                 currency={currency}
+                onClick={() => {
+                  navigate(`${ROUTES_CONFIG.Transactions.path}/${item.id}`);
+                }}
               />
             ))
         )}

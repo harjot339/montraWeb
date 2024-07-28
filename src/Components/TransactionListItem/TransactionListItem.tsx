@@ -14,7 +14,11 @@ import Money from '../../assets/svgs/money-bag.svg';
 import Transfer from '../../assets/svgs/currency-exchange.svg';
 import { currencies } from '../../Shared/Strings';
 import useAppTheme from '../../Hooks/themeHook';
-import { useIsDesktop } from '../../Hooks/mobileCheckHook';
+import {
+  useIsDesktop,
+  useIsMobile,
+  useIsTablet,
+} from '../../Hooks/mobileCheckHook';
 
 function TransactionListItem({
   item,
@@ -52,14 +56,18 @@ function TransactionListItem({
   };
   const [theme] = useAppTheme();
   const isDesktop = useIsDesktop();
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
   return (
     <button
       onClick={onClick}
       type="button"
       disabled={disabled}
       className={clsx(
-        'flex mb-4 border p-2.5 sm:p-3 rounded-xl gap-x-2  items-center outline-none text-start ',
-        theme === 'dark' ? 'bg-black' : 'bg-white'
+        'flex mb-4 border p-2.5 sm:p-3 rounded-xl gap-x-2  items-center outline-none text-start',
+        theme === 'dark' ? 'bg-black' : 'bg-white',
+        isMobile && 'max-w-[85vw]',
+        isTablet && 'max-w-custom'
       )}
       style={{
         width: '100%',
@@ -92,7 +100,7 @@ function TransactionListItem({
       </div>
       <div
         className={clsx(
-          'w-full overflow-hidden ',
+          'w-full overflow-hidden',
           isDesktop && 'max-w-[9vw] xl:max-w-[10vw]  2xl:max-w-[20vw]'
         )}
       >
@@ -118,7 +126,7 @@ function TransactionListItem({
           {item.desc}
         </p>
       </div>
-      <div className="min-w-20 text-end w-full ">
+      <div className="min-w-20 text-end w-full">
         <p
           style={{ color: getAmtColor(item) }}
           className="font-semibold text-lg sm:text-xl overflow-hidden whitespace-nowrap text-ellipsis"

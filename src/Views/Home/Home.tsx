@@ -34,6 +34,7 @@ function Home() {
     (state: RootState) => state.transactions.transactions
   );
   // constants
+  Notification.requestPermission();
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
   const isDesktop = useIsDesktop();

@@ -188,7 +188,7 @@ function CreateBudget({
       style={{
         backgroundColor: COLORS.VIOLET[100],
         // minWidth: '28vw',
-        height: isMobile || isTablet ? '100dvh' : '95vh',
+        height: isMobile || isTablet ? '100vh' : '95vh',
       }}
     >
       <CategoryModal

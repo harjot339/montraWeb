@@ -13,7 +13,6 @@ import ArrowLeftBlack from '../../assets/svgs/arrow left black.svg';
 import Trash from '../../assets/svgs/trash.svg';
 import TrashBlack from '../../assets/svgs/trash black.svg';
 import { formatWithCommas } from '../../Utils/commonFuncs';
-import { ROUTES } from '../../Shared/Constants';
 import CustomButton from '../../Components/CustomButton';
 import AddExpense from '../AddExpense/AddExpense';
 import useAppTheme from '../../Hooks/themeHook';
@@ -83,7 +82,7 @@ function TransactionDetail() {
 
   return isOpen ? (
     <AddExpense
-      height={isMobile || isTablet ? '100dvh' : '95vh'}
+      height={isMobile || isTablet ? '100vh' : '95vh'}
       isEdit
       pageType={transaction!.type}
       setIsOpen={setIsOpen}
@@ -99,7 +98,7 @@ function TransactionDetail() {
         )}
         style={{
           minHeight: '95vh',
-          height: isMobile || isTablet ? '100dvh' : 'fit-content',
+          height: isMobile || isTablet ? '100vh' : 'fit-content',
         }}
       >
         <DeleteTransactionModal
@@ -121,7 +120,8 @@ function TransactionDetail() {
                 type="button"
                 className="outline-none bg-transparent"
                 onClick={() => {
-                  navigate(ROUTES.Transactions);
+                  // navigate(ROUTES.Transactions);
+                  navigate(-1);
                 }}
               >
                 {theme === 'dark' ? (

@@ -90,7 +90,7 @@ function BudgetItem({
           <img src={Alert} width="30px" alt="" />
         )}
       </div>
-      <p className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-3 text-ellipsis overflow-hidden whitespace-nowrap">
+      <p className="text-xl sm:text-2xl md:text-3xl font-semibold mb-3">
         {STRINGS.Remaining} {currencies[currency!].symbol}
         {formatWithCommas(Number(getValue(val, key)).toString())}
       </p>

@@ -6,6 +6,7 @@ import ReactModal from 'react-modal';
 import clsx from 'clsx';
 import { useSelector } from 'react-redux';
 // Custom Components
+import { RemoveScroll } from 'react-remove-scroll';
 import { TransactionType } from '../../Defs/transaction';
 import { RootState } from '../../Store';
 import TransactionListItem from '../../Components/TransactionListItem';
@@ -302,7 +303,9 @@ function TransactionScreen() {
             },
           }}
         >
-          <FilterSection setMenu={setFilter} />
+          <RemoveScroll>
+            <FilterSection setMenu={setFilter} />
+          </RemoveScroll>
         </ReactModal>
         {applyFilters(offset).length === 2 &&
         applyFilters(offset)[0].data.length === 0 &&
