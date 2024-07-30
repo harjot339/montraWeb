@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Select, { ActionMeta, SingleValue } from 'react-select';
 import { COLORS, PlaceholderTextColor } from '../../Shared/commonStyles';
 import useAppTheme from '../../Hooks/themeHook';
@@ -30,9 +30,9 @@ function CustomDropdown({
   menuPlacement?: 'top' | 'bottom' | 'auto';
 }>) {
   const apptheme = useAppTheme();
-  return (
-    <Select
-      options={data.map((item) => {
+  const dropdownData = useMemo(
+    () =>
+      data.map((item) => {
         return {
           label:
             item.value === 'add'
@@ -40,7 +40,12 @@ function CustomDropdown({
               : item.label[0].toUpperCase() + item.label.slice(1),
           value: item.value,
         };
-      })}
+      }),
+    [data]
+  );
+  return (
+    <Select
+      options={dropdownData}
       onChange={onChange}
       placeholder={placeholder}
       value={value}
@@ -96,6 +101,7 @@ function CustomDropdown({
       menuPlacement={menuPlacement}
       isSearchable={false}
       menuPosition="fixed"
+      // menuIsOpen
     />
   );
 }

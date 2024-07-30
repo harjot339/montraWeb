@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import ReactSwitch from 'react-switch';
 import { Timestamp } from 'firebase/firestore';
 // Custom Components
+import { RemoveScroll } from 'react-remove-scroll';
 import CustomButton from '../../Components/CustomButton';
 import CustomDropdown from '../../Components/CustomDropdown/CustomDropdown';
 import CustomInput from '../../Components/CustomInput';
@@ -199,8 +200,9 @@ function AddExpense({
         formatWithCommas(
           Number(
             (
-              (conversion?.usd?.[user?.currency?.toLowerCase() ?? 'usd'] ?? 1) *
-              Number(prevTransaction?.amount)
+              (prevTransaction?.conversion?.usd?.[
+                user?.currency?.toLowerCase() ?? 'usd'
+              ] ?? 1) * Number(prevTransaction?.amount)
             ).toFixed(2)
           ).toString()
         )
@@ -216,21 +218,26 @@ function AddExpense({
       setTo(prevTransaction!.to);
     }
   }, [conversion?.usd, isEdit, prevTransaction, user?.currency]);
+  // console.log(img, file);
   return (
     <div
       className={clsx(
-        'flex flex-col rounded-lg h-screen justify-between w-full',
+        'flex flex-col rounded-lg h-screen justify-between w-full sticky top-0 overflow-auto overflow-x-hidden',
         !isMobile && !isTablet && 'max-w-[450px]'
       )}
       style={{ backgroundColor: getBackgroundColor, height }}
     >
-      <RepeatDataModal
-        modal={modal}
-        setModal={setModal}
-        setChecked={setChecked}
-        setRepeatData={setRepeatData}
-        repeatData={repeatData}
-      />
+      {modal && (
+        <RemoveScroll>
+          <RepeatDataModal
+            modal={modal}
+            setModal={setModal}
+            setChecked={setChecked}
+            setRepeatData={setRepeatData}
+            repeatData={repeatData}
+          />
+        </RemoveScroll>
+      )}
       <CategoryModal
         modal={addCategoryModal}
         setModal={setAddCategoryModal}
@@ -272,10 +279,17 @@ function AddExpense({
           {STRINGS.HowMuch}
         </p>
         <MoneyInput
+          isEdit={isEdit}
           amount={amount}
           setAmount={setAmount}
           theme={theme}
           currency={user?.currency}
+          editAmt={Number(
+            (
+              (conversion?.usd?.[user?.currency?.toLowerCase() ?? 'usd'] ?? 1) *
+              Number(prevTransaction?.amount ?? 0)
+            ).toFixed(2)
+          ).toString()}
         />
         <EmptyZeroError
           value={amount}
@@ -418,7 +432,11 @@ function AddExpense({
               >
                 <div>
                   <p className="text-2xl font-semibold">{STRINGS.Repeat}</p>
-                  <p>{STRINGS.RepeatTransaction}</p>
+                  <p>
+                    {repeatData
+                      ? 'Repeat transaction, set your own time'
+                      : STRINGS.RepeatTransaction}
+                  </p>
                 </div>
                 <ReactSwitch
                   checked={checked}
@@ -470,14 +488,14 @@ function AddExpense({
                     weekData[repeatData.weekDay].label}
                 </p>
               </div>
-              {repeatData.end !== 'never' ? (
-                <div>
-                  <p className="text-xl font-semibold">{STRINGS.EndAfter}</p>
-                  <p>{getDate()}</p>
-                </div>
-              ) : (
+              {/* {repeatData.end !== 'never' ? ( */}
+              <div>
+                <p className="text-xl font-semibold">{STRINGS.EndAfter}</p>
+                <p> {repeatData.end === 'date' ? getDate() : 'Never'}</p>
+              </div>
+              {/* ) : (
                 <div />
-              )}
+              )} */}
               <button
                 type="button"
                 className="rounded-2xl px-4 h-8 text-sm sm:text-base font-semibold"

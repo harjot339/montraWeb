@@ -1,9 +1,17 @@
+import clsx from 'clsx';
 import React from 'react';
+import useAppTheme from '../../Hooks/themeHook';
 
 function TermsScreen() {
   const email = 'harjot.singh@chicmic.co.in';
+  const [theme] = useAppTheme();
   return (
-    <div className="w-full px-3 sm:px-6 py-3">
+    <div
+      className={clsx(
+        'w-full px-3 sm:px-6 py-3',
+        theme === 'dark' && 'text-white'
+      )}
+    >
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4">Terms and Conditions</h1>
 

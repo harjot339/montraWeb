@@ -97,8 +97,6 @@ function PieSection({
                   const { height } = chart;
                   const { ctx } = chart;
                   ctx.restore();
-                  const fontSize = (height / 160).toFixed(2);
-                  ctx.font = `bold ${fontSize}em sans-serif`;
                   ctx.textBaseline = 'top';
                   const fontColor = COLORS.DARK[25];
                   ctx.fillStyle = fontColor;
@@ -113,6 +111,11 @@ function PieSection({
                         ).toFixed(2)
                       ).toString()
                     );
+                  let fontSize = (height / 180 / (text.length / 14)).toFixed(2);
+                  if (Number(fontSize) > 2.5) {
+                    fontSize = '2.5';
+                  }
+                  ctx.font = `bold ${fontSize}em sans-serif`;
                   const textX = Math.round(
                     (width - ctx.measureText(text).width) / 2
                   );

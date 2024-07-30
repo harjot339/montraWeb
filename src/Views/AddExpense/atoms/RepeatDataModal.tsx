@@ -93,10 +93,13 @@ function RepeatDataModal({
     }
   }, [repeatData]);
   useEffect(() => {
-    const x = new Date(`${new Date().getFullYear()}-${month}-${day}`);
+    let x = new Date(new Date().getFullYear(), month - 1, day);
+    if (freq === 'monthly') {
+      x = new Date(new Date().getFullYear(), new Date().getMonth(), day);
+    }
     x.setDate(x.getDate() + 1);
     setMyDate(x);
-  }, [month, day]);
+  }, [month, day, freq]);
   return (
     <Modal
       isOpen={modal}
@@ -140,7 +143,9 @@ function RepeatDataModal({
       }}
     >
       <div className="w-full flex flex-col">
-        <div className="flex gap-x-4">
+        <div
+          className={clsx('flex gap-x-4 gap-y-3 ', !isDesktop && 'flex-wrap')}
+        >
           <CustomDropdown
             menuPlacement="bottom"
             placeholder={STRINGS.Frequency}
@@ -152,7 +157,10 @@ function RepeatDataModal({
             // menuIsOpen
             value={
               freq
-                ? { label: freq[0].toUpperCase() + freq.slice(1), value: freq }
+                ? {
+                    label: freq[0].toUpperCase() + freq.slice(1),
+                    value: freq,
+                  }
                 : undefined
             }
           />
@@ -248,7 +256,7 @@ function RepeatDataModal({
                   ? myDate!.toISOString().split('T')[0]
                   : new Date().toISOString().split('T')[0]
               }
-              max={new Date('2050-1-1').toISOString().split('T')[0]}
+              max={new Date(2050, 1, 1).toISOString().split('T')[0]}
               value={
                 date?.toISOString()?.split('T')?.[0] ??
                 (freq === 'yearly' || freq === 'monthly'
@@ -278,12 +286,12 @@ function RepeatDataModal({
           title={STRINGS.Continue}
           onPress={() => {
             setFormkey(true);
-            if (end === 'date' && date! < new Date()) {
-              toast.error(
-                "The selected end date must be later than today's date."
-              );
-              return;
-            }
+            // if (end === 'date' && date! < new Date()) {
+            //   toast.error(
+            //     "The selected end date must be later than today's date."
+            //   );
+            //   return;
+            // }
             if (end === 'date' && date! < myDate!) {
               toast.error(
                 "The selected end date must be later than selected frequency's date."

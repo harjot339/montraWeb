@@ -193,7 +193,12 @@ function Header({
                       </div>
                     ))}
                 </div>
-                <div className="flex mt-2 px-6 justify-end bg-white">
+                <div
+                  className={clsx(
+                    'flex mt-2 px-6 justify-end ',
+                    theme === 'dark' ? 'bg-black' : 'bg-white'
+                  )}
+                >
                   <button
                     type="button"
                     className={clsx(

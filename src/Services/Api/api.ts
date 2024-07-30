@@ -8,8 +8,9 @@ import {
 import { ResponseOptions } from './api.d';
 
 const baseQuery: BaseQueryFn = fetchBaseQuery({
-  baseUrl:
-    'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/',
+  baseUrl: `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${
+    new Date().toISOString().split('T')[0]
+  }/v1/currencies/`,
 });
 
 const baseQueryWithInterceptor = async (

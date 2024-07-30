@@ -24,9 +24,14 @@ export default function useInitialSetup() {
   const dispatch = useDispatch();
   useEffect(() => {
     try {
-      if ('Notification' in window) {
+      if (
+        'Notification' in window &&
+        'serviceWorker' in navigator &&
+        'PushManager' in window
+      ) {
+        // console.log();
         Notification.requestPermission();
-        // console.log('Notification permission:', Notification.permission)
+        // console.log('Notification permission:', Notification.permission);
       }
     } catch (e) {
       toast.error(`Notification error:${e as string}`);

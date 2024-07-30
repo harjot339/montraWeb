@@ -156,7 +156,10 @@ function Login() {
         <div className="my-2" />
         <p className="text-sm md:text-xl font-bold">
           {STRINGS.DontHaveAccount}{' '}
-          <Link to="/signup" className="underline text-[#7F3DFF]">
+          <Link
+            to="/signup"
+            className="underline text-[#7F3DFF] whitespace-nowrap"
+          >
             {STRINGS.SIGNUP}
           </Link>
         </p>

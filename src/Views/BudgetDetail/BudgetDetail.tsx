@@ -57,7 +57,7 @@ function BudgetDetail() {
         !isMobile && !isTablet && 'max-w-[450px]'
       )}
       style={{
-        height: isMobile || isTablet ? '100vh' : '95vh',
+        height: isMobile || isTablet ? '100dvh' : '95vh',
       }}
     >
       <DeleteBudgetModal
@@ -146,7 +146,7 @@ function BudgetDetail() {
             </p>
             <p
               className={clsx(
-                'self-center text-[40px] font-semibold mt-5 mb-6 max-w-[90%]',
+                'self-center text-center text-[40px] font-semibold mt-5 mb-6 max-w-[90%] text-ellipsis overflow-hidden whitespace-nowrap',
                 theme === 'dark' && 'text-white'
               )}
             >

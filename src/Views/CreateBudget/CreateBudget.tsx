@@ -188,7 +188,7 @@ function CreateBudget({
       style={{
         backgroundColor: COLORS.VIOLET[100],
         // minWidth: '28vw',
-        height: isMobile || isTablet ? '100vh' : '95vh',
+        height: isMobile || isTablet ? '100dvh' : '95vh',
       }}
     >
       <CategoryModal
@@ -234,7 +234,25 @@ function CreateBudget({
           amount={amount}
           setAmount={setAmount}
           theme={theme}
+          isEdit={isEdit}
           currency={currency}
+          editAmt={
+            isEdit
+              ? Number(
+                  (
+                    (budget?.[params.id!.split('_')[0]][
+                      params.id!.split('_')[1]
+                    ].conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ??
+                      1) *
+                    Number(
+                      budget![params.id!.split('_')[0]][
+                        params.id!.split('_')[1]
+                      ].limit
+                    )
+                  ).toFixed(2)
+                ).toString()
+              : '0'
+          }
         />
         <EmptyZeroError
           value={amount}

@@ -15,7 +15,7 @@ export const passRegex =
 
 export const STRINGS = {
   ClearRepeatTransaction:
-    'Clearing Repeating Transaction Frequency \nAre you sure you want to clear the repeating transaction frequency?',
+    'Clearing Repeat Transaction Frequency \nAre you sure you want to clear the repeat transaction frequency?',
   ToManyRequestError: 'Too many requests. Please try again after sometime.',
   PopupClosedByUser: 'Authentication process canceled. Please try again.',
   Categories: 'Categories',
@@ -214,7 +214,7 @@ export const STRINGS = {
   EmailAdressAlreadyUsed:
     'The email address is already in used by another account.',
   CredentialMalformed:
-    'The supplied auth credential is malformed or has expired.',
+    'The email or password entered is incorrect. Please check your credentials and try again.',
   NetworkError:
     'A network error (such as timeout, interrupted connection or unreachable host) has occurred.',
   UnknownError: 'An unknown error occurred. Please try again later.',

@@ -35,6 +35,12 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
     return formatWithCommas(Number(Number(amount).toFixed(2)).toString());
   }, []);
   const [theme] = useAppTheme();
+  // console.log(
+  //   conversion.date,
+  //   conversion.usd?.[(currency ?? 'USD').toLowerCase()],
+  //   9400,
+  //   conversion.usd?.[(currency ?? 'USD').toLowerCase()] * 9400
+  // );
   return (
     <div
       className={clsx(
@@ -69,13 +75,17 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
             )}
           >
             {currencies[currency ?? 'USD'].symbol}
-            {formatWithCommas(
+            {Number.isNaN(
               Number(
                 (
-                  9400 * conversion.usd[currency?.toLowerCase() ?? 'usd']
+                  conversion.usd[(currency ?? 'USD').toLowerCase()] * 9400
                 ).toFixed(2)
-              ).toString()
-            )}
+              )
+            )
+              ? 0
+              : (conversion.usd[(currency ?? 'USD').toLowerCase()] * 9400)
+                  .toFixed(2)
+                  .toString()}
           </p>
           <p
             className="text-sm md:text-md font-normal"

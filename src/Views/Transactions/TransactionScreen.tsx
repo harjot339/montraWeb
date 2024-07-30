@@ -345,6 +345,9 @@ function TransactionScreen() {
                           replace: params?.id !== undefined,
                         });
                       }}
+                      dateShow={
+                        filters.sort === 'highest' || filters.sort === 'lowest'
+                      }
                     />
                   ))}
                 </ul>

@@ -35,6 +35,9 @@ function CustomPassInput({
         value={value}
         maxLength={maxLength}
         onChange={onChange}
+        onPaste={(e) => {
+          e.preventDefault();
+        }}
       />
       <button
         type="button"

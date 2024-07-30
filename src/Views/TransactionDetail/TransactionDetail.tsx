@@ -79,10 +79,10 @@ function TransactionDetail() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   });
-
+  // console.log(transaction);
   return isOpen ? (
     <AddExpense
-      height={isMobile || isTablet ? '100vh' : '95vh'}
+      height={isMobile || isTablet ? '100dvh' : '95vh'}
       isEdit
       pageType={transaction!.type}
       setIsOpen={setIsOpen}
@@ -98,7 +98,7 @@ function TransactionDetail() {
         )}
         style={{
           minHeight: '95vh',
-          height: isMobile || isTablet ? '100vh' : 'fit-content',
+          height: isMobile || isTablet ? '100dvh' : 'fit-content',
         }}
       >
         <DeleteTransactionModal
@@ -147,9 +147,9 @@ function TransactionDetail() {
                 )}
               </button>
             </div>
-            <div className="self-center items-center flex flex-col max-w-[90%]">
+            <div className=" items-center flex flex-col">
               <p
-                className="text-5xl  font-bold mb-4 text-ellipsis overflow-hidden whitespace-nowrap "
+                className="text-4xl text-ellipsis overflow-hidden whitespace-nowrap font-bold mb-4 max-w-[95%] text-center"
                 title={
                   (currencies[currency!].symbol ?? '$') +
                   currencyConvert(transaction.amount)
@@ -300,7 +300,7 @@ function TransactionDetail() {
             flex={1}
             onPress={() => {
               setIsOpen(true);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              // window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
           />
         </div>

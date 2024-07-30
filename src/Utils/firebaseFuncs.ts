@@ -72,9 +72,10 @@ export async function getAttachmentUrl({
   try {
     if (
       isEdit &&
-      attachement !== undefined &&
+      attachement === undefined &&
       prevTransaction?.attachementType !== 'none'
     ) {
+      // console.log('yeh chla')
       return prevTransaction?.attachement ?? '';
     }
     if (attachementType !== 'none' && attachement) {
@@ -82,7 +83,7 @@ export async function getAttachmentUrl({
       url = await getDownloadURL(ref(storage, `users/${uid}/${id}`));
     }
   } catch (e) {
-    // console.log(e)
+    // console.log(e);
   }
   return url;
 }
@@ -440,7 +441,7 @@ export async function handleNewExpense({
       });
     }
   } catch (e) {
-    console.log(e);
+    // console.log(e);
   }
 }
 export const handleOnline = async ({
@@ -492,12 +493,13 @@ export const handleOnline = async ({
     prevTransaction,
     isEdit,
   });
+  // console.log('sdjskdfnjksdn', url)
   const trans = createTransaction({
     id,
     url,
     attachementType:
       isEdit &&
-      attachement !== undefined &&
+      attachement === undefined &&
       prevTransaction?.attachementType !== 'none'
         ? prevTransaction?.attachementType ?? 'none'
         : attachementType,

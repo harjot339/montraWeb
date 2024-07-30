@@ -12,7 +12,7 @@ import { COLORS } from '../../Shared/commonStyles';
 import { TransactionType } from '../../Defs/transaction';
 import Money from '../../assets/svgs/money-bag.svg';
 import Transfer from '../../assets/svgs/currency-exchange.svg';
-import { currencies } from '../../Shared/Strings';
+import { currencies, monthData } from '../../Shared/Strings';
 import useAppTheme from '../../Hooks/themeHook';
 import {
   useIsDesktop,
@@ -27,6 +27,7 @@ function TransactionListItem({
   disabled = false,
   onClick,
   selected = false,
+  dateShow = false,
 }: Readonly<{
   item: TransactionType;
   width: 'full' | 'half';
@@ -34,6 +35,7 @@ function TransactionListItem({
   onClick?: () => void;
   disabled?: boolean;
   selected?: boolean;
+  dateShow?: boolean;
 }>) {
   // functions
   const getAmtSymbol = (x: TransactionType) => {
@@ -120,7 +122,7 @@ function TransactionListItem({
         <p
           className={clsx(
             'text-sm sm:text-lg text-ellipsis overflow-hidden whitespace-nowrap break-words ',
-            theme === 'dark' && 'text-white'
+            selected ? 'text-black' : theme === 'dark' && 'text-white'
           )}
         >
           {item.desc}
@@ -157,6 +159,21 @@ function TransactionListItem({
             Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate()
           )}
         </p>
+        {dateShow && (
+          <p className="text-xs sm:text-sm" style={{ color: COLORS.DARK[25] }}>
+            {`${Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+              ?.toDate()
+              ?.getDate()} ${
+              monthData[
+                Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                  ?.toDate()
+                  ?.getMonth()
+              ].label
+            } ${Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+              ?.toDate()
+              ?.getFullYear()}`}
+          </p>
+        )}
       </div>
     </button>
   );

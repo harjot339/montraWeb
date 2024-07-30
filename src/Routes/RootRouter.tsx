@@ -16,6 +16,9 @@ function RootRouter() {
   const isAuthenticated = !!uid;
   const { data: conversion, isSuccess } = useGetUsdConversionQuery({});
   const dispatch = useDispatch();
+  // if (isSuccess) {
+  //   // console.log(conversion.date);
+  // }
   useEffect(() => {
     if (isSuccess) {
       const myCurrencies: { [key: string]: number } = {};

@@ -118,24 +118,34 @@ function Budgets() {
                   </p>
                 </div>
               ) : (
-                Object.entries(budgets ?? {}).map((item) => {
-                  return (
-                    <BudgetItem
-                      color={catColors?.[item[0]] ?? 'green'}
-                      onClick={() => {
-                        if (`${month}_${item[0]}` !== params?.id)
-                          navigate(`${month}_${item[0]}`, {
-                            replace: params?.id !== undefined,
-                          });
-                      }}
-                      key={item[0]}
-                      item={item}
-                      // conversion={conversion}
-                      currency={currency}
-                      spend={spend}
-                    />
-                  );
-                })
+                Object.entries(budgets ?? {})
+                  .sort((a, b) => {
+                    if (a[0] < b[0]) {
+                      return -1;
+                    }
+                    if (a[0] > b[0]) {
+                      return 1;
+                    }
+                    return 0;
+                  })
+                  .map((item) => {
+                    return (
+                      <BudgetItem
+                        color={catColors?.[item[0]] ?? 'green'}
+                        onClick={() => {
+                          if (`${month}_${item[0]}` !== params?.id)
+                            navigate(`${month}_${item[0]}`, {
+                              replace: params?.id !== undefined,
+                            });
+                        }}
+                        key={item[0]}
+                        item={item}
+                        // conversion={conversion}
+                        currency={currency}
+                        spend={spend}
+                      />
+                    );
+                  })
               )}
             </div>
           </div>

@@ -34,7 +34,6 @@ function Home() {
     (state: RootState) => state.transactions.transactions
   );
   // constants
-  Notification.requestPermission();
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
   const isDesktop = useIsDesktop();
@@ -53,6 +52,7 @@ function Home() {
   return isOpenMobile ? (
     <div className={clsx(isTablet && 'ml-52')}>
       <AddExpense
+        height={isMobile || isTablet ? '100dvh' : '95vh'}
         isEdit={false}
         pageType={pageType!}
         setIsOpen={setIsOpenMobile}
@@ -81,6 +81,7 @@ function Home() {
         </div>
         {isOpen && (
           <AddExpense
+            // height={isMobile || isTablet ? '100vh' : '95vh'}
             setIsOpen={setIsOpen}
             pageType={pageType!}
             isEdit={false}
