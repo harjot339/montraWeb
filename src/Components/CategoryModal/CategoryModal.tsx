@@ -17,6 +17,7 @@ import { encrypt } from '../../Utils/encryption';
 import { COLORS } from '../../Shared/commonStyles';
 import { useIsDesktop } from '../../Hooks/mobileCheckHook';
 import useAppTheme from '../../Hooks/themeHook';
+import { getMyColor } from '../../Utils/commonFuncs';
 
 function CategoryModal({
   modal,
@@ -41,6 +42,12 @@ function CategoryModal({
   const incomeCats = useSelector(
     (state: RootState) => state.common.user?.incomeCategory
   );
+  const expenseColors = useSelector(
+    (state: RootState) => state.common.user?.expenseColors
+  );
+  const incomeColors = useSelector(
+    (state: RootState) => state.common.user?.incomeColors
+  );
   // constants
   const [theme, COLOR] = useAppTheme();
   const isDesktop = useIsDesktop();
@@ -61,18 +68,35 @@ function CategoryModal({
       }
       try {
         setModal(false);
+        const getUniqueColor = (existingColors: string[]): string => {
+          let color;
+          do {
+            color = getMyColor();
+          } while (existingColors.includes(color));
+          return color;
+        };
         if (type === 'expense') {
           dispatch(addExpenseCategory(category.toLowerCase()));
           await updateDoc(doc(db, 'users', uid!), {
             expenseCategory: [...expenseCats!, category.toLowerCase()].map(
-              (item) => encrypt(item, uid!)
+              (item) => ({
+                color:
+                  expenseColors?.[item] ??
+                  getUniqueColor(Object.values(expenseColors ?? {})),
+                name: encrypt(item, uid!),
+              })
             ),
           });
         } else if (type === 'income') {
           dispatch(addIncomeCategory(category.toLowerCase()));
           await updateDoc(doc(db, 'users', uid!), {
             incomeCategory: [...incomeCats!, category.toLowerCase()].map(
-              (item) => encrypt(item, uid!)
+              (item) => ({
+                color:
+                  incomeColors?.[item] ??
+                  getUniqueColor(Object.values(incomeColors ?? {})),
+                name: encrypt(item, uid!),
+              })
             ),
           });
         }
@@ -90,7 +114,9 @@ function CategoryModal({
     category,
     dispatch,
     expenseCats,
+    expenseColors,
     incomeCats,
+    incomeColors,
     setModal,
     setMyCategory,
     type,

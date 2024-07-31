@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 // Third Party Libraries
 import { useSelector } from 'react-redux';
 import clsx from 'clsx';
@@ -11,7 +11,6 @@ import SidebarButton from '../../Components/SidebarButton';
 import { monthData, STRINGS } from '../../Shared/Strings';
 import { RootState } from '../../Store';
 import CustomDropdown from '../../Components/CustomDropdown/CustomDropdown';
-import { getMyColor } from '../../Utils/commonFuncs';
 import useAppTheme from '../../Hooks/themeHook';
 import {
   useIsMobile,
@@ -30,7 +29,7 @@ function Budgets() {
   const [month, setMonth] = useState<number>(new Date().getMonth());
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
-  const [catColors, setCatColors] = useState<{ [key: string]: string }>();
+  // const [catColors, setCatColors] = useState<{ [key: string]: string }>();
   // redux
   const budgets = useSelector(
     (state: RootState) => state.common.user?.budget[month]
@@ -38,24 +37,27 @@ function Budgets() {
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
   );
+  const expenseColors = useSelector(
+    (state: RootState) => state.common.user?.expenseColors
+  );
   // const conversion = useSelector((state: RootState) => state.common.conversion);
   const spend =
     useSelector((state: RootState) => state.common.user?.spend[month]) ?? {};
 
-  useEffect(() => {
-    setCatColors(
-      Object.entries(budgets ?? {}).reduce(
-        (acc: { [key: string]: string }, item) => {
-          acc[item[0]] = getMyColor();
-          return acc;
-        },
-        {}
-      )
-    );
-    return () => {
-      setCatColors(undefined);
-    };
-  }, [budgets]);
+  // useEffect(() => {
+  //   setCatColors(
+  //     Object.entries(budgets ?? {}).reduce(
+  //       (acc: { [key: string]: string }, item) => {
+  //         acc[item[0]] = getMyColor();
+  //         return acc;
+  //       },
+  //       {}
+  //     )
+  //   );
+  //   return () => {
+  //     setCatColors(undefined);
+  //   };
+  // }, [budgets]);
 
   return (isTablet || isMobile) && params?.id !== undefined ? (
     <div className={clsx(isTablet && 'ml-52')}>
@@ -131,7 +133,7 @@ function Budgets() {
                   .map((item) => {
                     return (
                       <BudgetItem
-                        color={catColors?.[item[0]] ?? 'green'}
+                        color={expenseColors?.[item[0]] ?? 'green'}
                         onClick={() => {
                           if (`${month}_${item[0]}` !== params?.id)
                             navigate(`${month}_${item[0]}`, {

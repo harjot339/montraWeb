@@ -57,7 +57,7 @@ function FinancialReport() {
           {STRINGS.FinancialReport}
         </p>
         <div className="flex gap-x-5 w-full md:w-fit justify-between">
-          <div className="flex w-56 sm:w-72 md:w-[580px]">
+          <div className="flex w-56 sm:w-72 md:w-[480px] lg:w-[600px]">
             <CustomButton
               flex={1}
               title={STRINGS.ExportData}
@@ -83,7 +83,9 @@ function FinancialReport() {
               }
             />
           )}
+          {/* <div className="flex w-full max-w-[0%]"> */}
           <CustomDropdown
+            flex={1}
             data={monthData.slice(0, new Date().getMonth() + 1)}
             placeholder={STRINGS.Month}
             onChange={(e) => {
@@ -91,6 +93,7 @@ function FinancialReport() {
             }}
             value={month !== undefined ? monthData[month] : undefined}
           />
+          {/* </div> */}
         </div>
       </div>
       <div

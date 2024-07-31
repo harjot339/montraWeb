@@ -1,12 +1,18 @@
+import { COLORS } from './commonStyles';
+
 export const initialExpenseCategories = [
-  'add',
-  'food',
-  'bill',
-  'shopping',
-  'subscription',
-  'transportation',
+  { name: 'add', color: '' },
+  { name: 'food', color: COLORS.RED[100] },
+  { name: 'bills', color: COLORS.VIOLET[100] },
+  { name: 'shopping', color: COLORS.YELLOW[100] },
+  { name: 'subscription', color: '#fc803d' },
+  { name: 'transportation', color: COLORS.BLUE[100] },
 ];
-export const initialIncomeCategories = ['add', 'salary', 'passive income'];
+export const initialIncomeCategories = [
+  { name: 'add', color: '' },
+  { name: 'salary', color: COLORS.GREEN[100] },
+  { name: 'passive income', color: '#f531d7' },
+];
 
 export const emailRegex = /^[a-zA-Z0-9_-]+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9]+$/;
 export const nameRegex = /^[a-zA-Z ]*$/;

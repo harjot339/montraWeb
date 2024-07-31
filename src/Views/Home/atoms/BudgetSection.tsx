@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import ProgressBar from '@ramonak/react-progress-bar';
 // Custom Components
 import { RootState } from '../../../Store';
-import { formatWithCommas, getMyColor } from '../../../Utils/commonFuncs';
+import { formatWithCommas } from '../../../Utils/commonFuncs';
 import { currencies, STRINGS } from '../../../Shared/Strings';
 import useAppTheme from '../../../Hooks/themeHook';
 import Alert from '../../../assets/svgs/alert.svg';
@@ -14,6 +14,9 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
   // redux
   const budgets = useSelector(
     (state: RootState) => state.common.user?.budget?.[month]
+  );
+  const expenseColors = useSelector(
+    (state: RootState) => state.common.user?.expenseColors
   );
   const spends = useSelector(
     (state: RootState) => state.common.user?.spend?.[month]
@@ -114,7 +117,7 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
                         <ProgressBar
                           // width="30vw"
                           isLabelVisible={false}
-                          bgColor={getMyColor()}
+                          bgColor={expenseColors?.[key] ?? 'green'}
                           completed={
                             (spends?.[key]?.USD ?? 0) / val.limit > 1
                               ? 100

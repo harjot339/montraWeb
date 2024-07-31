@@ -135,14 +135,20 @@ export function UserToJson({
   name: string;
   email: string;
   isSocial: boolean;
-}): UserType {
+}) {
   return {
     uid,
     name: encrypt(name, uid),
     email: encrypt(email, uid),
     pin: '',
-    expenseCategory: initialExpenseCategories.map((item) => encrypt(item, uid)),
-    incomeCategory: initialIncomeCategories.map((item) => encrypt(item, uid)),
+    expenseCategory: initialExpenseCategories.map((item) => ({
+      color: item.color,
+      name: encrypt(item.name, uid),
+    })),
+    incomeCategory: initialIncomeCategories.map((item) => ({
+      color: item.color,
+      name: encrypt(item.name, uid),
+    })),
     budget: {},
     spend: {},
     income: {},
@@ -159,11 +165,33 @@ export function UserFromJson(json: DocumentData): UserType {
     name: decrypt(json.name, json.uid) ?? json.name,
     pin: json.pin !== '' ? decrypt(json.pin, json.uid) ?? json.pin : '',
     expenseCategory:
-      json?.expenseCategory?.map((item: string) => decrypt(item, json.uid)) ??
-      initialExpenseCategories,
+      json?.expenseCategory?.map((item: { name: string; color: string }) =>
+        decrypt(item.name, json.uid)
+      ) ?? initialExpenseCategories.map((item) => item.name),
+    expenseColors: json?.expenseCategory?.reduce(
+      (
+        acc: { [key: string]: string },
+        item: { name: string; color: string }
+      ) => {
+        acc[decrypt(item.name, json.uid) ?? item.name] = item.color;
+        return acc;
+      },
+      {}
+    ),
     incomeCategory:
-      json?.incomeCategory?.map((item: string) => decrypt(item, json.uid)) ??
-      initialIncomeCategories,
+      json?.incomeCategory?.map((item: { name: string; color: string }) =>
+        decrypt(item.name, json.uid)
+      ) ?? initialIncomeCategories,
+    incomeColors: json?.incomeCategory?.reduce(
+      (
+        acc: { [key: string]: string },
+        item: { name: string; color: string }
+      ) => {
+        acc[decrypt(item.name, json.uid) ?? item.name] = item.color;
+        return acc;
+      },
+      {}
+    ),
     budget: decryptBudget(json),
     spend: decryptExpense(json),
     income: decryptIncome(json),

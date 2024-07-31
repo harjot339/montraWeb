@@ -117,7 +117,7 @@ function Header({
               </p>
             ) : (
               <>
-                <div className="max-h-[400px] overflow-auto">
+                <div className="max-h-[400px] overflow-auto max-w-[80vw]">
                   {Object.values(notifications!)
                     .sort((a, b) => b.time.seconds - a.time.seconds)
                     .map((item, i, arr) => (

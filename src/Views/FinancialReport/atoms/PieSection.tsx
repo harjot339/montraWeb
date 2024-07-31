@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 // Third Party Libraries
 import clsx from 'clsx';
 import { Doughnut } from 'react-chartjs-2';
@@ -12,11 +12,13 @@ import {
   Filler,
 } from 'chart.js';
 // Custom Components
+import { useSelector } from 'react-redux';
 import CategoryItem from './CategoryItem';
 import { COLORS } from '../../../Shared/commonStyles';
 import { STRINGS, currencies } from '../../../Shared/Strings';
-import { getMyColor, formatWithCommas } from '../../../Utils/commonFuncs';
+import { formatWithCommas } from '../../../Utils/commonFuncs';
 import { useIsDesktop } from '../../../Hooks/mobileCheckHook';
+import { RootState } from '../../../Store';
 
 ChartJS.register(CategoryScale, Title, Tooltip, Legend, Filler, ArcElement);
 
@@ -52,7 +54,13 @@ function PieSection({
   setType: React.Dispatch<React.SetStateAction<'income' | 'expense'>>;
 }>) {
   const isDesktop = useIsDesktop();
-  const [catColors, setCatColors] = useState<{ [key: string]: string }>();
+  const expenseColors = useSelector(
+    (state: RootState) => state.common.user?.expenseColors
+  );
+  const incomeColors = useSelector(
+    (state: RootState) => state.common.user?.incomeColors
+  );
+  // const [catColors, setCatColors] = useState<{ [key: string]: string }>();
   const [sort, setSort] = useState<boolean>(false);
   const data = Object.entries((type === 'income' ? income : spends) ?? {})
     .sort((a, b) => b[1][currency ?? 'USD'] - a[1][currency ?? 'USD'])
@@ -64,19 +72,19 @@ function PieSection({
       },
       { data: [], labels: [] }
     );
-  useEffect(() => {
-    setCatColors(
-      Object.entries(type === 'expense' ? spends ?? {} : income ?? {})
-        .sort((a, b) => b[1][currency ?? 'USD'] - a[1][currency ?? 'USD'])
-        .reduce((acc: { [key: string]: string }, item) => {
-          acc[item[0]] = getMyColor();
-          return acc;
-        }, {})
-    );
-    return () => {
-      setCatColors(undefined);
-    };
-  }, [currency, income, spends, type]);
+  // useEffect(() => {
+  //   setCatColors(
+  //     Object.entries(type === 'expense' ? spends ?? {} : income ?? {})
+  //       .sort((a, b) => b[1][currency ?? 'USD'] - a[1][currency ?? 'USD'])
+  //       .reduce((acc: { [key: string]: string }, item) => {
+  //         acc[item[0]] = getMyColor();
+  //         return acc;
+  //       }, {})
+  //   );
+  //   return () => {
+  //     setCatColors(undefined);
+  //   };
+  // }, [currency, income, spends, type]);
   return (
     <div className="flex flex-col items-center">
       <div className="h-96 justify-center flex items-center">
@@ -149,7 +157,12 @@ function PieSection({
               datasets: [
                 {
                   data: data.data,
-                  backgroundColor: Object.values(catColors ?? {}),
+                  backgroundColor: data.labels.map(
+                    (item) =>
+                      (type === 'expense' ? expenseColors : incomeColors)?.[
+                        item.toLowerCase()
+                      ] ?? 'green'
+                  ),
                 },
               ],
               labels: data.labels,
@@ -267,7 +280,11 @@ function PieSection({
                   (item) =>
                     item[1][currency?.toUpperCase() ?? 'USD'] !== 0 && (
                       <CategoryItem
-                        catColors={catColors}
+                        color={
+                          (type === 'expense' ? expenseColors : incomeColors)?.[
+                            item[0]
+                          ] ?? 'green'
+                        }
                         currency={currency}
                         item={item}
                         theme={theme}

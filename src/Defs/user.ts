@@ -6,7 +6,9 @@ export type UserType = {
   uid: string;
   pin: string;
   expenseCategory: string[];
+  expenseColors: { [key: string]: string };
   incomeCategory: string[];
+  incomeColors: { [key: string]: string };
   budget: {
     [month: string]: {
       [key: string]: {

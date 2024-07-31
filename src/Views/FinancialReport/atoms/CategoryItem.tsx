@@ -7,7 +7,7 @@ import { formatWithCommas } from '../../../Utils/commonFuncs';
 
 function CategoryItem({
   item,
-  catColors,
+  color,
   type,
   currency,
   theme,
@@ -20,11 +20,7 @@ function CategoryItem({
       [currency: string]: number;
     },
   ];
-  catColors:
-    | {
-        [key: string]: string;
-      }
-    | undefined;
+  color: string;
   type: 'income' | 'expense';
   currency: string | undefined;
   theme: 'light' | 'dark';
@@ -38,7 +34,7 @@ function CategoryItem({
           <div
             className="w-5 h-5 rounded-full"
             style={{
-              backgroundColor: catColors?.[item[0]] ?? 'green',
+              backgroundColor: color,
             }}
           />
           <p
@@ -70,7 +66,7 @@ function CategoryItem({
             (type === 'expense' ? Number(totalSpend) : Number(totalIncome))) *
           100
         ).toFixed(0)}
-        bgColor={catColors?.[item[0]] ?? 'green'}
+        bgColor={color}
       />
     </div>
   );
