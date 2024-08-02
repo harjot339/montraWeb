@@ -12,7 +12,7 @@ import ArrowLeft from '../../assets/svgs/arrow left.svg';
 import ArrowLeftBlack from '../../assets/svgs/arrow left black.svg';
 import Trash from '../../assets/svgs/trash.svg';
 import TrashBlack from '../../assets/svgs/trash black.svg';
-import { formatWithCommas } from '../../Utils/commonFuncs';
+import { formatAMPM, formatWithCommas } from '../../Utils/commonFuncs';
 import CustomButton from '../../Components/CustomButton';
 import AddExpense from '../AddExpense/AddExpense';
 import useAppTheme from '../../Hooks/themeHook';
@@ -52,24 +52,21 @@ function TransactionDetail() {
     (amount: number) => {
       if (
         Number.isNaN(
-          Number(
-            (
-              (transaction?.conversion?.usd?.[
-                currency?.toLowerCase() ?? 'usd'
-              ] ?? 1) * amount
-            ).toFixed(2)
-          )
+          (
+            (transaction?.conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ??
+              1) * amount
+          ).toFixed(2)
         )
       ) {
         return 0;
       }
       return formatWithCommas(
-        Number(
-          (
-            (transaction?.conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ??
-              1) * Number(amount)
-          ).toFixed(2)
-        ).toString()
+        (
+          (transaction?.conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ??
+            1) * Number(amount)
+        )
+          .toFixed(2)
+          .toString()
       );
     },
     [currency, transaction]
@@ -168,7 +165,8 @@ function TransactionDetail() {
                       .toDate()
                       .getDay()
                   ].label
-                }{' '}
+                }
+                {', '}
                 {Timestamp.fromMillis(transaction.timeStamp.seconds * 1000)
                   .toDate()
                   .getDate()}{' '}
@@ -181,14 +179,13 @@ function TransactionDetail() {
                 }{' '}
                 {Timestamp.fromMillis(transaction.timeStamp.seconds * 1000)
                   .toDate()
-                  .getFullYear()}{' '}
-                {Timestamp.fromMillis(transaction.timeStamp.seconds * 1000)
-                  .toDate()
-                  .getHours()}
-                :
-                {Timestamp.fromMillis(transaction.timeStamp.seconds * 1000)
-                  .toDate()
-                  .getMinutes()}
+                  .getFullYear()}
+                {', '}
+                {formatAMPM(
+                  Timestamp.fromMillis(
+                    transaction.timeStamp.seconds * 1000
+                  ).toDate()
+                )}
               </p>
             </div>
           </div>

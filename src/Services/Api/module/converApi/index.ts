@@ -3,7 +3,9 @@ import api from '../../api';
 export const convertApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getUsdConversion: builder.query({
-      query: () => 'usd.json',
+      query: ({ date }) => {
+        return `/currency-api@${date}/v1/currencies/usd.json`;
+      },
     }),
   }),
 });

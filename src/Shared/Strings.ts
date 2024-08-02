@@ -14,7 +14,7 @@ export const initialIncomeCategories = [
   { name: 'passive income', color: '#f531d7' },
 ];
 
-export const emailRegex = /^[a-zA-Z0-9_-]+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9]+$/;
+export const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 export const nameRegex = /^[a-zA-Z ]*$/;
 export const passRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\s])[A-Za-z\d@$!%*?&\s]{8,}$/;
@@ -51,7 +51,7 @@ export const STRINGS = {
   EmailOnWay: 'Your email is on the way',
   CheckYourEmail: 'Check your email',
   InstructionResetPass:
-    'and follow the instructions to reset your password. Please note that the reset link will only be valid for 1 hour.',
+    'and follow the instructions to reset your password. This link will expire soon, please ensure you access it promptly.',
   BackToLogin: 'Back to Login',
   DontWorry: "Don't worry.",
   EnterEmailForReset:
@@ -218,9 +218,8 @@ export const STRINGS = {
   LeaveWithoutSettingPin:
     'Are you sure you want to leave without setting up your pin?',
   EmailAdressAlreadyUsed:
-    'The email address is already in used by another account.',
-  CredentialMalformed:
-    'The email or password entered is incorrect. Please check your credentials and try again.',
+    'The email address is already in use by another account.',
+  CredentialMalformed: 'Incorrect email or password. Please try again.',
   NetworkError:
     'A network error (such as timeout, interrupted connection or unreachable host) has occurred.',
   UnknownError: 'An unknown error occurred. Please try again later.',

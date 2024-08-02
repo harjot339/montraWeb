@@ -92,7 +92,7 @@ function BudgetItem({
       </div>
       <p className="text-xl sm:text-2xl md:text-3xl font-semibold mb-3">
         {STRINGS.Remaining} {currencies[currency!].symbol}
-        {formatWithCommas(Number(getValue(val, key)).toString())}
+        {formatWithCommas(getValue(val, key).toString())}
       </p>
       <div className="max-w-96 w-full">
         <ProgressBar
@@ -109,18 +109,18 @@ function BudgetItem({
       <p className="text-lg sm:text-xl md:text-2xl font-semibold mt-2 mb-3">
         {currencies[currency!].symbol}
         {formatWithCommas(
-          Number(
-            (spend?.[key]?.[currency?.toUpperCase() ?? 'USD'] ?? 0).toFixed(2)
-          ).toString()
+          (spend?.[key]?.[currency?.toUpperCase() ?? 'USD'] ?? 0)
+            .toFixed(2)
+            .toString()
         )}{' '}
         of {currencies[currency!].symbol}
         {formatWithCommas(
-          Number(
-            (
-              (item[1]?.conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ??
-                0) * val.limit
-            ).toFixed(2)
-          ).toString()
+          (
+            (item[1]?.conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ??
+              0) * val.limit
+          )
+            .toFixed(2)
+            .toString()
         )}
       </p>
       {(spend?.[key]?.USD ?? 0) >= val.limit && (

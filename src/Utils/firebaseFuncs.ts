@@ -221,7 +221,7 @@ export async function handleNotify({
   if (totalBudget && totalBudget.alert) {
     if (
       totalSpent >= totalBudget.limit ||
-      totalSpent >= totalBudget.limit * (totalBudget.percentage / 100)
+      Number((totalBudget.limit * (totalBudget.percentage / 100)).toFixed(2))
     ) {
       try {
         const notificationId = uuidv4();
@@ -255,7 +255,9 @@ export async function handleNotify({
           }
         } else if (
           totalSpent >=
-          totalBudget.limit * (totalBudget.percentage / 100)
+          Number(
+            (totalBudget.limit * (totalBudget.percentage / 100)).toFixed(2)
+          )
         ) {
           await updateDoc(doc(db, 'users', uid), {
             [`notification.${notificationId}`]: {

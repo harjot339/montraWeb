@@ -198,13 +198,13 @@ function AddExpense({
     if (isEdit) {
       setAmount(
         formatWithCommas(
-          Number(
-            (
-              (prevTransaction?.conversion?.usd?.[
-                user?.currency?.toLowerCase() ?? 'usd'
-              ] ?? 1) * Number(prevTransaction?.amount)
-            ).toFixed(2)
-          ).toString()
+          (
+            (prevTransaction?.conversion?.usd?.[
+              user?.currency?.toLowerCase() ?? 'usd'
+            ] ?? 1) * Number(prevTransaction?.amount)
+          )
+            .toFixed(2)
+            .toString()
         )
       );
       setCat(prevTransaction!.category);
@@ -284,12 +284,12 @@ function AddExpense({
           setAmount={setAmount}
           theme={theme}
           currency={user?.currency}
-          editAmt={Number(
-            (
-              (conversion?.usd?.[user?.currency?.toLowerCase() ?? 'usd'] ?? 1) *
-              Number(prevTransaction?.amount ?? 0)
-            ).toFixed(2)
-          ).toString()}
+          editAmt={(
+            (conversion?.usd?.[user?.currency?.toLowerCase() ?? 'usd'] ?? 1) *
+            Number(prevTransaction?.amount ?? 0)
+          )
+            .toFixed(2)
+            .toString()}
         />
         <EmptyZeroError
           value={amount}

@@ -307,9 +307,11 @@ function TransactionScreen() {
             <FilterSection setMenu={setFilter} />
           </RemoveScroll>
         </ReactModal>
-        {applyFilters(offset).length === 2 &&
-        applyFilters(offset)[0].data.length === 0 &&
-        applyFilters(offset)[1].data.length === 0 ? (
+        {(applyFilters(offset).length === 1 &&
+          applyFilters(offset)[0].data.length === 0) ||
+        (applyFilters(offset).length === 2 &&
+          applyFilters(offset)[0].data.length === 0 &&
+          applyFilters(offset)[1].data.length === 0) ? (
           <div className="flex w-full h-full justify-center items-center">
             <p className="text-gray-400 text-xl">
               {STRINGS.NoTransactionsMonth}

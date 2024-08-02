@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useCallback, useState } from 'react';
 // Third Party Libraries
 import { Link, useNavigate } from 'react-router-dom';
@@ -28,6 +29,7 @@ import { UserFromJson, UserToJson } from '../../Utils/userFuncs';
 import { setTheme, setUser } from '../../Store/Common';
 import { FirebaseAuthErrorHandler } from '../../Utils/commonFuncs';
 import useAppTheme from '../../Hooks/themeHook';
+import './styles.css';
 
 function Signup() {
   // constants
@@ -69,7 +71,7 @@ function Signup() {
       email !== '' &&
       testInput(emailRegex, email) &&
       pass.trim() !== '' &&
-      pass.trim().length >= 6 &&
+      pass.length >= 6 &&
       pass === confirmPass
     ) {
       if (!checked) {
@@ -174,21 +176,25 @@ function Signup() {
         formKey={form.confirmPass}
       />
       <div className="flex justify-start mt-1">
-        <input
-          type="checkbox"
-          id="checkbox"
+        <label
           className={clsx(
-            'h-7 w-7 rounded-full',
-            appTheme[0] === 'dark' ? 'bg-[#3b3b3b] ' : 'bg-white',
+            'custom-checkbox',
             form.terms &&
               !checked &&
-              'outline-red-500 outline-2 outline outline-offset-1'
+              'outline-red-500 outline-2 outline outline-offset-1 rounded-[3px]'
           )}
-          value={String(checked)}
-          onClick={(e) => {
-            setChecked((e.target as HTMLInputElement).checked);
-          }}
-        />
+        >
+          <input
+            type="checkbox"
+            id="checkbox"
+            // className={clsx('h-7 w-7 rounded-full')}
+            value={String(checked)}
+            onClick={(e) => {
+              setChecked((e.target as HTMLInputElement).checked);
+            }}
+          />
+          <span />
+        </label>
         <p className="inline ml-4 text-md md:text-xl text-start">
           {STRINGS.BySigningUp}{' '}
           <Link to={ROUTES.Terms} className="inline text-[#7F3DFF]">

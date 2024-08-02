@@ -112,12 +112,12 @@ function PieSection({
                     currencies[currency ?? 'USD'].symbol +
                     formatWithCommas(
                       Number(
-                        Number(
-                          chart.data.datasets[0].data
-                            .reduce((acc, curr) => acc + curr, 0)
-                            .toFixed(2)
-                        ).toFixed(2)
-                      ).toString()
+                        chart.data.datasets[0].data
+                          .reduce((acc, curr) => acc + curr, 0)
+                          .toFixed(2)
+                      )
+                        .toFixed(2)
+                        .toString()
                     );
                   let fontSize = (height / 180 / (text.length / 14)).toFixed(2);
                   if (Number(fontSize) > 2.5) {

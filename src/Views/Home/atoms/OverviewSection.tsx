@@ -32,15 +32,9 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
     if (Number.isNaN(Number(amount.toFixed(2)))) {
       return 0;
     }
-    return formatWithCommas(Number(Number(amount).toFixed(2)).toString());
+    return formatWithCommas(Number(amount).toFixed(2).toString());
   }, []);
   const [theme] = useAppTheme();
-  // console.log(
-  //   conversion.date,
-  //   conversion.usd?.[(currency ?? 'USD').toLowerCase()],
-  //   9400,
-  //   conversion.usd?.[(currency ?? 'USD').toLowerCase()] * 9400
-  // );
   return (
     <div
       className={clsx(
@@ -61,11 +55,9 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
           className="max-w-[30%]"
           title={
             currencies[currency ?? 'USD'].symbol +
-            Number(
-              (9400 * conversion.usd[currency?.toLowerCase() ?? 'usd']).toFixed(
-                2
-              )
-            ).toString()
+            (9400 * conversion.usd[currency?.toLowerCase() ?? 'usd'])
+              .toFixed(2)
+              .toString()
           }
         >
           <p
@@ -76,22 +68,45 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
           >
             {currencies[currency ?? 'USD'].symbol}
             {Number.isNaN(
-              Number(
-                (
-                  conversion.usd[(currency ?? 'USD').toLowerCase()] * 9400
-                ).toFixed(2)
-              )
+              (
+                conversion.usd[(currency ?? 'USD').toLowerCase()] * 9400
+              ).toFixed(2)
             )
               ? 0
-              : (conversion.usd[(currency ?? 'USD').toLowerCase()] * 9400)
-                  .toFixed(2)
-                  .toString()}
+              : formatWithCommas(
+                  (conversion.usd[(currency ?? 'USD').toLowerCase()] * 9400)
+                    .toFixed(2)
+                    .toString()
+                )}
           </p>
           <p
             className="text-sm md:text-md font-normal"
             style={{ color: COLORS.DARK[25] }}
           >
             {STRINGS.AccountBalance}
+          </p>
+        </div>
+
+        <div
+          className="max-w-[30%]"
+          title={
+            currencies[currency ?? 'USD'].symbol + currencyConvert(totalIncome)
+          }
+        >
+          <p
+            className={clsx(
+              'text-lg md:text-xl lg:text-2xl font-semibold overflow-hidden text-ellipsis whitespace-nowrap',
+              theme === 'dark' && 'text-white'
+            )}
+          >
+            {currencies[currency ?? 'USD'].symbol}
+            {currencyConvert(totalIncome)}
+          </p>
+          <p
+            className="text-sm md:text-md font-normal"
+            style={{ color: COLORS.DARK[25] }}
+          >
+            {STRINGS.Income}
           </p>
         </div>
         <div
@@ -114,28 +129,6 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
             style={{ color: COLORS.DARK[25] }}
           >
             {STRINGS.Expense}
-          </p>
-        </div>
-        <div
-          className="max-w-[30%]"
-          title={
-            currencies[currency ?? 'USD'].symbol + currencyConvert(totalIncome)
-          }
-        >
-          <p
-            className={clsx(
-              'text-lg md:text-xl lg:text-2xl font-semibold overflow-hidden text-ellipsis whitespace-nowrap',
-              theme === 'dark' && 'text-white'
-            )}
-          >
-            {currencies[currency ?? 'USD'].symbol}
-            {currencyConvert(totalIncome)}
-          </p>
-          <p
-            className="text-sm md:text-md font-normal"
-            style={{ color: COLORS.DARK[25] }}
-          >
-            {STRINGS.Income}
           </p>
         </div>
       </div>

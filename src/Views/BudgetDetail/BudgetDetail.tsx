@@ -38,6 +38,9 @@ function BudgetDetail() {
   const spends = useSelector(
     (state: RootState) => state.common.user?.spend[month]
   );
+  const expenseColors = useSelector(
+    (state: RootState) => state.common.user?.expenseColors
+  );
   const uid = useSelector((state: RootState) => state.common.user?.uid);
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
@@ -154,19 +157,17 @@ function BudgetDetail() {
               {budget.limit - (spends?.[selectedCategory]?.USD ?? 0) < 0
                 ? '0'
                 : formatWithCommas(
-                    Number(
-                      (
-                        budget.conversion.usd[
-                          currency?.toLowerCase() ?? 'usd'
-                        ] *
-                          Number(budget.limit) -
-                        Number(
-                          spends?.[selectedCategory]?.[
-                            currency?.toUpperCase() ?? 'USD'
-                          ] ?? 0
-                        )
-                      ).toFixed(2)
-                    ).toString()
+                    (
+                      budget.conversion.usd[currency?.toLowerCase() ?? 'usd'] *
+                        Number(budget.limit) -
+                      Number(
+                        spends?.[selectedCategory]?.[
+                          currency?.toUpperCase() ?? 'USD'
+                        ] ?? 0
+                      )
+                    )
+                      .toFixed(2)
+                      .toString()
                   )}
             </p>
             <div className="px-10">
@@ -177,6 +178,7 @@ function BudgetDetail() {
                     : ((spends?.[selectedCategory]?.USD ?? 0) / budget.limit) *
                       100
                 }
+                bgColor={expenseColors?.[selectedCategory] ?? 'green'}
                 isLabelVisible={false}
               />
             </div>

@@ -3,12 +3,15 @@ import React from 'react';
 import clsx from 'clsx';
 import { useSelector } from 'react-redux';
 import ProgressBar from '@ramonak/react-progress-bar';
+import { useNavigate } from 'react-router-dom';
 // Custom Components
 import { RootState } from '../../../Store';
 import { formatWithCommas } from '../../../Utils/commonFuncs';
 import { currencies, STRINGS } from '../../../Shared/Strings';
 import useAppTheme from '../../../Hooks/themeHook';
 import Alert from '../../../assets/svgs/alert.svg';
+import { COLORS } from '../../../Shared/commonStyles';
+import { ROUTES_CONFIG } from '../../../Shared/Constants';
 
 function BudgetSection({ month }: Readonly<{ month: number }>) {
   // redux
@@ -26,7 +29,7 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
   );
   // constants
   const [theme] = useAppTheme();
-
+  const navigate = useNavigate();
   return (
     <div className="hidden md:flex gap-3">
       <div
@@ -35,15 +38,34 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
           theme === 'dark' ? 'bg-black' : 'bg-white'
         )}
       >
-        <p
-          className={clsx(
-            'text-2xl md:text-3xl lg:text-4xl font-bold ',
-            theme === 'dark' && 'text-white'
+        <div className="flex justify-between">
+          <p
+            className={clsx(
+              'text-2xl md:text-3xl lg:text-4xl font-bold ',
+              theme === 'dark' && 'text-white'
+            )}
+          >
+            {STRINGS.Budget}
+          </p>
+          {Object.entries(budgets ?? {}).slice(0, 4).length === 0 ? (
+            <div className="w-16 h-0" />
+          ) : (
+            <button
+              type="button"
+              className="rounded-2xl px-4 h-8 text-sm sm:text-base font-semibold"
+              style={{
+                backgroundColor: COLORS.VIOLET[20],
+                color: COLORS.VIOLET[100],
+              }}
+              onClick={() => {
+                navigate(ROUTES_CONFIG.Budgets.path);
+              }}
+            >
+              {STRINGS.SeeAll}
+            </button>
           )}
-        >
-          {STRINGS.Budget}
-        </p>
-        {Object.entries(budgets ?? {}).length === 0 ? (
+        </div>
+        {Object.entries(budgets ?? {}).slice(0, 4).length === 0 ? (
           <p className="text-gray-400 mt-3 text-md">
             {STRINGS.NoBudgetForThisMonth}
           </p>
@@ -59,13 +81,16 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
               <th>{STRINGS.Left}</th>
             </tr>
             {Object.entries(budgets ?? {})
-              .sort(
-                (a, b) =>
-                  a[1].limit -
-                  (spends?.[a[0]]?.[currency?.toUpperCase() ?? 'USD'] ?? 0) -
-                  (b[1].limit -
-                    (spends?.[b[0]]?.[currency?.toUpperCase() ?? 'USD'] ?? 0))
-              )
+              .sort((a, b) => {
+                if (a[0] < b[0]) {
+                  return -1;
+                }
+                if (a[0] > b[0]) {
+                  return 1;
+                }
+                return 0;
+              })
+              .slice(0, 4)
               .map(([key, val]) => {
                 return (
                   <>
@@ -94,24 +119,24 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
                         title={`${
                           currencies[currency ?? 'USD'].symbol +
                           formatWithCommas(
-                            Number(
-                              (
-                                spends?.[key]?.[
-                                  currency?.toUpperCase() ?? 'USD'
-                                ] ?? 0
-                              ).toFixed(2)
-                            ).toString()
+                            (
+                              spends?.[key]?.[
+                                currency?.toUpperCase() ?? 'USD'
+                              ] ?? 0
+                            )
+                              .toFixed(2)
+                              .toString()
                           )
                         } of ${
                           currencies[currency ?? 'USD'].symbol
                         }${formatWithCommas(
-                          Number(
-                            (
-                              val.conversion.usd[
-                                (currency ?? 'USD').toLowerCase()
-                              ] * val.limit
-                            ).toFixed(2)
-                          ).toString()
+                          (
+                            val.conversion.usd[
+                              (currency ?? 'USD').toLowerCase()
+                            ] * val.limit
+                          )
+                            .toFixed(2)
+                            .toString()
                         )}`}
                       >
                         <ProgressBar
@@ -123,65 +148,47 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
                               ? 100
                               : ((spends?.[key]?.USD ?? 0) / val.limit) * 100
                           }
-                          customLabel={`${
-                            (spends?.[key]?.[
-                              currency?.toUpperCase() ?? 'USD'
-                            ] ?? 0) /
-                              val.limit >
-                            1
-                              ? String(100)
-                              : String(
-                                  (
-                                    ((spends?.[key]?.[
-                                      currency?.toUpperCase() ?? 'USD'
-                                    ] ?? 0) /
-                                      val.limit) *
-                                    100
-                                  ).toFixed(0)
-                                )
-                          }%`}
                           borderRadius="9999999999px"
                         />
                       </td>
                       <td className="font-semibold">
                         {currencies[currency ?? 'USD'].symbol}
                         {formatWithCommas(
-                          Number(
-                            (
-                              val.conversion.usd[
-                                (currency ?? 'USD').toLowerCase()
-                              ] * val.limit
-                            ).toFixed(2)
-                          ).toString()
+                          (
+                            val.conversion.usd[
+                              (currency ?? 'USD').toLowerCase()
+                            ] * val.limit
+                          )
+                            .toFixed(2)
+                            .toString()
                         )}
                       </td>
                       <td className="font-semibold">
                         {currencies[currency ?? 'USD'].symbol}
                         {formatWithCommas(
-                          Number(
-                            (
-                              spends?.[key]?.[
+                          (
+                            spends?.[key]?.[currency?.toUpperCase() ?? 'USD'] ??
+                            0
+                          )
+                            .toFixed(2)
+                            .toString()
+                        )}
+                      </td>
+                      <td className="font-semibold">
+                        {currencies[currency ?? 'USD'].symbol}
+                        {formatWithCommas(
+                          (val.limit - (spends?.[key]?.USD ?? 0) < 0
+                            ? 0
+                            : val.limit *
+                                val.conversion.usd[
+                                  currency?.toLowerCase() ?? 'usd'
+                                ] -
+                              (spends?.[key]?.[
                                 currency?.toUpperCase() ?? 'USD'
-                              ] ?? 0
-                            ).toFixed(2)
-                          ).toString()
-                        )}
-                      </td>
-                      <td className="font-semibold">
-                        {currencies[currency ?? 'USD'].symbol}
-                        {formatWithCommas(
-                          Number(
-                            (val.limit - (spends?.[key]?.USD ?? 0) < 0
-                              ? 0
-                              : val.limit *
-                                  val.conversion.usd[
-                                    currency?.toLowerCase() ?? 'usd'
-                                  ] -
-                                (spends?.[key]?.[
-                                  currency?.toUpperCase() ?? 'USD'
-                                ] ?? 0)
-                            ).toFixed(2)
-                          ).toString()
+                              ] ?? 0)
+                          )
+                            .toFixed(2)
+                            .toString()
                         )}
                       </td>
                     </tr>

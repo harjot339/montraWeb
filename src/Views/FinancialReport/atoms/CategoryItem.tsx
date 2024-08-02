@@ -54,9 +54,7 @@ function CategoryItem({
         >
           {type === 'expense' ? '- ' : '+ '}
           {currencies[currency!].symbol}
-          {formatWithCommas(
-            Number(item[1][currency ?? 'USD'].toFixed(2)).toString()
-          )}
+          {formatWithCommas(item[1][currency ?? 'USD'].toFixed(2).toString())}
         </p>
       </div>
       <ProgressBar

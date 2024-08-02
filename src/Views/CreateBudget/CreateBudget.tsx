@@ -164,13 +164,13 @@ function CreateBudget({
       const c = params.id?.split('_')[1];
       setAmount(
         formatWithCommas(
-          Number(
-            (
-              (budget![m!][c!].conversion?.usd?.[
-                currency?.toLowerCase() ?? 'usd'
-              ] ?? 1) * Number(budget![m!][c!].limit)
-            ).toFixed(2)
-          ).toString()
+          (
+            (budget![m!][c!].conversion?.usd?.[
+              currency?.toLowerCase() ?? 'usd'
+            ] ?? 1) * Number(budget![m!][c!].limit)
+          )
+            .toFixed(2)
+            .toString()
         )
       );
       setPercentage(budget![m!][c!].percentage);
@@ -182,7 +182,7 @@ function CreateBudget({
   return (
     <div
       className={clsx(
-        'flex flex-col rounded-lg w-full justify-between',
+        'flex flex-col rounded-lg w-full justify-between sticky top-0 overflow-auto overflow-x-hidden',
         !isMobile && !isTablet && 'max-w-[450px]'
       )}
       style={{
@@ -238,19 +238,16 @@ function CreateBudget({
           currency={currency}
           editAmt={
             isEdit
-              ? Number(
-                  (
-                    (budget?.[params.id!.split('_')[0]][
-                      params.id!.split('_')[1]
-                    ].conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ??
-                      1) *
-                    Number(
-                      budget![params.id!.split('_')[0]][
-                        params.id!.split('_')[1]
-                      ].limit
-                    )
-                  ).toFixed(2)
-                ).toString()
+              ? (
+                  (budget?.[params.id!.split('_')[0]][params.id!.split('_')[1]]
+                    .conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ?? 1) *
+                  Number(
+                    budget![params.id!.split('_')[0]][params.id!.split('_')[1]]
+                      .limit
+                  )
+                )
+                  .toFixed(2)
+                  .toString()
               : '0'
           }
         />

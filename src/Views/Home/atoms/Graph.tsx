@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 // Third Party Libraries
 import { Timestamp } from 'firebase/firestore';
 import {
@@ -21,7 +21,7 @@ import { TransactionType } from '../../../Defs/transaction';
 import { COLORS } from '../../../Shared/commonStyles';
 import { currencies, STRINGS } from '../../../Shared/Strings';
 import useAppTheme from '../../../Hooks/themeHook';
-import { formatWithCommas } from '../../../Utils/commonFuncs';
+import { formatAMPM, formatWithCommas } from '../../../Utils/commonFuncs';
 import { RootState } from '../../../Store';
 
 ChartJS.register(
@@ -120,6 +120,19 @@ function Graph({
       },
       { data: [], labels: [] }
     );
+  const formatDate = useCallback(
+    (item: number) => {
+      if (graphDay === 0 && !hideDropdown) {
+        return formatAMPM(Timestamp.fromMillis(item).toDate());
+      }
+      return `${Timestamp.fromMillis(item)
+        .toDate()
+        .getDay()}/${Timestamp.fromMillis(item)
+        .toDate()
+        .getMonth()}/${Timestamp.fromMillis(item).toDate().getFullYear()}`;
+    },
+    [graphDay, hideDropdown]
+  );
   return (
     <div
       className={clsx(
@@ -203,16 +216,12 @@ function Graph({
                   displayColors: false,
                   callbacks: {
                     title: (context) =>
-                      Timestamp.fromMillis(Number(context[0].label) * 1000)
-                        .toDate()
-                        .toLocaleDateString(),
+                      formatDate(Number(context[0].label) * 1000),
                     label: (context) => {
                       const val = context.raw as string;
                       return (
                         currencies[currency ?? 'USD'].symbol +
-                        formatWithCommas(
-                          Number(Number(val).toFixed(2)).toString()
-                        )
+                        formatWithCommas(Number(val).toFixed(2).toString())
                       );
                     },
                   },

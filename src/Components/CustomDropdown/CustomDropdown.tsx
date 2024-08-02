@@ -11,6 +11,7 @@ function CustomDropdown({
   placeholder,
   borderColor,
   menuPlacement = 'auto',
+  menuPosition = 'fixed',
 }: Readonly<{
   data: { label: string; value: string | number }[];
   value: { label: string; value: string | number } | undefined;
@@ -28,6 +29,7 @@ function CustomDropdown({
   placeholder: string;
   borderColor?: string;
   menuPlacement?: 'top' | 'bottom' | 'auto';
+  menuPosition?: 'absolute' | 'fixed';
 }>) {
   const apptheme = useAppTheme();
   const dropdownData = useMemo(
@@ -100,8 +102,8 @@ function CustomDropdown({
       }}
       menuPlacement={menuPlacement}
       isSearchable={false}
-      menuPosition="fixed"
-      // menuIsOpen
+      menuPosition={menuPosition}
+      maxMenuHeight={250}
     />
   );
 }

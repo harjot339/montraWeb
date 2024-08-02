@@ -14,11 +14,11 @@ function RootRouter() {
   const authenticated = useRoutes(authenticatedRoutes);
   const uid = useSelector((state: RootState) => state?.common?.user?.uid);
   const isAuthenticated = !!uid;
-  const { data: conversion, isSuccess } = useGetUsdConversionQuery({});
   const dispatch = useDispatch();
-  // if (isSuccess) {
-  //   // console.log(conversion.date);
-  // }
+  const todayDate = new Date().toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+  const { data: conversion, isSuccess } = useGetUsdConversionQuery({
+    date: todayDate,
+  });
   useEffect(() => {
     if (isSuccess) {
       const myCurrencies: { [key: string]: number } = {};

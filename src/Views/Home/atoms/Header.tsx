@@ -15,6 +15,7 @@ import useOutsideAlerter from '../../../Hooks/outsideClick';
 import { formatAMPM } from '../../../Utils/commonFuncs';
 import NotifcationDeleteModal from '../../../Components/NotifcationDeleteModal/NotifcationDeleteModal';
 import { setLoading } from '../../../Store/Loader';
+import { COLORS } from '../../../Shared/commonStyles';
 
 function Header({
   month,
@@ -117,7 +118,15 @@ function Header({
               </p>
             ) : (
               <>
-                <div className="max-h-[400px] overflow-auto max-w-[80vw]">
+                <div
+                  className="max-h-[400px] overflow-auto max-w-[80vw]"
+                  style={{
+                    scrollbarColor:
+                      theme === 'dark'
+                        ? `${COLORS.DARK[50]} ${COLORS.DARK[75]}`
+                        : `${COLORS.LIGHT[20]} ${COLORS.LIGHT[80]}`,
+                  }}
+                >
                   {Object.values(notifications!)
                     .sort((a, b) => b.time.seconds - a.time.seconds)
                     .map((item, i, arr) => (

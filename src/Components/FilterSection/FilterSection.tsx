@@ -31,7 +31,6 @@ function FilterSection({
   const incomeCategories = useSelector(
     (state: RootState) => state.common.user?.incomeCategory
   );
-  console.log(incomeCategories);
   const expenseCategories = useSelector(
     (state: RootState) => state.common.user?.expenseCategory
   );

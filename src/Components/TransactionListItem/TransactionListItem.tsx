@@ -135,23 +135,23 @@ function TransactionListItem({
           title={
             currencies[currency ?? 'USD'].symbol +
             formatWithCommas(
-              Number(
-                (
-                  item.conversion.usd[(currency ?? 'USD').toLowerCase()] *
-                  item.amount
-                ).toFixed(2)
-              ).toString()
+              (
+                item.conversion.usd[(currency ?? 'USD').toLowerCase()] *
+                item.amount
+              )
+                .toFixed(2)
+                .toString()
             )
           }
         >
           {getAmtSymbol(item)} {currencies[currency ?? 'USD'].symbol}
           {formatWithCommas(
-            Number(
-              (
-                item.conversion.usd[(currency ?? 'USD').toLowerCase()] *
-                item.amount
-              ).toFixed(2)
-            ).toString()
+            (
+              item.conversion.usd[(currency ?? 'USD').toLowerCase()] *
+              item.amount
+            )
+              .toFixed(2)
+              .toString()
           )}
         </p>
         <p className="text-xs sm:text-sm" style={{ color: COLORS.DARK[25] }}>

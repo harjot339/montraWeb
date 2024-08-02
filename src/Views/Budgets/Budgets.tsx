@@ -29,7 +29,6 @@ function Budgets() {
   const [month, setMonth] = useState<number>(new Date().getMonth());
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
-  // const [catColors, setCatColors] = useState<{ [key: string]: string }>();
   // redux
   const budgets = useSelector(
     (state: RootState) => state.common.user?.budget[month]
@@ -40,25 +39,8 @@ function Budgets() {
   const expenseColors = useSelector(
     (state: RootState) => state.common.user?.expenseColors
   );
-  // const conversion = useSelector((state: RootState) => state.common.conversion);
   const spend =
     useSelector((state: RootState) => state.common.user?.spend[month]) ?? {};
-
-  // useEffect(() => {
-  //   setCatColors(
-  //     Object.entries(budgets ?? {}).reduce(
-  //       (acc: { [key: string]: string }, item) => {
-  //         acc[item[0]] = getMyColor();
-  //         return acc;
-  //       },
-  //       {}
-  //     )
-  //   );
-  //   return () => {
-  //     setCatColors(undefined);
-  //   };
-  // }, [budgets]);
-
   return (isTablet || isMobile) && params?.id !== undefined ? (
     <div className={clsx(isTablet && 'ml-52')}>
       <Outlet />
