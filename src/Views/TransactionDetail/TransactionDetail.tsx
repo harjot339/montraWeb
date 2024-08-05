@@ -48,6 +48,9 @@ function TransactionDetail() {
     }
     return COLORS.PRIMARY.GREEN;
   }, [transaction]);
+  useEffect(() => {
+    setIsOpen(false);
+  }, [params.id]);
   const currencyConvert = useCallback(
     (amount: number) => {
       if (

@@ -142,7 +142,7 @@ function Graph({
       )}
     >
       {!hideDropdown && (
-        <div className="flex justify-between px-4 py-2 items-center">
+        <div className="flex justify-between px-4 py-2 items-center border gap-y-2">
           <p
             className={clsx(
               'text-1xl md:text-2xl lg:text-3xl font-bold',
@@ -151,7 +151,7 @@ function Graph({
           >
             {STRINGS.SpendFrequency}
           </p>
-          <div className="max-w-40">
+          <div className="max-w-40 min-w-[120px]">
             <CustomDropdown
               onChange={(e) => {
                 setGraphDay(Number(e!.value));
