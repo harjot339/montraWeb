@@ -1,12 +1,15 @@
 .custom-checkbox {
   position: relative;
   display: inline-block;
+  vertical-align: middle;
 }
 
 .custom-checkbox input[type='checkbox'] {
   opacity: 0;
   position: absolute;
   cursor: pointer;
+  width: 100%;
+  height: 100%;
 }
 
 .custom-checkbox input[type='checkbox'] + span {

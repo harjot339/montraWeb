@@ -247,7 +247,9 @@ function RepeatDataModal({
                 'border rounded-lg px-4 bg-transparent min-w-40',
                 formkey &&
                   end === 'date' &&
-                  (date! < today || date! < myDate!) &&
+                  (date! < today ||
+                    date! < myDate! ||
+                    date!.getFullYear() > 2050) &&
                   'outline-red-500 outline outline-2 outline-offset-2',
                 theme === 'dark' ? 'text-white' : 'text-black'
               )}
@@ -256,7 +258,7 @@ function RepeatDataModal({
                   ? myDate!.toISOString().split('T')[0]
                   : new Date().toISOString().split('T')[0]
               }
-              max={new Date(2050, 1, 1).toISOString().split('T')[0]}
+              max={new Date(2050, 11, 32).toISOString().split('T')[0]}
               value={
                 date?.toISOString()?.split('T')?.[0] ??
                 (freq === 'yearly' || freq === 'monthly'
@@ -292,6 +294,17 @@ function RepeatDataModal({
             //   );
             //   return;
             // }
+            // const newDate = new Date(date ?? new Date());
+            // if (end === 'date' && Number.isNaN(newDate.getTime())) {
+            //   toast.error('Enter a Valid date');
+            //   return;
+            // }
+            if (end === 'date' && date!.getFullYear() > 2050) {
+              toast.error(
+                'The selected end date exceeded max date limit (31/12/2050)'
+              );
+              return;
+            }
             if (end === 'date' && date! < myDate!) {
               toast.error(
                 "The selected end date must be later than selected frequency's date."

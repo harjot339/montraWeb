@@ -77,7 +77,7 @@ function MoneyInput({
       }
     }
 
-    setAmount(formatWithCommas(numericValue));
+    setAmount(numericValue);
   };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCursor(e.target.selectionStart);
@@ -107,10 +107,17 @@ function MoneyInput({
             setAmount('');
           }
         }}
-        onBlur={() => {
+        onBlur={(e) => {
           if (amount === '') {
             setAmount('0');
           }
+          setAmount(formatWithCommas(e.target.value));
+        }}
+        onFocus={(e) => {
+          if (amount === '0') {
+            setAmount('');
+          }
+          setAmount(e.target.value.replace(/,/g, ''));
         }}
         value={amount}
         className={clsx(

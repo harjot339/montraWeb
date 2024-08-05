@@ -175,7 +175,7 @@ function Signup() {
         pass={pass}
         formKey={form.confirmPass}
       />
-      <div className="flex justify-start mt-1">
+      <div className="flex items-center mt-1">
         <label
           className={clsx(
             'custom-checkbox',
@@ -187,7 +187,6 @@ function Signup() {
           <input
             type="checkbox"
             id="checkbox"
-            // className={clsx('h-7 w-7 rounded-full')}
             value={String(checked)}
             onClick={(e) => {
               setChecked((e.target as HTMLInputElement).checked);
