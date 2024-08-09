@@ -35,9 +35,24 @@ function MoneyInput({
   const { beforeDecimal, afterDecimal } = getMaxLengths();
   const [cursor, setCursor] = useState<number | null>(null);
   const ref = useRef<HTMLInputElement>(null);
+  const isSafari = (() => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    return (
+      userAgent.includes('safari') &&
+      !userAgent.includes('chrome') &&
+      !userAgent.includes('android')
+    );
+  })();
+  // const [first, setFirst] = useState(true);
   useEffect(() => {
     const input = ref.current;
-    if (input) input.setSelectionRange(cursor, cursor);
+    if (input) {
+      if (cursor) {
+        input.setSelectionRange(cursor, cursor);
+      } else {
+        input.setSelectionRange(amount.length, amount.length);
+      }
+    }
   }, [ref, cursor, amount]);
   const onTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const str = e.target.value;
@@ -83,7 +98,14 @@ function MoneyInput({
     setCursor(e.target.selectionStart);
     onTextChange(e);
   };
-
+  useEffect(() => {
+    if (isSafari) {
+      ref.current?.blur();
+      if (amount === '0') {
+        setAmount('');
+      }
+    }
+  }, [isSafari]);
   return (
     <div className="flex items-center px-4 sm:px-8  w-full">
       <p
@@ -105,19 +127,25 @@ function MoneyInput({
         onClick={() => {
           if (amount === '0') {
             setAmount('');
+          } else {
+            setAmount((amt) => amt.replace(/,/g, ''));
           }
         }}
         onBlur={(e) => {
           if (amount === '') {
             setAmount('0');
+          } else {
+            setAmount(formatWithCommas(e.target.value));
           }
-          setAmount(formatWithCommas(e.target.value));
         }}
         onFocus={(e) => {
-          if (amount === '0') {
-            setAmount('');
+          if (!isSafari) {
+            if (amount === '0') {
+              setAmount('');
+            } else {
+              setAmount(e.target.value.replace(/,/g, ''));
+            }
           }
-          setAmount(e.target.value.replace(/,/g, ''));
         }}
         value={amount}
         className={clsx(
