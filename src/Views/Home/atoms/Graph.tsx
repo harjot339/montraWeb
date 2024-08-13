@@ -142,7 +142,7 @@ function Graph({
       )}
     >
       {!hideDropdown && (
-        <div className="flex justify-between px-4 py-2 items-center border gap-y-2">
+        <div className="flex justify-between px-4 py-2 items-center gap-y-2">
           <p
             className={clsx(
               'text-1xl md:text-2xl lg:text-3xl font-bold',

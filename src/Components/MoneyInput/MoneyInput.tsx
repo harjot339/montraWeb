@@ -105,6 +105,7 @@ function MoneyInput({
         setAmount('');
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSafari]);
   return (
     <div className="flex items-center px-4 sm:px-8  w-full">

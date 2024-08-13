@@ -20,6 +20,7 @@ export const passRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\s])[A-Za-z\d@$!%*?&\s]{8,}$/;
 
 export const STRINGS = {
+  ResetPassword: 'Reset Password',
   ClearRepeatTransaction:
     'Clearing Repeat Transaction Frequency \nAre you sure you want to clear the repeat transaction frequency?',
   ToManyRequestError: 'Too many requests. Please try again after sometime.',
@@ -49,6 +50,8 @@ export const STRINGS = {
   LOGIN: 'Login',
   SIGNUP: 'Sign Up',
   EmailOnWay: 'Your email is on the way',
+  ResetEmailSent:
+    'Please check your email to reset your password. The link will expire soon, so be sure to use it promptly.',
   CheckYourEmail: 'Check your email',
   InstructionResetPass:
     'and follow the instructions to reset your password. This link will expire soon, please ensure you access it promptly.',
@@ -190,7 +193,8 @@ export const STRINGS = {
   CheckInternet: 'Please check your internet connection',
   PasswordDoNotMatch: 'Password do not match',
   ConfirmPasswordCannotBeEmpty: 'Confirm Password cannot be Empty',
-  PasswordNotValid: 'Password must be at least 6 characters long',
+  PasswordNotValid:
+    'Password must contain atleast 1 Uppercase, 1 Lowercase, 1 Numeric and 1 Symbol Character',
   PasswordCannotBeEmpty: 'Password cannot be Empty',
   EmailIsNotValid: 'Email is not Valid',
   EmailCannotBeEmpty: 'Email cannot be Empty',
@@ -223,6 +227,7 @@ export const STRINGS = {
   NetworkError:
     'A network error (such as timeout, interrupted connection or unreachable host) has occurred.',
   UnknownError: 'An unknown error occurred. Please try again later.',
+  PasswordResetSucessful: 'Password Reset Sucessful',
 };
 export const OnboardData = [
   {

@@ -299,13 +299,13 @@ function RepeatDataModal({
             //   toast.error('Enter a Valid date');
             //   return;
             // }
-            if (end === 'date' && date!.getFullYear() > 2050) {
+            if (end === 'date' && date && date.getFullYear() > 2050) {
               toast.error(
                 'The selected end date exceeded max date limit (31/12/2050)'
               );
               return;
             }
-            if (end === 'date' && date! < myDate!) {
+            if (end === 'date' && date && date < myDate!) {
               toast.error(
                 "The selected end date must be later than selected frequency's date."
               );

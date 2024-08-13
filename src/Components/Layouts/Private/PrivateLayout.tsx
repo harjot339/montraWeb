@@ -9,7 +9,7 @@ function PrivateLayout({ children }: Readonly<AppLayoutProps>) {
   useInitialSetup();
   const appTheme = useAppTheme();
   const loc = useLocation();
-  return loc.pathname === '/terms' ? (
+  return loc.pathname === '/terms' || loc.pathname === '/reset-pass' ? (
     <div
       style={{
         backgroundColor: appTheme[1].PRIMARY.LIGHT,

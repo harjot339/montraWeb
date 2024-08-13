@@ -45,9 +45,7 @@ function Forgotpassword() {
         dispatch(setLoading(true));
         if (await isUserExist(email)) {
           await sendPasswordResetEmail(auth, email);
-          toast.success(
-            `${STRINGS.CheckYourEmail} ${email} ${STRINGS.InstructionResetPass}`
-          );
+          toast.success(STRINGS.ResetEmailSent);
           navigate(ROUTES.LOGIN);
         } else {
           toast.error(STRINGS.EmailNotRegistered);

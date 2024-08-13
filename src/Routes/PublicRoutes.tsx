@@ -5,6 +5,7 @@ import Login from '../Views/Login';
 import Signup from '../Views/Signup';
 import Forgotpassword from '../Views/ForgotPassword/Forgotpassword';
 import TermsScreen from '../Views/TermsScreen';
+import ResetPassword from '../Views/ResetPassword/ResetPassword';
 
 // eslint-disable-next-line import/prefer-default-export
 export const PUBLIC_ROUTES: Array<CustomRouter> = [
@@ -22,6 +23,11 @@ export const PUBLIC_ROUTES: Array<CustomRouter> = [
     path: `${ROUTES_CONFIG.ForgotPassword.path}`,
     title: ROUTES_CONFIG.ForgotPassword.title,
     element: <Forgotpassword />,
+  },
+  {
+    path: `${ROUTES_CONFIG.ResetPassword.path}`,
+    title: ROUTES_CONFIG.ResetPassword.title,
+    element: <ResetPassword />,
   },
   {
     path: `${ROUTES_CONFIG.Terms.path}`,

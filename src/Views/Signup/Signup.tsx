@@ -14,7 +14,12 @@ import Google from '../../assets/svgs/google.svg';
 import { COLORS, InputBorderColor } from '../../Shared/commonStyles';
 import CustomPassInput from '../../Components/CustomPassInput';
 import { singupUser } from '../../Utils/firebaseFuncs';
-import { emailRegex, nameRegex, STRINGS } from '../../Shared/Strings';
+import {
+  emailRegex,
+  nameRegex,
+  passRegex,
+  STRINGS,
+} from '../../Shared/Strings';
 import {
   ConfirmPassError,
   EmailValError,
@@ -71,7 +76,7 @@ function Signup() {
       email !== '' &&
       testInput(emailRegex, email) &&
       pass.trim() !== '' &&
-      pass.length >= 6 &&
+      testInput(passRegex, pass) &&
       pass === confirmPass
     ) {
       if (!checked) {

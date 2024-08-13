@@ -251,7 +251,7 @@ export async function handleNotify({
                 )} budget has exceeded the limit`,
               }
             );
-            // console.log(notif);
+            console.log(notif);
           }
         } else if (
           totalSpent >=
@@ -281,7 +281,7 @@ export async function handleNotify({
                 } budget. Take action to stay on track.`,
               }
             );
-            // console.log(notif);
+            console.log(notif);
           }
         }
       } catch (e) {

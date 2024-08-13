@@ -7,6 +7,7 @@ const ROUTES = {
   Budgets: '/budgets',
   Report: '/report',
   Terms: '/terms',
+  ResetPassword: '/reset-pass',
 };
 
 const WILDCARD_ROUTES = {
@@ -46,6 +47,10 @@ const ROUTES_CONFIG = {
   Terms: {
     path: ROUTES.Terms,
     title: 'Terms & Conditions',
+  },
+  ResetPassword: {
+    path: ROUTES.ResetPassword,
+    title: 'Reset Password',
   },
 };
 
