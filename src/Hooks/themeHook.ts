@@ -5,18 +5,24 @@ import { RootState } from '../Store';
 
 const useAppTheme: () => ['dark' | 'light', typeof COLORS] = () => {
   const theme = useSelector((state: RootState) => state?.common.user?.theme);
+  const authTheme = useSelector((state: RootState) => state?.common.theme);
   const [light, setLight] = useState<boolean>();
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: light)');
-
     if (mq.matches) {
       setLight(true);
     }
-
-    // This callback will fire if the perferred color scheme changes without a reload
     mq.addEventListener('change', (evt) => setLight(evt.matches));
   }, []);
   if (theme === 'device' || theme === undefined) {
+    if (theme === undefined && authTheme !== undefined) {
+      if (authTheme === 'light') {
+        return ['light', COLORS];
+      }
+      if (authTheme === 'dark') {
+        return ['dark', DARKCOLORS];
+      }
+    }
     if (light) {
       return ['light', COLORS];
     }

@@ -1,19 +1,31 @@
-export const initialExpenseCategories = [
-  'add',
-  'food',
-  'bill',
-  'shopping',
-  'subscription',
-  'transportation',
-];
-export const initialIncomeCategories = ['add', 'salary', 'passive income'];
+import { COLORS } from './commonStyles';
 
-export const emailRegex = /^[a-zA-Z0-9_-]+@([a-zA-Z0-9-]+\.)+[a-zA-Z0-9]+$/;
+export const initialExpenseCategories = [
+  { name: 'add', color: '' },
+  { name: 'food', color: COLORS.RED[100] },
+  { name: 'bills', color: COLORS.VIOLET[100] },
+  { name: 'shopping', color: COLORS.YELLOW[100] },
+  { name: 'subscription', color: '#fc803d' },
+  { name: 'transportation', color: COLORS.BLUE[100] },
+];
+export const initialIncomeCategories = [
+  { name: 'add', color: '' },
+  { name: 'salary', color: COLORS.GREEN[100] },
+  { name: 'passive income', color: '#f531d7' },
+];
+
+export const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 export const nameRegex = /^[a-zA-Z ]*$/;
 export const passRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\s])[A-Za-z\d@$!%*?&\s]{8,}$/;
 
 export const STRINGS = {
+  ResetPassword: 'Reset Password',
+  ClearRepeatTransaction:
+    'Clearing Repeat Transaction Frequency \nAre you sure you want to clear the repeat transaction frequency?',
+  ToManyRequestError: 'Too many requests. Please try again after sometime.',
+  PopupClosedByUser: 'Authentication process canceled. Please try again.',
+  Categories: 'Categories',
   Filters: 'Filters',
   Percentage: 'Percentage',
   Limit: 'Limit',
@@ -38,9 +50,11 @@ export const STRINGS = {
   LOGIN: 'Login',
   SIGNUP: 'Sign Up',
   EmailOnWay: 'Your email is on the way',
+  ResetEmailSent:
+    'Please check your email to reset your password. The link will expire soon, so be sure to use it promptly.',
   CheckYourEmail: 'Check your email',
   InstructionResetPass:
-    'and follow the instructions to reset your password. Please note that the reset link will only be valid for 1 hour.',
+    'and follow the instructions to reset your password. This link will expire soon, please ensure you access it promptly.',
   BackToLogin: 'Back to Login',
   DontWorry: "Don't worry.",
   EnterEmailForReset:
@@ -56,7 +70,7 @@ export const STRINGS = {
   Or: 'Or',
   SignupWithGoogle: 'Sign Up with Google',
   AlreadyHaveAccount: 'Already have an Account?',
-  SignupSuccesful: 'A verification email has been sent to your account.',
+  EmailVerificationSent: 'A verification email has been sent to your account.',
   CategoryName: 'Category Name',
   Add: 'Add',
   Home: 'Home',
@@ -69,6 +83,7 @@ export const STRINGS = {
   Yes: 'Yes',
   BudgetDeletedSuccesfully: 'Budget Deleted Successfully',
   BudgetCreatedSuccesfully: 'Budget Created Successfully',
+  BudgetUpdatedSuccesfully: 'Budget Updated Successfully',
   RemovethisTransaction: 'Remove this Transaction?',
   sureRemoveTransaction: 'Are you sure you want to remove this transaction?',
   TransactionDeletedSuccesfully: 'Transaction Deleted Successfully',
@@ -95,6 +110,7 @@ export const STRINGS = {
   Date: 'Date',
   Next: 'Next',
   PleaseFillAnAmount: 'Please fill an amount',
+  PleaseFillValidAmount: 'Please fill a valid amount',
   PleaseSelectACategory: 'Please select a category',
   Description: 'Description',
   Wallet: 'Wallet',
@@ -177,7 +193,8 @@ export const STRINGS = {
   CheckInternet: 'Please check your internet connection',
   PasswordDoNotMatch: 'Password do not match',
   ConfirmPasswordCannotBeEmpty: 'Confirm Password cannot be Empty',
-  PasswordNotValid: 'Password must be at least 6 characters long',
+  PasswordNotValid:
+    'Password must contain atleast 1 Uppercase, 1 Lowercase, 1 Numeric and 1 Symbol Character',
   PasswordCannotBeEmpty: 'Password cannot be Empty',
   EmailIsNotValid: 'Email is not Valid',
   EmailCannotBeEmpty: 'Email cannot be Empty',
@@ -206,11 +223,11 @@ export const STRINGS = {
     'Are you sure you want to leave without setting up your pin?',
   EmailAdressAlreadyUsed:
     'The email address is already in use by another account.',
-  CredentialMalformed:
-    'The supplied auth credential is malformed or has expired.',
+  CredentialMalformed: 'Incorrect email or password. Please try again.',
   NetworkError:
     'A network error (such as timeout, interrupted connection or unreachable host) has occurred.',
   UnknownError: 'An unknown error occurred. Please try again later.',
+  PasswordResetSucessful: 'Password Reset Sucessful',
 };
 export const OnboardData = [
   {

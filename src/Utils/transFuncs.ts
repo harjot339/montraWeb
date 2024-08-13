@@ -5,7 +5,7 @@ import { decrypt } from './encryption';
 export default function TransFromJson(
   json: DocumentData,
   uid: string
-): TransactionType {
+): TransactionType & { deleted: boolean } {
   return {
     amount: Number(decrypt(json.amount, uid) ?? json.amount),
     category: decrypt(json.category, uid) ?? json.category,
@@ -33,5 +33,7 @@ export default function TransFromJson(
     attachementType: decrypt(json.attachementType, uid) ?? json.attachementType,
     from: decrypt(json.from, uid) ?? json.from ?? '',
     to: decrypt(json.to, uid) ?? json.to ?? '',
+    conversion: json.conversion,
+    deleted: json?.deleted ?? false,
   };
 }

@@ -1,37 +1,77 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
+// Third Party Libraries
 import { useSelector } from 'react-redux';
-import { RootState } from '../../Store';
-import { COLORS } from '../../Shared/commonStyles';
+// Custom Components
 import Graph from './atoms/Graph';
 import Income from '../../assets/svgs/income.svg';
 import Expense from '../../assets/svgs/expense.svg';
 import Transfer from '../../assets/svgs/currency-exchange.svg';
-// import Close from '../../assets/svgs/close.svg'
 import BudgetSection from './atoms/BudgetSection';
 import RecentSection from './atoms/RecentSection';
 import OverviewSection from './atoms/OverviewSection';
 import AddExpense from '../AddExpense/AddExpense';
 import Header from './atoms/Header';
 import useAppTheme from '../../Hooks/themeHook';
+import { RootState } from '../../Store';
+import { COLORS } from '../../Shared/commonStyles';
+import {
+  useIsDesktop,
+  useIsMobile,
+  useIsTablet,
+} from '../../Hooks/mobileCheckHook';
+import SpeedDial from '../../Components/SpeedDial';
 
 function Home() {
+  // state
   const [month, setMonth] = useState(new Date().getMonth());
-
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isOpenMobile, setIsOpenMobile] = useState<boolean>(false);
+  const [pageType, setPageType] = useState<'income' | 'expense' | 'transfer'>();
+  const [fullGraph, setFullGraph] = useState<boolean>(true);
+  // redux
   const data = useSelector(
     (state: RootState) => state.transactions.transactions
   );
-
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [pageType, setPageType] = useState<'income' | 'expense' | 'transfer'>();
+  // constants
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+  const isDesktop = useIsDesktop();
   const [theme] = useAppTheme();
-  return (
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 1200) {
+        setFullGraph(true);
+      } else {
+        setFullGraph(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  return isOpenMobile ? (
+    <div className={clsx(isTablet && 'ml-52')}>
+      <AddExpense
+        height={isMobile || isTablet ? '100dvh' : '95vh'}
+        isEdit={false}
+        pageType={pageType!}
+        setIsOpen={setIsOpenMobile}
+      />
+    </div>
+  ) : (
     <div className="sm:ml-48 pt-4 pb-2 px-5">
       <Header month={month} setMonth={setMonth} />
       <div className="flex gap-3">
         <div className="flex flex-col flex-1">
           <div className="flex gap-3 flex-wrap">
-            <div className="flex flex-col flex-1 gap-2">
+            <div
+              className={clsx(
+                'flex flex-col flex-1 gap-2',
+                isDesktop &&
+                  !isOpen &&
+                  (fullGraph ? 'max-w-[40vw]' : 'max-w-[29vw]')
+              )}
+            >
               <OverviewSection month={month} />
               <Graph data={data} month={month} />
             </div>
@@ -41,6 +81,7 @@ function Home() {
         </div>
         {isOpen && (
           <AddExpense
+            // height={isMobile || isTablet ? '100vh' : '95vh'}
             setIsOpen={setIsOpen}
             pageType={pageType!}
             isEdit={false}
@@ -49,7 +90,7 @@ function Home() {
         {!isOpen && (
           <div
             className={clsx(
-              'hidden sm:flex rounded-lg px-2 sm:px-4 py-4 flex-col gap-y-6',
+              'hidden lg:flex rounded-lg px-2 sm:px-4 py-4 flex-col gap-y-6',
               theme === 'dark' ? 'bg-black' : 'bg-white'
             )}
           >
@@ -57,15 +98,15 @@ function Home() {
               type="button"
               className="h-14 min-w-14 rounded-lg hover:opacity-85 flex justify-center items-center"
               style={{
-                backgroundColor: COLORS.RED[100],
+                backgroundColor: COLORS.GREEN[100],
               }}
               onClick={() => {
-                setPageType('expense');
+                setPageType('income');
                 setIsOpen(true);
               }}
-              title="Expense"
+              title="Income"
             >
-              <img src={Expense} alt="" width="35px" />
+              <img src={Income} alt="" width="35px" />
             </button>
             <button
               type="button"
@@ -85,31 +126,22 @@ function Home() {
               type="button"
               className="h-14 min-w-14 rounded-lg hover:opacity-85 flex justify-center items-center"
               style={{
-                backgroundColor: COLORS.GREEN[100],
+                backgroundColor: COLORS.RED[100],
               }}
               onClick={() => {
-                setPageType('income');
+                setPageType('expense');
                 setIsOpen(true);
               }}
-              title="Income"
+              title="Expense"
             >
-              <img src={Income} alt="" width="35px" />
+              <img src={Expense} alt="" width="35px" />
             </button>
           </div>
         )}
       </div>
-      {/* <div className="absolute sm:hidden bg-purple-300 h-14 w-14 text-4xl rounded-full bottom-6 right-8">
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100%',
-          }}
-        >
-          <img src={Close} alt="" />
-        </div>
-      </div> */}
+      {(isTablet || isMobile) && (
+        <SpeedDial openScreen={setIsOpenMobile} setPageType={setPageType} />
+      )}
     </div>
   );
 }

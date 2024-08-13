@@ -1,6 +1,8 @@
 import React, { useCallback } from 'react';
+// Third Party Librarires
 import { useSelector } from 'react-redux';
 import clsx from 'clsx';
+// Custom Components
 import { COLORS } from '../../../Shared/commonStyles';
 import { RootState } from '../../../Store';
 import { formatWithCommas } from '../../../Utils/commonFuncs';
@@ -8,6 +10,7 @@ import { currencies, STRINGS } from '../../../Shared/Strings';
 import useAppTheme from '../../../Hooks/themeHook';
 
 function OverviewSection({ month }: Readonly<{ month: number }>) {
+  // redux
   const spends = useSelector(
     (state: RootState) => state.common.user?.spend?.[month]
   );
@@ -18,33 +21,19 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
     (state: RootState) => state.common.user?.currency
   );
   const conversion = useSelector((state: RootState) => state.common.conversion);
-  const totalSpend = Object.values(spends ?? []).reduce((a, b) => a + b, 0);
-  const totalIncome = Object.values(incomes ?? []).reduce((a, b) => a + b, 0);
-  const currencyConvert = useCallback(
-    (amount: number) => {
-      if (
-        Number.isNaN(
-          Number(
-            (
-              (conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ?? 1) *
-              amount
-            ).toFixed(1)
-          )
-        )
-      ) {
-        return 0;
-      }
-      return formatWithCommas(
-        Number(
-          (
-            (conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ?? 1) *
-            Number(amount)
-          ).toFixed(1)
-        ).toString()
-      );
-    },
-    [conversion?.usd, currency]
-  );
+  const totalSpend = Object.values(spends ?? []).reduce((a, b) => {
+    return a + (b?.[currency?.toUpperCase() ?? 'USD'] ?? 0);
+  }, 0);
+  const totalIncome = Object.values(incomes ?? []).reduce((a, b) => {
+    return a + (b[currency?.toUpperCase() ?? 'USD'] ?? 0);
+  }, 0);
+  // functions
+  const currencyConvert = useCallback((amount: number) => {
+    if (Number.isNaN(Number(amount.toFixed(2)))) {
+      return 0;
+    }
+    return formatWithCommas(Number(amount).toFixed(2).toString());
+  }, []);
   const [theme] = useAppTheme();
   return (
     <div
@@ -61,45 +50,52 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
       >
         {STRINGS.Overview}
       </p>
-      <div className="flex mt-5 justify-evenly gap-3 text-center">
-        <div>
+      <div className="flex mt-5 justify-evenly text-center flex-wrap">
+        <div
+          className="max-w-[30%]"
+          title={
+            currencies[currency ?? 'USD'].symbol +
+            (9400 * conversion.usd[currency?.toLowerCase() ?? 'usd'])
+              .toFixed(2)
+              .toString()
+          }
+        >
           <p
             className={clsx(
-              'text-xl md:text-2xl lg:text-3xl font-semibold max-w-max overflow-hidden text-ellipsis whitespace-nowrap',
+              'text-lg md:text-xl lg:text-2xl font-semibold  overflow-hidden text-ellipsis whitespace-nowrap',
               theme === 'dark' && 'text-white'
             )}
           >
             {currencies[currency ?? 'USD'].symbol}
-            {currencyConvert(9400)}
+            {Number.isNaN(
+              (
+                conversion.usd[(currency ?? 'USD').toLowerCase()] * 9400
+              ).toFixed(2)
+            )
+              ? 0
+              : formatWithCommas(
+                  (conversion.usd[(currency ?? 'USD').toLowerCase()] * 9400)
+                    .toFixed(2)
+                    .toString()
+                )}
           </p>
           <p
-            className="text-md md:text-lg font-normal"
+            className="text-sm md:text-md font-normal"
             style={{ color: COLORS.DARK[25] }}
           >
             {STRINGS.AccountBalance}
           </p>
         </div>
-        <div>
+
+        <div
+          className="max-w-[30%]"
+          title={
+            currencies[currency ?? 'USD'].symbol + currencyConvert(totalIncome)
+          }
+        >
           <p
             className={clsx(
-              'text-xl md:text-2xl lg:text-3xl font-semibold max-w-max overflow-hidden text-ellipsis whitespace-nowrap',
-              theme === 'dark' && 'text-white'
-            )}
-          >
-            {currencies[currency ?? 'USD'].symbol}
-            {currencyConvert(totalSpend)}
-          </p>
-          <p
-            className="text-md md:text-lg font-normal"
-            style={{ color: COLORS.DARK[25] }}
-          >
-            {STRINGS.Expense}
-          </p>
-        </div>
-        <div>
-          <p
-            className={clsx(
-              'text-xl md:text-2xl lg:text-3xl font-semibold max-w-max overflow-hidden text-ellipsis whitespace-nowrap',
+              'text-lg md:text-xl lg:text-2xl font-semibold overflow-hidden text-ellipsis whitespace-nowrap',
               theme === 'dark' && 'text-white'
             )}
           >
@@ -107,10 +103,32 @@ function OverviewSection({ month }: Readonly<{ month: number }>) {
             {currencyConvert(totalIncome)}
           </p>
           <p
-            className="text-md md:text-lg font-normal"
+            className="text-sm md:text-md font-normal"
             style={{ color: COLORS.DARK[25] }}
           >
             {STRINGS.Income}
+          </p>
+        </div>
+        <div
+          className="max-w-[30%]"
+          title={
+            currencies[currency ?? 'USD'].symbol + currencyConvert(totalSpend)
+          }
+        >
+          <p
+            className={clsx(
+              'text-lg md:text-xl lg:text-2xl font-semibold overflow-hidden text-ellipsis whitespace-nowrap',
+              theme === 'dark' && 'text-white'
+            )}
+          >
+            {currencies[currency ?? 'USD'].symbol}
+            {currencyConvert(totalSpend)}
+          </p>
+          <p
+            className="text-sm md:text-md font-normal"
+            style={{ color: COLORS.DARK[25] }}
+          >
+            {STRINGS.Expense}
           </p>
         </div>
       </div>

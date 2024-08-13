@@ -1,6 +1,8 @@
 import React from 'react';
+// Third party Libraries
 import { Timestamp } from 'firebase/firestore';
 import clsx from 'clsx';
+// Custom Components
 import {
   catIcons,
   formatAMPM,
@@ -10,30 +12,32 @@ import { COLORS } from '../../Shared/commonStyles';
 import { TransactionType } from '../../Defs/transaction';
 import Money from '../../assets/svgs/money-bag.svg';
 import Transfer from '../../assets/svgs/currency-exchange.svg';
-import { currencies } from '../../Shared/Strings';
+import { currencies, monthData } from '../../Shared/Strings';
 import useAppTheme from '../../Hooks/themeHook';
+import {
+  useIsDesktop,
+  useIsMobile,
+  useIsTablet,
+} from '../../Hooks/mobileCheckHook';
 
 function TransactionListItem({
   item,
   width,
   currency,
-  conversion,
   disabled = false,
   onClick,
   selected = false,
+  dateShow = false,
 }: Readonly<{
   item: TransactionType;
   width: 'full' | 'half';
   currency: string | undefined;
-  conversion: {
-    [key: string]: {
-      [key: string]: number;
-    };
-  };
   onClick?: () => void;
   disabled?: boolean;
   selected?: boolean;
+  dateShow?: boolean;
 }>) {
+  // functions
   const getAmtSymbol = (x: TransactionType) => {
     if (x.type === 'expense') {
       return '-';
@@ -53,19 +57,23 @@ function TransactionListItem({
     return COLORS.PRIMARY.BLUE;
   };
   const [theme] = useAppTheme();
+  const isDesktop = useIsDesktop();
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
   return (
     <button
       onClick={onClick}
       type="button"
       disabled={disabled}
       className={clsx(
-        'flex mb-4 border p-2.5 sm:p-3 rounded-xl gap-x-2  items-center outline-none text-start ',
-        theme === 'dark' ? 'bg-black' : 'bg-white'
+        'flex mb-4 border p-2.5 sm:p-3 rounded-xl gap-x-2  items-center outline-none text-start',
+        theme === 'dark' ? 'bg-black' : 'bg-white',
+        isMobile && 'max-w-[85vw]',
+        isTablet && 'max-w-custom'
       )}
       style={{
         width: '100%',
-        maxWidth: width === 'half' ? '400px' : '100%',
-        // minWidth: width === 'half' ? '200px' : undefined,
+        maxWidth: width === 'half' ? '400px' : undefined,
         backgroundColor: selected ? COLORS.VIOLET[20] : '',
       }}
       key={item.id}
@@ -92,7 +100,12 @@ function TransactionListItem({
           />
         )}
       </div>
-      <div className="w-full overflow-hidden">
+      <div
+        className={clsx(
+          'w-full overflow-hidden',
+          isDesktop && 'max-w-[9vw] xl:max-w-[10vw]  2xl:max-w-[20vw]'
+        )}
+      >
         <p
           className={clsx(
             'text-ellipsis overflow-hidden text-lg sm:text-xl font-semibold',
@@ -108,8 +121,8 @@ function TransactionListItem({
         </p>
         <p
           className={clsx(
-            'text-sm sm:text-lg text-ellipsis overflow-hidden whitespace-nowrap',
-            theme === 'dark' && 'text-white'
+            'text-sm sm:text-lg text-ellipsis overflow-hidden whitespace-nowrap break-words ',
+            selected ? 'text-black' : theme === 'dark' && 'text-white'
           )}
         >
           {item.desc}
@@ -119,14 +132,26 @@ function TransactionListItem({
         <p
           style={{ color: getAmtColor(item) }}
           className="font-semibold text-lg sm:text-xl overflow-hidden whitespace-nowrap text-ellipsis"
+          title={
+            currencies[currency ?? 'USD'].symbol +
+            formatWithCommas(
+              (
+                item.conversion.usd[(currency ?? 'USD').toLowerCase()] *
+                item.amount
+              )
+                .toFixed(2)
+                .toString()
+            )
+          }
         >
           {getAmtSymbol(item)} {currencies[currency ?? 'USD'].symbol}
           {formatWithCommas(
-            Number(
-              (
-                conversion.usd[(currency ?? 'USD').toLowerCase()] * item.amount
-              ).toFixed(1)
-            ).toString()
+            (
+              item.conversion.usd[(currency ?? 'USD').toLowerCase()] *
+              item.amount
+            )
+              .toFixed(2)
+              .toString()
           )}
         </p>
         <p className="text-xs sm:text-sm" style={{ color: COLORS.DARK[25] }}>
@@ -134,6 +159,21 @@ function TransactionListItem({
             Timestamp.fromMillis(item.timeStamp.seconds * 1000).toDate()
           )}
         </p>
+        {dateShow && (
+          <p className="text-xs sm:text-sm" style={{ color: COLORS.DARK[25] }}>
+            {`${Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+              ?.toDate()
+              ?.getDate()} ${
+              monthData[
+                Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                  ?.toDate()
+                  ?.getMonth()
+              ].label
+            } ${Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+              ?.toDate()
+              ?.getFullYear()}`}
+          </p>
+        )}
       </div>
     </button>
   );

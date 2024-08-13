@@ -4,6 +4,7 @@ import { UserType } from '../../Defs/user';
 const initialState: {
   user: UserType | undefined;
   conversion: { [key: string]: { [key: string]: number } };
+  theme?: 'device' | 'light' | 'dark';
 } = { user: undefined, conversion: {} };
 const common = createSlice({
   name: 'common',
@@ -33,6 +34,9 @@ const common = createSlice({
         },
       };
     },
+    setTheme(state, action) {
+      return { ...state, theme: action.payload };
+    },
   },
 });
 
@@ -41,6 +45,7 @@ export const {
   setConversionData,
   addExpenseCategory,
   addIncomeCategory,
+  setTheme,
 } = common.actions;
 
 export default common.reducer;

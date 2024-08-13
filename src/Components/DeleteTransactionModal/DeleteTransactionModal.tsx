@@ -1,32 +1,94 @@
-import React, { SetStateAction } from 'react';
+import React, { SetStateAction, useCallback } from 'react';
+// Third Party Libraries
 import Modal from 'react-modal';
-import { deleteDoc, doc } from 'firebase/firestore';
+import { doc, getDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { deleteObject, ref } from 'firebase/storage';
+// Custom Components
+import CustomButton from '../CustomButton';
 import { COLORS } from '../../Shared/commonStyles';
 import { ROUTES } from '../../Shared/Constants';
 import { STRINGS } from '../../Shared/Strings';
 import { setLoading } from '../../Store/Loader';
-import { db } from '../../Utils/firebaseConfig';
-import CustomButton from '../CustomButton';
+import { db, storage } from '../../Utils/firebaseConfig';
 import useAppTheme from '../../Hooks/themeHook';
 import { TransactionType } from '../../Defs/transaction';
+import { useIsDesktop } from '../../Hooks/mobileCheckHook';
+import {
+  handleExpenseUpdate,
+  handleIncomeUpdate,
+} from '../../Utils/firebaseFuncs';
+import { RootState } from '../../Store';
 
 function DeleteTransactionModal({
   modal,
   setModal,
   uid,
   transaction,
-}: {
+}: Readonly<{
   modal: boolean;
   setModal: React.Dispatch<SetStateAction<boolean>>;
   uid: string | undefined;
   transaction: TransactionType | undefined;
-}) {
+}>) {
+  // constants
   const [theme, COLOR] = useAppTheme();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const isDesktop = useIsDesktop();
+  const currency = useSelector(
+    (state: RootState) => state.common.user?.currency
+  );
+  // functions
+  const handlePress = useCallback(async () => {
+    try {
+      dispatch(setLoading(true));
+      setModal(false);
+      const curr = await getDoc(doc(db, 'users', uid!));
+      const month = Timestamp.fromMillis(transaction!.timeStamp.seconds * 1000)
+        .toDate()
+        .getMonth();
+      const { category } = transaction!;
+      if (transaction!.type === 'income') {
+        await handleIncomeUpdate({
+          curr,
+          uid: uid!,
+          amount: 0,
+          category,
+          currency: currency!,
+          month,
+          transaction: transaction!,
+        });
+      } else {
+        await handleExpenseUpdate({
+          curr,
+          uid: uid!,
+          amount: 0,
+          category,
+          currency: currency!,
+          month,
+          transaction: transaction!,
+        });
+      }
+      if (transaction?.attachementType !== 'none') {
+        await deleteObject(ref(storage, transaction?.attachement));
+      }
+      await updateDoc(doc(db, 'users', uid!, 'transactions', transaction!.id), {
+        deleted: true,
+      });
+      // deleteDoc(doc(db, 'users', uid!, 'transactions', transaction!.id));
+      toast.success(STRINGS.TransactionDeletedSuccesfully);
+    } catch (e) {
+      toast.error(e as string);
+      toast.clearWaitingQueue();
+    } finally {
+      setModal(false);
+      navigate(ROUTES.Transactions);
+      dispatch(setLoading(false));
+    }
+  }, [currency, dispatch, navigate, setModal, transaction, uid]);
   return (
     <Modal
       isOpen={modal}
@@ -35,7 +97,7 @@ function DeleteTransactionModal({
       }}
       style={{
         content: {
-          width: 'min-content',
+          width: isDesktop ? '40%' : '80%',
           height: 'min-content',
           margin: 'auto',
           display: 'flex',
@@ -52,15 +114,7 @@ function DeleteTransactionModal({
         },
       }}
     >
-      <div
-        style={{
-          width: '30vw',
-          display: 'flex',
-          flexDirection: 'column',
-          textAlign: 'center',
-          padding: '20px 50px',
-        }}
-      >
+      <div className="w-full flex flex-col text-center py-5 px-5 md:px-10">
         <p className="text-3xl mb-6 font-semibold">
           {STRINGS.RemovethisTransaction}
         </p>
@@ -72,28 +126,10 @@ function DeleteTransactionModal({
             onPress={() => {
               setModal(false);
             }}
-          />
-          <CustomButton
-            flex={1}
-            title={STRINGS.Yes}
-            onPress={async () => {
-              try {
-                dispatch(setLoading(true));
-                await deleteDoc(
-                  doc(db, 'users', uid!, 'transactions', transaction!.id!)
-                );
-                toast.success(STRINGS.TransactionDeletedSuccesfully);
-              } catch (e) {
-                toast.error(e as string);
-              } finally {
-                setModal(false);
-                navigate(ROUTES.Transactions);
-                dispatch(setLoading(false));
-              }
-            }}
             backgroundColor={COLORS.VIOLET[20]}
             textColor={COLORS.VIOLET[100]}
           />
+          <CustomButton flex={1} title={STRINGS.Yes} onPress={handlePress} />
         </div>
       </div>
     </Modal>

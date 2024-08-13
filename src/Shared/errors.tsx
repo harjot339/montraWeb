@@ -1,4 +1,4 @@
-import { emailRegex, nameRegex, STRINGS } from './Strings';
+import { emailRegex, nameRegex, passRegex, STRINGS } from './Strings';
 
 export function testInput(re: RegExp, str: string): boolean {
   return re.test(str);
@@ -11,7 +11,7 @@ const style = {
     paddingTop: 3,
     // justifyContent:"flex-end",
     alignSelf: 'flex-start',
-    height: 25,
+    minHeight: 25,
   },
 };
 export function EmailValError({
@@ -48,8 +48,12 @@ export function PassValidationError({
   pass,
   formKey,
 }: Readonly<{ pass: string; formKey: boolean }>) {
-  if (!!pass && pass.length < 6) {
-    return <p style={style.error}>{STRINGS.PasswordNotValid}</p>;
+  if (!!pass && !testInput(passRegex, pass)) {
+    return (
+      <p style={style.error} className="text-start h-fit">
+        {STRINGS.PasswordNotValid}
+      </p>
+    );
   }
   if (pass.trim() === '' && formKey) {
     return <p style={style.error}>{STRINGS.PasswordCannotBeEmpty}</p>;
@@ -112,7 +116,9 @@ export function EmptyZeroError({
   formKey: boolean;
   errorText: string;
 }>) {
-  return (value === '' || Number(value) <= 0 || value.trim() === '.') &&
+  return (value === '' ||
+    Number(value.replace(/,/g, '')) <= 0 ||
+    value.trim() === '.') &&
     formKey ? (
     <p
       className="pl-4 sm:pl-8"

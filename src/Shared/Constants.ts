@@ -6,7 +6,8 @@ const ROUTES = {
   Transactions: '/transactions',
   Budgets: '/budgets',
   Report: '/report',
-  // ABOUT: '/about-us',
+  Terms: '/terms',
+  ResetPassword: '/reset-pass',
 };
 
 const WILDCARD_ROUTES = {
@@ -42,6 +43,14 @@ const ROUTES_CONFIG = {
   Report: {
     path: ROUTES.Report,
     title: 'Financial Report',
+  },
+  Terms: {
+    path: ROUTES.Terms,
+    title: 'Terms & Conditions',
+  },
+  ResetPassword: {
+    path: ROUTES.ResetPassword,
+    title: 'Reset Password',
   },
 };
 

@@ -1,23 +1,33 @@
-import { signOut } from 'firebase/auth';
 import React, { SetStateAction } from 'react';
+// Third Party Libraries
+import { signOut } from 'firebase/auth';
 import Modal from 'react-modal';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+// Custom Components
 import { COLORS } from '../../Shared/commonStyles';
 import { STRINGS } from '../../Shared/Strings';
-import { setUser } from '../../Store/Common';
+import { setTheme, setUser } from '../../Store/Common';
 import { auth } from '../../Utils/firebaseConfig';
 import CustomButton from '../CustomButton';
 import useAppTheme from '../../Hooks/themeHook';
+import { useIsDesktop } from '../../Hooks/mobileCheckHook';
+import { setSidebar } from '../../Store/Loader';
+import { RootState } from '../../Store';
 
 function LogoutModal({
   modal,
   setModal,
-}: {
+}: Readonly<{
   modal: boolean;
   setModal: React.Dispatch<SetStateAction<boolean>>;
-}) {
+}>) {
+  // constants
   const [appTheme, COLOR] = useAppTheme();
+  const isDesktop = useIsDesktop();
   const dispatch = useDispatch();
+  const authTheme = useSelector(
+    (state: RootState) => state.common?.user?.theme
+  );
   return (
     <Modal
       isOpen={modal}
@@ -26,7 +36,7 @@ function LogoutModal({
       }}
       style={{
         content: {
-          width: 'min-content',
+          width: isDesktop ? '40%' : '80%',
           height: 'min-content',
           margin: 'auto',
           display: 'flex',
@@ -40,18 +50,11 @@ function LogoutModal({
         },
         overlay: {
           backgroundColor: appTheme === 'dark' ? '#ffffff30' : '#00000050',
+          zIndex: '50',
         },
       }}
     >
-      <div
-        style={{
-          width: '30vw',
-          display: 'flex',
-          flexDirection: 'column',
-          textAlign: 'center',
-          padding: '20px 50px',
-        }}
-      >
+      <div className="w-full flex flex-col text-center py-5 px-5 md:px-10">
         <p className="text-3xl mb-6 font-semibold">{STRINGS.Logout}</p>
         <p className="text-lg mb-7">{STRINGS.SureLogout}</p>
         <div className="flex gap-x-8">
@@ -61,16 +64,18 @@ function LogoutModal({
             onPress={() => {
               setModal(false);
             }}
+            backgroundColor={COLORS.VIOLET[20]}
+            textColor={COLORS.VIOLET[100]}
           />
           <CustomButton
-            flex={1}
             title={STRINGS.Yes}
             onPress={async () => {
               await signOut(auth);
+              dispatch(setTheme(authTheme));
               dispatch(setUser(undefined));
+              dispatch(setSidebar(false));
             }}
-            backgroundColor={COLORS.VIOLET[20]}
-            textColor={COLORS.VIOLET[100]}
+            flex={1}
           />
         </div>
       </div>

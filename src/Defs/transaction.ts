@@ -23,6 +23,11 @@ export type TransactionType = {
     | 'none';
   from: string;
   to: string;
+  conversion: {
+    [key: string]: {
+      [key: string]: number;
+    };
+  };
 };
 export type RepeatDataType = {
   freq: 'yearly' | 'monthly' | 'weekly' | 'daily';

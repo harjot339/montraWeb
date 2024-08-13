@@ -5,10 +5,10 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './Store';
 import RootRouter from './Routes/RootRouter';
 import './App.css';
-import Loader from './Components/Loader/Loader';
 // eslint-disable-next-line import/order
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Loader from './Components/Loader';
 
 const baseName = import.meta.env.VITE_BASE_NAME;
 

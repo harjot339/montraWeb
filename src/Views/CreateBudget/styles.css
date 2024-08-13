@@ -5,6 +5,7 @@
   border-radius: 20px;
   color: white;
   outline: none;
+  z-index: 0 !important;
 }
 .track-0 {
   background-color: #7f3dff;

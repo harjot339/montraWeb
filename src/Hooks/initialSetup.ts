@@ -8,8 +8,8 @@ import {
   orderBy,
   query,
   QuerySnapshot,
-  //   QuerySnapshot,
 } from 'firebase/firestore';
+import { toast } from 'react-toastify';
 import { UserType } from '../Defs/user';
 import { UserFromJson } from '../Utils/userFuncs';
 import { RootState } from '../Store';
@@ -18,21 +18,29 @@ import { setUser } from '../Store/Common';
 import { TransactionType } from '../Defs/transaction';
 import TransFromJson from '../Utils/transFuncs';
 import { setTransactions } from '../Store/Transactions';
-// import { TransactionType } from '../Defs/transaction';
-// import TransFromJson from '../Utils/transFuncs';
-// import { collection } from 'firebase/firestore/lite';
 
 export default function useInitialSetup() {
   const uid = useSelector((state: RootState) => state.common.user?.uid);
   const dispatch = useDispatch();
   useEffect(() => {
-    Notification.requestPermission();
+    try {
+      if (
+        'Notification' in window &&
+        'serviceWorker' in navigator &&
+        'PushManager' in window
+      ) {
+        // console.log();
+        Notification.requestPermission();
+        // console.log('Notification permission:', Notification.permission);
+      }
+    } catch (e) {
+      toast.error(`Notification error:${e as string}`);
+    }
     if (uid) {
       const unsubscribe = onSnapshot(
         doc(db, 'users', uid),
         (snapshot: DocumentSnapshot) => {
           const user = UserFromJson(snapshot.data() as UserType);
-          // console.log('USERRR', user)
           dispatch(setUser(user));
         }
       );
@@ -47,29 +55,15 @@ export default function useInitialSetup() {
           collection(db, 'users', uid, 'transactions'),
           orderBy('timeStamp', 'desc')
         ),
-        // doc(db, 'users', collection('transactions')),
         (snapshot: QuerySnapshot) => {
-          const data: TransactionType[] = snapshot.docs.map((x) =>
-            TransFromJson(x.data(), uid)
-          );
-          // console.log(data)
+          const data: TransactionType[] = snapshot.docs
+            .map((x) => TransFromJson(x.data(), uid))
+            .filter((item) => {
+              return !item.deleted;
+            });
           dispatch(setTransactions(data));
-          //   dispatch()
         }
       );
-
-      // firestore()
-      //   .collection('users')
-      //   .doc(uid)
-      //   .collection('transactions')
-      //   .orderBy('timeStamp', 'desc')
-      //   .onSnapshot((snapshot: QuerySnapshot) => {
-      //     const data: TransactionType[] = snapshot.docs.map((x) =>
-      //       TransFromJson(x.data(), uid)
-      //     );
-      //     console.log(data);
-      //     //   dispatch()
-      //   });
       return () => unsubscribe();
     }
     return () => {};

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify';
+import { TransactionType } from '../../../Defs/transaction';
+import { MimeToExtension } from '../../../Utils/commonFuncs';
 import Attachment from '../../../assets/svgs/attachment.svg';
 import Close from '../../../assets/svgs/close.svg';
 import File from '../../../assets/svgs/file.svg';
-import { TransactionType } from '../../../Defs/transaction';
-import { MimeToExtension } from '../../../Utils/commonFuncs';
+import { STRINGS } from '../../../Shared/Strings';
 
 function AttachmentCtr({
   img,
@@ -41,9 +43,9 @@ function AttachmentCtr({
           height="10px"
         />
       ) : (
-        <div className="bg-violet-200 p-4 w-32 flex flex-col justify-center rounded-lg items-center">
+        <div className="bg-violet-200 p-4 w-36 rounded-lg flex flex-col justify-center  items-center overflow-hidden text-ellipsis">
           <img src={File} alt="" width="40px" />
-          <p className="mt-4 overflow-hidden text-ellipsis">
+          <p className="mt-4">
             {isEdit && img === undefined ? 'Document' : img!.name}
           </p>
         </div>
@@ -71,6 +73,14 @@ function AttachmentCtr({
         accept="image/*,.doc,.docx,.pdf,.txt,.xls,.xlsx"
         className="hidden"
         onChange={(e) => {
+          if (
+            !e.target.files![0].type.startsWith('image') &&
+            e.target.files![0].size > 10485760
+          ) {
+            toast.error(STRINGS.FileError);
+            toast.clearWaitingQueue();
+            return;
+          }
           setImg(e.target.files?.[0]);
           setFile({
             file: e.target.files?.[0],
@@ -91,7 +101,9 @@ function AttachmentCtr({
         }}
       >
         <img src={Attachment} alt="" />
-        <p className="text-lg text-[#7A7E80] font-semibold">Add Attachement</p>
+        <p className="text-lg text-[#7A7E80] font-semibold">
+          {STRINGS.AddAttachement}
+        </p>
       </button>
     </>
   );

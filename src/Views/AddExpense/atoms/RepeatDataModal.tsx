@@ -1,6 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
+// Third Party Libraries
 import Modal from 'react-modal';
 import clsx from 'clsx';
+import { Timestamp } from 'firebase/firestore';
+import { toast } from 'react-toastify';
+// Custom Components
 import CustomButton from '../../../Components/CustomButton';
 import CustomDropdown from '../../../Components/CustomDropdown/CustomDropdown';
 import { RepeatDataType } from '../../../Defs/transaction';
@@ -14,6 +18,7 @@ import {
 import { EmptyError } from '../../../Shared/errors';
 import useAppTheme from '../../../Hooks/themeHook';
 import { COLORS } from '../../../Shared/commonStyles';
+import { useIsDesktop } from '../../../Hooks/mobileCheckHook';
 
 function RepeatDataModal({
   modal,
@@ -21,7 +26,7 @@ function RepeatDataModal({
   setChecked,
   repeatData,
   setRepeatData,
-}: {
+}: Readonly<{
   modal: boolean;
   setModal: React.Dispatch<React.SetStateAction<boolean>>;
   setChecked: React.Dispatch<React.SetStateAction<boolean>>;
@@ -29,7 +34,8 @@ function RepeatDataModal({
   setRepeatData: React.Dispatch<
     React.SetStateAction<RepeatDataType | undefined>
   >;
-}) {
+}>) {
+  // state
   const [freq, setFreq] = useState<RepeatDataType['freq']>();
   const [end, setEnd] = useState<RepeatDataType['end']>();
   const [day, setDay] = useState<number>(1);
@@ -37,8 +43,13 @@ function RepeatDataModal({
   const [weekDay, setWeekDay] = useState<number>(1);
   const [month, setMonth] = useState<number>(1);
   const [formkey, setFormkey] = useState<boolean>(false);
+  const [myDate, setMyDate] = useState<Date>();
   // constants
   const year = new Date().getFullYear();
+  const [theme] = useAppTheme();
+  const isDesktop = useIsDesktop();
+  const today = new Date();
+  today.setHours(0);
   // functions
   const daysInYear = useMemo(() => {
     const res = [];
@@ -54,8 +65,8 @@ function RepeatDataModal({
         daysInMonth = new Date(year, m, 0).getDate();
       }
       const daysArray = [];
-      for (let d = 1; d <= daysInMonth; d += 1) {
-        daysArray.push(d);
+      for (let i = 1; i <= daysInMonth; i += 1) {
+        daysArray.push(i);
       }
       res.push({
         month: m,
@@ -71,9 +82,24 @@ function RepeatDataModal({
     setDay(repeatData?.day ?? 1);
     setWeekDay(repeatData?.weekDay ?? 1);
     setEnd((repeatData?.end as 'date' | 'never') ?? undefined);
-    setDate(repeatData?.date as Date);
+    if ((repeatData?.date as Timestamp)?.seconds !== undefined) {
+      setDate(
+        Timestamp.fromMillis(
+          (repeatData?.date as Timestamp).seconds * 1000
+        ).toDate()
+      );
+    } else {
+      setDate(repeatData?.date as Date);
+    }
   }, [repeatData]);
-  const [theme] = useAppTheme();
+  useEffect(() => {
+    let x = new Date(new Date().getFullYear(), month - 1, day);
+    if (freq === 'monthly') {
+      x = new Date(new Date().getFullYear(), new Date().getMonth(), day);
+    }
+    x.setDate(x.getDate() + 1);
+    setMyDate(x);
+  }, [month, day, freq]);
   return (
     <Modal
       isOpen={modal}
@@ -82,10 +108,25 @@ function RepeatDataModal({
         if (repeatData === undefined) {
           setChecked(false);
         }
+        setFormkey(false);
+        setFreq((repeatData?.freq as RepeatDataType['freq']) ?? undefined);
+        setMonth(repeatData?.month ?? 1);
+        setDay(repeatData?.day ?? 1);
+        setWeekDay(repeatData?.weekDay ?? 1);
+        setEnd((repeatData?.end as 'date' | 'never') ?? undefined);
+        if ((repeatData?.date as Timestamp)?.seconds !== undefined) {
+          setDate(
+            Timestamp.fromMillis(
+              (repeatData?.date as Timestamp).seconds * 1000
+            ).toDate()
+          );
+        } else {
+          setDate(repeatData?.date as Date);
+        }
       }}
       style={{
         content: {
-          width: 'min-content',
+          width: isDesktop ? '40%' : '80%',
           height: 'min-content',
           margin: 'auto',
           display: 'flex',
@@ -101,38 +142,43 @@ function RepeatDataModal({
         },
       }}
     >
-      <div
-        style={{
-          width: '30vw',
-          display: 'flex',
-          flexDirection: 'column',
-          backgroundColor:
-            theme === 'dark' ? COLORS.DARK[100] : COLORS.LIGHT[100],
-        }}
-      >
-        <div className="flex gap-x-4">
+      <div className="w-full flex flex-col">
+        <div
+          className={clsx('flex gap-x-4 gap-y-3 ', !isDesktop && 'flex-wrap')}
+        >
           <CustomDropdown
+            menuPlacement="bottom"
             placeholder={STRINGS.Frequency}
             flex={1}
             data={FreqDropdownData}
             onChange={(e) => {
-              setFreq(e.target.value as RepeatDataType['freq']);
+              setFreq(e!.value as RepeatDataType['freq']);
             }}
-            value={freq ?? ''}
+            // menuIsOpen
+            value={
+              freq
+                ? {
+                    label: freq[0].toUpperCase() + freq.slice(1),
+                    value: freq,
+                  }
+                : undefined
+            }
           />
           {freq === 'yearly' && (
             <CustomDropdown
+              menuPlacement="bottom"
               placeholder={STRINGS.Month}
               flex={1}
               data={monthData}
               onChange={(e) => {
-                setMonth(Number(e.target.value));
+                setMonth(Number(e!.value));
               }}
-              value={month}
+              value={month !== undefined ? monthData[month - 1] : undefined}
             />
           )}
           {(freq === 'yearly' || freq === 'monthly') && (
             <CustomDropdown
+              menuPlacement="bottom"
               placeholder={STRINGS.Day}
               data={
                 freq === 'monthly'
@@ -150,19 +196,28 @@ function RepeatDataModal({
                     })
               }
               onChange={(e) => {
-                setDay(Number(e.target.value));
+                setDay(Number(e!.value));
               }}
-              value={day}
+              value={
+                day !== undefined
+                  ? { label: String(day), value: day }
+                  : undefined
+              }
             />
           )}
           {freq === 'weekly' && (
             <CustomDropdown
+              menuPlacement="bottom"
               placeholder={STRINGS.Day}
               data={weekData}
               onChange={(e) => {
-                setWeekDay(Number(e.target.value));
+                setWeekDay(Number(e!.value));
               }}
-              value={weekDay}
+              value={
+                weekDay !== undefined
+                  ? { label: weekData[weekDay].label, value: weekDay }
+                  : undefined
+              }
             />
           )}
         </div>
@@ -176,22 +231,50 @@ function RepeatDataModal({
             placeholder={STRINGS.EndAfter}
             data={EndDropdownData}
             onChange={(e) => {
-              setEnd(e.target.value as RepeatDataType['end']);
+              setEnd(e!.value as RepeatDataType['end']);
             }}
-            value={end ?? ''}
+            value={
+              end
+                ? { label: end[0].toUpperCase() + end.slice(1), value: end }
+                : undefined
+            }
             flex={1}
           />
           {end === 'date' && (
             <input
               type="date"
               className={clsx(
-                'border rounded-lg px-4',
-                theme === 'dark' && 'text-white'
+                'border rounded-lg px-4 bg-transparent min-w-40',
+                formkey &&
+                  end === 'date' &&
+                  (date! < today ||
+                    date! < myDate! ||
+                    date!.getFullYear() > 2050) &&
+                  'outline-red-500 outline outline-2 outline-offset-2',
+                theme === 'dark' ? 'text-white' : 'text-black'
               )}
-              min={new Date().toISOString().split('T')[0]}
-              value={new Date().toISOString().split('T')[0]}
+              min={
+                freq === 'yearly' || freq === 'monthly'
+                  ? myDate!.toISOString().split('T')[0]
+                  : new Date().toISOString().split('T')[0]
+              }
+              max={new Date(2050, 11, 32).toISOString().split('T')[0]}
+              value={
+                date?.toISOString()?.split('T')?.[0] ??
+                (freq === 'yearly' || freq === 'monthly'
+                  ? myDate!.toISOString().split('T')[0]
+                  : new Date().toISOString().split('T')[0])
+              }
+              style={{ colorScheme: theme }}
               onChange={(e) => {
-                setDate(new Date(e.target.value));
+                if (!e.target.value) {
+                  setDate(new Date());
+                } else {
+                  const newDate = new Date(e.target.value);
+                  if (!Number.isNaN(newDate.getTime())) {
+                    setDate(newDate);
+                  }
+                }
               }}
             />
           )}
@@ -202,9 +285,32 @@ function RepeatDataModal({
           value={end ?? ''}
         />
         <CustomButton
-          title="Continue"
+          title={STRINGS.Continue}
           onPress={() => {
             setFormkey(true);
+            // if (end === 'date' && date! < new Date()) {
+            //   toast.error(
+            //     "The selected end date must be later than today's date."
+            //   );
+            //   return;
+            // }
+            // const newDate = new Date(date ?? new Date());
+            // if (end === 'date' && Number.isNaN(newDate.getTime())) {
+            //   toast.error('Enter a Valid date');
+            //   return;
+            // }
+            if (end === 'date' && date && date.getFullYear() > 2050) {
+              toast.error(
+                'The selected end date exceeded max date limit (31/12/2050)'
+              );
+              return;
+            }
+            if (end === 'date' && date && date < myDate!) {
+              toast.error(
+                "The selected end date must be later than selected frequency's date."
+              );
+              return;
+            }
             if (freq && end) {
               setRepeatData({
                 freq: freq ?? 'daily',

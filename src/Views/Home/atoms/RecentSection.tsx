@@ -1,5 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
+// Third Party Librarires
 import { Timestamp } from 'firebase/firestore';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -11,13 +12,14 @@ import { STRINGS } from '../../../Shared/Strings';
 import useAppTheme from '../../../Hooks/themeHook';
 
 function RecentSection({ month }: Readonly<{ month: number }>) {
+  // redux
   const data = useSelector(
     (state: RootState) => state.transactions.transactions
   );
-  const conversion = useSelector((state: RootState) => state.common.conversion);
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
   );
+  // constants
   const navigate = useNavigate();
   const [theme] = useAppTheme();
   return (
@@ -36,51 +38,67 @@ function RecentSection({ month }: Readonly<{ month: number }>) {
         >
           {STRINGS.Recent}
         </p>
-        <button
-          type="button"
-          className="rounded-2xl px-4 h-8 text-sm sm:text-base font-semibold"
-          style={{
-            backgroundColor: COLORS.VIOLET[20],
-            color: COLORS.VIOLET[100],
-          }}
-          onClick={() => {
-            navigate(ROUTES_CONFIG.Transactions.path);
-          }}
-        >
-          {STRINGS.SeeAll}
-        </button>
+        {data.slice().filter((item) => {
+          return (
+            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+              .toDate()
+              ?.getMonth() === month
+          );
+        }).length === 0 ? (
+          <div className="w-16 h-0" />
+        ) : (
+          <button
+            type="button"
+            className="rounded-2xl px-4 h-8 text-sm sm:text-base font-semibold"
+            style={{
+              backgroundColor: COLORS.VIOLET[20],
+              color: COLORS.VIOLET[100],
+            }}
+            onClick={() => {
+              navigate(ROUTES_CONFIG.Transactions.path);
+            }}
+          >
+            {STRINGS.SeeAll}
+          </button>
+        )}
       </div>
-      {data.slice().filter((item) => {
-        return (
-          Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-            .toDate()
-            ?.getMonth() === month
-        );
-      }).length === 0 ? (
-        <p className="text-gray-400">{STRINGS.NoRecentTransactions}</p>
-      ) : (
-        data
-          .slice()
-          .filter((item) => {
-            return (
-              Timestamp.fromMillis(item.timeStamp.seconds * 1000)
-                .toDate()
-                ?.getMonth() === month
-            );
-          })
-          .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
-          .slice(0, 6)
-          .map((item) => (
-            <TransactionListItem
-              disabled
-              item={item}
-              key={item.id}
-              width="full"
-              currency={currency}
-              conversion={conversion}
-            />
-          ))
-      )}
+      <div className="flex flex-col gap-y-2.5 mt-2 items-center">
+        {data.slice().filter((item) => {
+          return (
+            Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+              .toDate()
+              ?.getMonth() === month
+          );
+        }).length === 0 ? (
+          <div className="flex w-full h-full justify-center items-center">
+            <p className="text-gray-400">{STRINGS.NoRecentTransactions}</p>
+          </div>
+        ) : (
+          data
+            .slice()
+            .filter((item) => {
+              return (
+                Timestamp.fromMillis(item.timeStamp.seconds * 1000)
+                  .toDate()
+                  ?.getMonth() === month
+              );
+            })
+            .sort((a, b) => b.timeStamp.seconds - a.timeStamp.seconds)
+            .slice(0, 5)
+            .map((item) => (
+              <TransactionListItem
+                // disabled
+                item={item}
+                key={item.id}
+                width="full"
+                currency={currency}
+                onClick={() => {
+                  navigate(`${ROUTES_CONFIG.Transactions.path}/${item.id}`);
+                }}
+              />
+            ))
+        )}
+      </div>
     </div>
   );
 }

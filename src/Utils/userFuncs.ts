@@ -33,44 +33,60 @@ const decryptNotifications = (json: DocumentData) => {
   );
 };
 const decryptIncome = (json: DocumentData) => {
+  const income: UserType['spend'] = json?.income;
   return (
     Object.fromEntries(
-      Object.entries<{ [key: string]: string }>(json?.income ?? {}).map(
-        ([key, value]) => {
-          return [
-            key,
-            Object.assign(
-              {},
-              ...Object.entries(value ?? {}).map(([subkey, subval]) => {
-                return {
-                  [subkey]: Number(decrypt(subval, json.uid)),
-                };
-              })
-            ),
-          ];
-        }
-      )
+      Object.entries(income ?? {}).map(([month, categories]) => {
+        return [
+          month,
+          Object.fromEntries(
+            Object.entries(categories ?? {}).map(([category, currencies]) => {
+              return [
+                category,
+                Object.fromEntries(
+                  Object.entries(currencies ?? {}).map(
+                    ([currency, encryptedValue]) => {
+                      return [
+                        currency,
+                        Number(decrypt(String(encryptedValue), json.uid)),
+                      ];
+                    }
+                  )
+                ),
+              ];
+            })
+          ),
+        ];
+      })
     ) ?? {}
   );
 };
 const decryptExpense = (json: DocumentData) => {
+  const spend: UserType['spend'] = json?.spend;
   return (
     Object.fromEntries(
-      Object.entries<{ [key: string]: string }>(json?.spend ?? {}).map(
-        ([key, value]) => {
-          return [
-            key,
-            Object.assign(
-              {},
-              ...Object.entries(value ?? {}).map(([subkey, subval]) => {
-                return {
-                  [subkey]: Number(decrypt(subval, json.uid)),
-                };
-              })
-            ),
-          ];
-        }
-      )
+      Object.entries(spend ?? {}).map(([month, categories]) => {
+        return [
+          month,
+          Object.fromEntries(
+            Object.entries(categories ?? {}).map(([category, currencies]) => {
+              return [
+                category,
+                Object.fromEntries(
+                  Object.entries(currencies ?? {}).map(
+                    ([currency, encryptedValue]) => {
+                      return [
+                        currency,
+                        Number(decrypt(String(encryptedValue), json.uid)),
+                      ];
+                    }
+                  )
+                ),
+              ];
+            })
+          ),
+        ];
+      })
     ) ?? {}
   );
 };
@@ -78,7 +94,16 @@ const decryptBudget = (json: DocumentData) => {
   return (
     Object.fromEntries(
       Object.entries<{
-        [key: string]: { alert: boolean; limit: string; percentage: string };
+        [key: string]: {
+          alert: boolean;
+          limit: string;
+          percentage: string;
+          conversion: {
+            [key: string]: {
+              [key: string]: number;
+            };
+          };
+        };
       }>(json?.budget ?? {}).map(([key, value]) => {
         return [
           key,
@@ -90,6 +115,7 @@ const decryptBudget = (json: DocumentData) => {
                   alert: subValue.alert,
                   limit: Number(decrypt(subValue.limit, json.uid)),
                   percentage: Number(decrypt(subValue.percentage, json.uid)),
+                  conversion: subValue.conversion,
                 },
               };
             })
@@ -109,14 +135,20 @@ export function UserToJson({
   name: string;
   email: string;
   isSocial: boolean;
-}): UserType {
+}) {
   return {
     uid,
     name: encrypt(name, uid),
     email: encrypt(email, uid),
     pin: '',
-    expenseCategory: initialExpenseCategories.map((item) => encrypt(item, uid)),
-    incomeCategory: initialIncomeCategories.map((item) => encrypt(item, uid)),
+    expenseCategory: initialExpenseCategories.map((item) => ({
+      color: item.color,
+      name: encrypt(item.name, uid),
+    })),
+    incomeCategory: initialIncomeCategories.map((item) => ({
+      color: item.color,
+      name: encrypt(item.name, uid),
+    })),
     budget: {},
     spend: {},
     income: {},
@@ -133,11 +165,33 @@ export function UserFromJson(json: DocumentData): UserType {
     name: decrypt(json.name, json.uid) ?? json.name,
     pin: json.pin !== '' ? decrypt(json.pin, json.uid) ?? json.pin : '',
     expenseCategory:
-      json?.expenseCategory?.map((item: string) => decrypt(item, json.uid)) ??
-      initialExpenseCategories,
+      json?.expenseCategory?.map((item: { name: string; color: string }) =>
+        decrypt(item.name, json.uid)
+      ) ?? initialExpenseCategories.map((item) => item.name),
+    expenseColors: json?.expenseCategory?.reduce(
+      (
+        acc: { [key: string]: string },
+        item: { name: string; color: string }
+      ) => {
+        acc[decrypt(item.name, json.uid) ?? item.name] = item.color;
+        return acc;
+      },
+      {}
+    ),
     incomeCategory:
-      json?.incomeCategory?.map((item: string) => decrypt(item, json.uid)) ??
-      initialIncomeCategories,
+      json?.incomeCategory?.map((item: { name: string; color: string }) =>
+        decrypt(item.name, json.uid)
+      ) ?? initialIncomeCategories,
+    incomeColors: json?.incomeCategory?.reduce(
+      (
+        acc: { [key: string]: string },
+        item: { name: string; color: string }
+      ) => {
+        acc[decrypt(item.name, json.uid) ?? item.name] = item.color;
+        return acc;
+      },
+      {}
+    ),
     budget: decryptBudget(json),
     spend: decryptExpense(json),
     income: decryptIncome(json),

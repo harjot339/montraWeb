@@ -1,16 +1,19 @@
-import React, { SetStateAction } from 'react';
+import React, { SetStateAction, useCallback } from 'react';
+// Third Party Libraries
 import Modal from 'react-modal';
 import { updateDoc, doc, deleteField } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
+// Custom Components
+import CustomButton from '../CustomButton';
 import { COLORS } from '../../Shared/commonStyles';
 import { ROUTES } from '../../Shared/Constants';
 import { STRINGS } from '../../Shared/Strings';
 import { setLoading } from '../../Store/Loader';
 import { db } from '../../Utils/firebaseConfig';
-import CustomButton from '../CustomButton';
 import useAppTheme from '../../Hooks/themeHook';
+import { useIsDesktop } from '../../Hooks/mobileCheckHook';
 
 function DeleteBudgetModal({
   modal,
@@ -18,16 +21,36 @@ function DeleteBudgetModal({
   month,
   selectedCategory,
   uid,
-}: {
+}: Readonly<{
   modal: boolean;
   setModal: React.Dispatch<SetStateAction<boolean>>;
   month: number;
   selectedCategory: string;
   uid: string | undefined;
-}) {
+}>) {
+  // constants
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [theme] = useAppTheme();
+  const isDesktop = useIsDesktop();
+  // functions
+  const handlePress = useCallback(async () => {
+    try {
+      dispatch(setLoading(true));
+      setModal(false);
+      await updateDoc(doc(db, 'users', uid!), {
+        [`budget.${month}.${selectedCategory}`]: deleteField(),
+      });
+      toast.success(STRINGS.BudgetDeletedSuccesfully);
+    } catch (e) {
+      toast.error(e as string);
+      toast.clearWaitingQueue();
+    } finally {
+      setModal(false);
+      navigate(ROUTES.Budgets);
+      dispatch(setLoading(false));
+    }
+  }, [dispatch, month, navigate, selectedCategory, setModal, uid]);
   return (
     <Modal
       isOpen={modal}
@@ -36,7 +59,7 @@ function DeleteBudgetModal({
       }}
       style={{
         content: {
-          width: 'min-content',
+          width: isDesktop ? '40%' : '80%',
           height: 'min-content',
           margin: 'auto',
           display: 'flex',
@@ -53,15 +76,7 @@ function DeleteBudgetModal({
         },
       }}
     >
-      <div
-        style={{
-          width: '30vw',
-          display: 'flex',
-          flexDirection: 'column',
-          textAlign: 'center',
-          padding: '20px 50px',
-        }}
-      >
+      <div className="w-full flex flex-col text-center py-5 px-5 md:px-10">
         <p className="text-3xl mb-6 font-semibold">{STRINGS.Removebudget}</p>
         <p className="text-lg mb-7">{STRINGS.SureRemoveBudgetNo}</p>
         <div className="flex gap-x-8">
@@ -71,29 +86,10 @@ function DeleteBudgetModal({
             onPress={() => {
               setModal(false);
             }}
-          />
-          <CustomButton
-            flex={1}
-            title={STRINGS.Yes}
-            onPress={async () => {
-              try {
-                setModal(false);
-                dispatch(setLoading(true));
-                await updateDoc(doc(db, 'users', uid!), {
-                  [`budget.${month}.${selectedCategory}`]: deleteField(),
-                });
-                toast.success(STRINGS.BudgetDeletedSuccesfully);
-              } catch (e) {
-                toast.error(e as string);
-              } finally {
-                setModal(false);
-                navigate(ROUTES.Budgets);
-                dispatch(setLoading(false));
-              }
-            }}
             backgroundColor={COLORS.VIOLET[20]}
             textColor={COLORS.VIOLET[100]}
           />
+          <CustomButton flex={1} title={STRINGS.Yes} onPress={handlePress} />
         </div>
       </div>
     </Modal>

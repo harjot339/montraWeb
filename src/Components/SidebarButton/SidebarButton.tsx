@@ -1,15 +1,21 @@
 import { useDispatch } from 'react-redux';
-import useIsMobile from '../../Hooks/mobileCheckHook';
+import clsx from 'clsx';
 import { setSidebar } from '../../Store/Loader';
+import { useIsMobile } from '../../Hooks/mobileCheckHook';
+import useAppTheme from '../../Hooks/themeHook';
 
 function SidebarButton() {
   const isMobile = useIsMobile();
   const dispatch = useDispatch();
+  const [theme] = useAppTheme();
   return (
     isMobile && (
       <button
         type="button"
-        className="bg-white p-2 rounded-lg"
+        className={clsx(
+          'p-2 rounded-lg',
+          theme === 'dark' ? 'bg-black' : 'bg-white'
+        )}
         onClick={() => {
           dispatch(setSidebar(true));
           document
@@ -20,7 +26,7 @@ function SidebarButton() {
         <svg
           className="w-6 h-6"
           aria-hidden="true"
-          fill="currentColor"
+          fill={theme === 'dark' ? 'white' : 'black'}
           viewBox="0 0 20 20"
           xmlns="http://www.w3.org/2000/svg"
         >

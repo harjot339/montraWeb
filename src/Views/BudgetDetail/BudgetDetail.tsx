@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
+// Third Party Libraries
 import ProgressBar from '@ramonak/react-progress-bar';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import clsx from 'clsx';
+// Custom Components
+import CustomButton from '../../Components/CustomButton';
+import CreateBudget from '../CreateBudget';
 import { ROUTES } from '../../Shared/Constants';
 import ArrowLeftBlack from '../../assets/svgs/arrow left black.svg';
 import ArrowLeft from '../../assets/svgs/arrow left.svg';
@@ -14,45 +18,50 @@ import { currencies, STRINGS } from '../../Shared/Strings';
 import { catIcons, formatWithCommas } from '../../Utils/commonFuncs';
 import { RootState } from '../../Store';
 import { COLORS } from '../../Shared/commonStyles';
-import CustomButton from '../../Components/CustomButton';
-import CreateBudget from '../CreateBudget';
 import DeleteBudgetModal from '../../Components/DeleteBudgetModal/DeleteBudgetModal';
 import useAppTheme from '../../Hooks/themeHook';
+import { useIsMobile, useIsTablet } from '../../Hooks/mobileCheckHook';
 
 function BudgetDetail() {
+  // constants
   const navigate = useNavigate();
   const params = useParams();
   const month = params.id!.split('_')[0];
   const selectedCategory = params.id!.split('_')[1];
+  const [theme] = useAppTheme();
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+  // redux
   const budgets = useSelector(
     (state: RootState) => state.common.user?.budget[month]
   );
   const spends = useSelector(
     (state: RootState) => state.common.user?.spend[month]
   );
+  const expenseColors = useSelector(
+    (state: RootState) => state.common.user?.expenseColors
+  );
   const uid = useSelector((state: RootState) => state.common.user?.uid);
-  const conversion = useSelector((state: RootState) => state.common.conversion);
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
   );
-  const budget = budgets?.[selectedCategory] ?? {
-    alert: false,
-    limit: 0,
-    percentage: 0,
-  };
-  const spend = spends?.[selectedCategory] ?? 0;
+  const budget = budgets?.[selectedCategory];
+  // state
   const [modal, setModal] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [theme] = useAppTheme();
+
   return isOpen ? (
     <CreateBudget isEdit setIsOpen={setIsOpen} />
   ) : (
     <div
       className={clsx(
-        'flex-col rounded-lg flex w-full max-w-[420px] pb-5 justify-between sticky top-2 right-2',
-        theme === 'dark' ? 'bg-black' : 'bg-white'
+        'flex-col rounded-lg flex w-full  pb-5 justify-between sticky top-2 right-2',
+        theme === 'dark' ? 'bg-black' : 'bg-white',
+        !isMobile && !isTablet && 'max-w-[450px]'
       )}
-      style={{ height: '95vh' }}
+      style={{
+        height: isMobile || isTablet ? '100dvh' : '95vh',
+      }}
     >
       <DeleteBudgetModal
         modal={modal}
@@ -132,7 +141,7 @@ function BudgetDetail() {
             </div>
             <p
               className={clsx(
-                'self-center text-5xl font-semibold mt-5',
+                'self-center text-[40px] font-semibold mt-5',
                 theme === 'dark' && 'text-white'
               )}
             >
@@ -140,31 +149,40 @@ function BudgetDetail() {
             </p>
             <p
               className={clsx(
-                'self-center text-6xl font-semibold mt-5 mb-6',
+                'self-center text-center text-[40px] font-semibold mt-5 mb-6 max-w-[90%] text-ellipsis overflow-hidden whitespace-nowrap',
                 theme === 'dark' && 'text-white'
               )}
             >
               {currencies[currency!].symbol}
-              {budget.limit - spend < 0 || spend === undefined
+              {budget.limit - (spends?.[selectedCategory]?.USD ?? 0) < 0
                 ? '0'
                 : formatWithCommas(
-                    Number(
-                      (
-                        conversion.usd[currency!.toLowerCase()] *
-                        (Number(budget.limit) - Number(spend))
-                      ).toFixed(1)
-                    ).toString()
+                    (
+                      budget.conversion.usd[currency?.toLowerCase() ?? 'usd'] *
+                        Number(budget.limit) -
+                      Number(
+                        spends?.[selectedCategory]?.[
+                          currency?.toUpperCase() ?? 'USD'
+                        ] ?? 0
+                      )
+                    )
+                      .toFixed(2)
+                      .toString()
                   )}
             </p>
             <div className="px-10">
               <ProgressBar
                 completed={
-                  spend / budget.limit > 1 ? 100 : (spend / budget.limit) * 100
+                  (spends?.[selectedCategory]?.USD ?? 0) / budget.limit > 1
+                    ? 100
+                    : ((spends?.[selectedCategory]?.USD ?? 0) / budget.limit) *
+                      100
                 }
+                bgColor={expenseColors?.[selectedCategory] ?? 'green'}
                 isLabelVisible={false}
               />
             </div>
-            {(spend ?? 0) >= budget.limit && (
+            {(spends?.[selectedCategory]?.USD ?? 0) >= budget.limit && (
               <div className="self-center flex items-center gap-x-3 bg-red-500 mt-16 px-6 py-3 rounded-3xl">
                 <img src={Alert} width="30px" alt="" />
                 <p className="text-white text-lg font-semibold">

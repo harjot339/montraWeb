@@ -64,5 +64,11 @@ export function FirebaseAuthErrorHandler(code: string) {
   if (code === 'auth/invalid-email') {
     return STRINGS.InvalidEmail;
   }
-  return STRINGS.UnknownError;
+  if (code === 'auth/popup-closed-by-user') {
+    return STRINGS.PopupClosedByUser;
+  }
+  if (code === 'auth/too-many-requests') {
+    return STRINGS.ToManyRequestError;
+  }
+  return `${STRINGS.UnknownError}(${code})`;
 }

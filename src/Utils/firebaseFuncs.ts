@@ -17,9 +17,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { auth, db, storage } from './firebaseConfig';
 import { UserFromJson, UserToJson } from './userFuncs';
 import { RepeatDataType, TransactionType } from '../Defs/transaction';
-import { encrypt } from './encryption';
+import { decrypt, encrypt } from './encryption';
 import { UserType } from '../Defs/user';
 import { FirebaseAuthErrorHandler } from './commonFuncs';
+import { currencies } from '../Shared/Strings';
 
 export async function singupUser({
   name,
@@ -47,6 +48,7 @@ export async function singupUser({
   } catch (e) {
     const error: AuthError = e as AuthError;
     toast.error(FirebaseAuthErrorHandler(error.code));
+    toast.clearWaitingQueue();
     return false;
   }
   return false;
@@ -70,9 +72,10 @@ export async function getAttachmentUrl({
   try {
     if (
       isEdit &&
-      attachement !== undefined &&
+      attachement === undefined &&
       prevTransaction?.attachementType !== 'none'
     ) {
+      // console.log('yeh chla')
       return prevTransaction?.attachement ?? '';
     }
     if (attachementType !== 'none' && attachement) {
@@ -80,7 +83,7 @@ export async function getAttachmentUrl({
       url = await getDownloadURL(ref(storage, `users/${uid}/${id}`));
     }
   } catch (e) {
-    // console.log(e)
+    // console.log(e);
   }
   return url;
 }
@@ -126,7 +129,12 @@ export function createTransaction({
   return {
     amount: encrypt(
       String(
-        (Number(amount) / conversion.usd[currency.toLowerCase()]).toFixed(10)
+        (
+          Number(amount) /
+          (isEdit ? transaction.conversion : conversion).usd[
+            currency.toLowerCase()
+          ]
+        ).toFixed(10)
       ),
       uid
     ),
@@ -151,6 +159,7 @@ export function createTransaction({
     attachementType: encrypt(attachementType, uid),
     from: encrypt(from, uid),
     to: encrypt(to, uid),
+    conversion: isEdit ? transaction.conversion : conversion,
   };
 }
 
@@ -161,7 +170,6 @@ export async function handleIncomeUpdate({
   category,
   transaction,
   amount,
-  conversion,
   currency,
 }: {
   curr: DocumentSnapshot;
@@ -170,22 +178,31 @@ export async function handleIncomeUpdate({
   category: string;
   transaction: TransactionType;
   amount: number;
-  conversion: {
-    [key: string]: {
-      [key: string]: number;
-    };
-  };
   currency: string;
 }) {
-  const finalAmount =
-    (UserFromJson(curr.data() as UserType)?.income?.[month]?.[category] ?? 0) -
-    transaction.amount +
-    Number(amount / conversion.usd[currency.toLowerCase()]);
+  const finalAmount: { [key: string]: string } = {};
+  Object.keys(currencies).forEach((dbCurrency) => {
+    finalAmount[dbCurrency] = encrypt(
+      Number(
+        (
+          (UserFromJson(curr.data() as UserType)?.income[month]?.[category]?.[
+            dbCurrency
+          ] ?? 0) -
+          Number(transaction.amount) *
+            transaction.conversion.usd[dbCurrency.toLowerCase()] +
+          (Number(amount) /
+            transaction.conversion.usd[currency.toLowerCase()]) *
+            transaction.conversion.usd[dbCurrency.toLowerCase()]
+        ).toFixed(2)
+      ).toString(),
+      uid
+    );
+  });
   await updateDoc(doc(db, 'users', uid), {
-    [`income.${month}.${category}`]: encrypt(String(finalAmount), uid),
+    [`income.${month}.${category}`]: finalAmount,
   });
 }
-export async function handleOnlineNotify({
+export async function handleNotify({
   curr,
   totalSpent,
   uid,
@@ -201,15 +218,16 @@ export async function handleOnlineNotify({
   const totalBudget = UserFromJson(curr.data() as UserType)?.budget?.[month]?.[
     category
   ];
-  if (totalBudget.alert) {
+  if (totalBudget && totalBudget.alert) {
     if (
-      totalBudget &&
-      (totalSpent >= totalBudget.limit ||
-        totalSpent >= totalBudget.limit * (totalBudget.percentage / 100))
+      totalSpent >= totalBudget.limit ||
+      Number((totalBudget.limit * (totalBudget.percentage / 100)).toFixed(2))
     ) {
       try {
         const notificationId = uuidv4();
-        await Notification.requestPermission();
+        if ('Notification' in window) {
+          await Notification.requestPermission();
+        }
         if (totalSpent >= totalBudget.limit) {
           await updateDoc(doc(db, 'users', uid), {
             [`notification.${notificationId}`]: {
@@ -221,20 +239,25 @@ export async function handleOnlineNotify({
               percentage: totalBudget.percentage,
             },
           });
-          const notif = new Notification(
-            `${
-              category[0].toUpperCase() + category.slice(1)
-            } Budget Limit Exceeded`,
-            {
-              body: `Your ${category[0].toUpperCase()}${category.slice(
-                1
-              )} budget has exceeded the limit`,
-            }
-          );
-          console.log(notif);
+          if ('Notification' in window) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const notif = new Notification(
+              `${
+                category[0].toUpperCase() + category.slice(1)
+              } Budget Limit Exceeded`,
+              {
+                body: `Your ${category[0].toUpperCase()}${category.slice(
+                  1
+                )} budget has exceeded the limit`,
+              }
+            );
+            console.log(notif);
+          }
         } else if (
           totalSpent >=
-          totalBudget.limit * (totalBudget.percentage / 100)
+          Number(
+            (totalBudget.limit * (totalBudget.percentage / 100)).toFixed(2)
+          )
         ) {
           await updateDoc(doc(db, 'users', uid), {
             [`notification.${notificationId}`]: {
@@ -246,20 +269,24 @@ export async function handleOnlineNotify({
               percentage: totalBudget.percentage,
             },
           });
-          const notif = new Notification(
-            `Exceeded ${totalBudget.percentage}% of ${
-              category[0].toUpperCase() + category.slice(1)
-            } budget`,
-            {
-              body: `You've exceeded ${totalBudget.percentage}% of your ${
+          if ('Notification' in window) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const notif = new Notification(
+              `Exceeded ${totalBudget.percentage}% of ${
                 category[0].toUpperCase() + category.slice(1)
-              } budget. Take action to stay on track.`,
-            }
-          );
-          console.log(notif);
+              } budget`,
+              {
+                body: `You've exceeded ${totalBudget.percentage}% of your ${
+                  category[0].toUpperCase() + category.slice(1)
+                } budget. Take action to stay on track.`,
+              }
+            );
+            console.log(notif);
+          }
         }
       } catch (e) {
         toast.error(e as string);
+        toast.clearWaitingQueue();
       }
     }
   }
@@ -285,11 +312,27 @@ export async function handleNewIncome({
   };
   currency: string;
 }) {
-  const finalAmount =
-    (UserFromJson(curr.data() as UserType)?.income[month]?.[category] ?? 0) +
-    Number(amount) / conversion.usd[currency.toLowerCase()];
+  const finalAmount: { [key: string]: string } = {};
+  Object.keys(currencies).forEach((dbCurrency) => {
+    finalAmount[dbCurrency] = encrypt(
+      Number(
+        (
+          (UserFromJson(curr.data() as UserType)?.income[month]?.[category]?.[
+            dbCurrency
+          ] ?? 0) +
+          Number(
+            (
+              (Number(amount) / conversion.usd[currency.toLowerCase()]) *
+              conversion.usd[dbCurrency.toLowerCase()]
+            ).toFixed(2)
+          )
+        ).toFixed(2)
+      ).toString(),
+      uid
+    );
+  });
   await updateDoc(doc(db, 'users', uid), {
-    [`income.${month}.${category}`]: encrypt(String(finalAmount), uid),
+    [`income.${month}.${category}`]: finalAmount,
   });
 }
 
@@ -300,7 +343,6 @@ export async function handleExpenseUpdate({
   category,
   transaction,
   amount,
-  conversion,
   currency,
 }: {
   curr: DocumentSnapshot;
@@ -309,27 +351,36 @@ export async function handleExpenseUpdate({
   category: string;
   transaction: TransactionType;
   amount: number;
-  conversion: {
-    [key: string]: {
-      [key: string]: number;
-    };
-  };
   currency: string;
 }) {
   try {
-    const finalAmount =
-      (UserFromJson(curr.data() as UserType)?.spend?.[month]?.[category] ?? 0) -
-      transaction.amount +
-      Number(amount) / conversion.usd[currency.toLowerCase()];
-    await updateDoc(doc(db, 'users', uid), {
-      [`spend.${month}.${category}`]: encrypt(String(finalAmount), uid),
+    const finalAmount: { [key: string]: string } = {};
+    Object.keys(currencies).forEach((dbCurrency) => {
+      finalAmount[dbCurrency] = encrypt(
+        Number(
+          (
+            (UserFromJson(curr.data() as UserType)?.spend[month]?.[category]?.[
+              dbCurrency
+            ] ?? 0) -
+            Number(transaction.amount) *
+              transaction.conversion.usd[dbCurrency.toLowerCase()] +
+            (Number(amount) /
+              transaction.conversion.usd[currency.toLowerCase()]) *
+              transaction.conversion.usd[dbCurrency.toLowerCase()]
+          ).toFixed(2)
+        ).toString(),
+        uid
+      );
     });
-    if (category !== 'transfer') {
-      await handleOnlineNotify({
+    await updateDoc(doc(db, 'users', uid), {
+      [`spend.${month}.${category}`]: finalAmount,
+    });
+    if (category !== 'transfer' && amount !== 0) {
+      await handleNotify({
         category,
         month,
         uid,
-        totalSpent: finalAmount,
+        totalSpent: Number(decrypt(finalAmount.USD, uid!)),
         curr,
       });
     }
@@ -360,23 +411,39 @@ export async function handleNewExpense({
   currency: string;
 }) {
   try {
-    const finalAmount =
-      (UserFromJson(curr.data() as UserType)?.spend[month]?.[category] ?? 0) +
-      Number(amount) / conversion.usd[currency.toLowerCase()];
+    const finalAmount: { [key: string]: string } = {};
+    Object.keys(currencies).forEach((dbCurrency) => {
+      finalAmount[dbCurrency] = encrypt(
+        Number(
+          (
+            (UserFromJson(curr.data() as UserType)?.spend[month]?.[category]?.[
+              dbCurrency
+            ] ?? 0) +
+            Number(
+              (
+                (Number(amount) / conversion.usd[currency.toLowerCase()]) *
+                conversion.usd[dbCurrency.toLowerCase()]
+              ).toFixed(2)
+            )
+          ).toFixed(2)
+        ).toString(),
+        uid
+      );
+    });
     await updateDoc(doc(db, 'users', uid), {
-      [`spend.${month}.${category}`]: encrypt(String(finalAmount), uid),
+      [`spend.${month}.${category}`]: finalAmount,
     });
     if (category !== 'transfer') {
-      await handleOnlineNotify({
+      await handleNotify({
         category,
         month,
         uid,
-        totalSpent: finalAmount,
+        totalSpent: Number(decrypt(finalAmount.USD, uid!)),
         curr,
       });
     }
   } catch (e) {
-    // console.log(e)
+    // console.log(e);
   }
 }
 export const handleOnline = async ({
@@ -428,12 +495,13 @@ export const handleOnline = async ({
     prevTransaction,
     isEdit,
   });
+  // console.log('sdjskdfnjksdn', url)
   const trans = createTransaction({
     id,
     url,
     attachementType:
       isEdit &&
-      attachement !== undefined &&
+      attachement === undefined &&
       prevTransaction?.attachementType !== 'none'
         ? prevTransaction?.attachementType ?? 'none'
         : attachementType,
@@ -458,7 +526,6 @@ export const handleOnline = async ({
         curr,
         amount: Number(amount.replace(/,/g, '')),
         category: category!,
-        conversion,
         currency: currency!,
         month,
         transaction: prevTransaction!,
@@ -469,7 +536,6 @@ export const handleOnline = async ({
         curr,
         amount: Number(amount.replace(/,/g, '')),
         category: category!,
-        conversion,
         currency: currency!,
         month,
         transaction: prevTransaction!,
@@ -480,7 +546,6 @@ export const handleOnline = async ({
         curr,
         amount: Number(amount.replace(/,/g, '')),
         category: 'transfer',
-        conversion,
         currency: currency!,
         month,
         transaction: prevTransaction!,

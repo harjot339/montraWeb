@@ -1,33 +1,39 @@
-import React, { SetStateAction, useState } from 'react';
+import React, { SetStateAction, useCallback, useState } from 'react';
+// Third Party Librarires
 import Modal from 'react-modal';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { doc, updateDoc } from 'firebase/firestore';
+// Custom Components
 import CustomInput from '../CustomInput';
 import { EmptyError } from '../../Shared/errors';
 import CustomButton from '../CustomButton';
-import { STRINGS } from '../../Shared/Strings';
+import { addExpenseCategory, addIncomeCategory } from '../../Store/Common';
 import { setLoading } from '../../Store/Loader';
+import { STRINGS } from '../../Shared/Strings';
 import { RootState } from '../../Store';
 import { db } from '../../Utils/firebaseConfig';
-import { addExpenseCategory, addIncomeCategory } from '../../Store/Common';
 import { encrypt } from '../../Utils/encryption';
-import useAppTheme from '../../Hooks/themeHook';
 import { COLORS } from '../../Shared/commonStyles';
+import { useIsDesktop } from '../../Hooks/mobileCheckHook';
+import useAppTheme from '../../Hooks/themeHook';
+import { getMyColor } from '../../Utils/commonFuncs';
 
 function CategoryModal({
   modal,
   setModal,
   type,
   setMyCategory,
-}: {
+}: Readonly<{
   modal: boolean;
   setModal: React.Dispatch<SetStateAction<boolean>>;
   setMyCategory: React.Dispatch<SetStateAction<string>>;
   type: 'expense' | 'income' | 'transfer';
-}) {
+}>) {
+  // state
   const [form, setForm] = useState<boolean>(false);
   const [category, setCategory] = useState<string>('');
+  // redux
   const dispatch = useDispatch();
   const uid = useSelector((state: RootState) => state.common.user?.uid);
   const expenseCats = useSelector(
@@ -36,7 +42,86 @@ function CategoryModal({
   const incomeCats = useSelector(
     (state: RootState) => state.common.user?.incomeCategory
   );
+  const expenseColors = useSelector(
+    (state: RootState) => state.common.user?.expenseColors
+  );
+  const incomeColors = useSelector(
+    (state: RootState) => state.common.user?.incomeColors
+  );
+  // constants
   const [theme, COLOR] = useAppTheme();
+  const isDesktop = useIsDesktop();
+  // functions
+  const handlePress = useCallback(async () => {
+    setForm(true);
+    if (category !== '') {
+      dispatch(setLoading(true));
+      if (
+        type === 'expense'
+          ? expenseCats?.includes(category.toLowerCase())
+          : incomeCats?.includes(category.toLowerCase())
+      ) {
+        toast.error(`${category}${STRINGS.AlreadyAdded}`);
+        toast.clearWaitingQueue();
+        dispatch(setLoading(false));
+        return;
+      }
+      try {
+        setModal(false);
+        const getUniqueColor = (existingColors: string[]): string => {
+          let color;
+          do {
+            color = getMyColor();
+          } while (existingColors.includes(color));
+          return color;
+        };
+        if (type === 'expense') {
+          dispatch(addExpenseCategory(category.toLowerCase()));
+          await updateDoc(doc(db, 'users', uid!), {
+            expenseCategory: [...expenseCats!, category.toLowerCase()].map(
+              (item) => ({
+                color:
+                  expenseColors?.[item] ??
+                  getUniqueColor(Object.values(expenseColors ?? {})),
+                name: encrypt(item, uid!),
+              })
+            ),
+          });
+        } else if (type === 'income') {
+          dispatch(addIncomeCategory(category.toLowerCase()));
+          await updateDoc(doc(db, 'users', uid!), {
+            incomeCategory: [...incomeCats!, category.toLowerCase()].map(
+              (item) => ({
+                color:
+                  incomeColors?.[item] ??
+                  getUniqueColor(Object.values(incomeColors ?? {})),
+                name: encrypt(item, uid!),
+              })
+            ),
+          });
+        }
+        setMyCategory(category.toLocaleLowerCase().trim());
+      } catch (e) {
+        toast.error(e as string);
+        toast.clearWaitingQueue();
+      } finally {
+        setForm(false);
+        setCategory('');
+        dispatch(setLoading(false));
+      }
+    }
+  }, [
+    category,
+    dispatch,
+    expenseCats,
+    expenseColors,
+    incomeCats,
+    incomeColors,
+    setModal,
+    setMyCategory,
+    type,
+    uid,
+  ]);
   return (
     <Modal
       isOpen={modal}
@@ -47,7 +132,7 @@ function CategoryModal({
       }}
       style={{
         content: {
-          width: 'min-content',
+          width: isDesktop ? '40%' : '80%',
           height: 'min-content',
           margin: 'auto',
           display: 'flex',
@@ -63,7 +148,7 @@ function CategoryModal({
         },
       }}
     >
-      <div style={{ width: '30vw', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
         <CustomInput
           inputColor={COLOR.DARK[100]}
           placeholderText={STRINGS.Category}
@@ -71,57 +156,14 @@ function CategoryModal({
             setCategory(e.target.value);
           }}
           value={category}
+          maxLength={20}
         />
         <EmptyError
           errorText={STRINGS.CategoryCannotBeEmpty}
           formKey={form}
           value={category}
         />
-        <CustomButton
-          title={STRINGS.Add}
-          onPress={async () => {
-            setForm(true);
-            if (category !== '') {
-              dispatch(setLoading(true));
-              if (
-                type === 'expense'
-                  ? expenseCats?.includes(category.toLowerCase())
-                  : incomeCats?.includes(category.toLowerCase())
-              ) {
-                toast.error(`${category}${STRINGS.AlreadyAdded}`);
-                dispatch(setLoading(false));
-                return;
-              }
-              try {
-                setModal(false);
-                if (type === 'expense') {
-                  dispatch(addExpenseCategory(category.toLowerCase()));
-                  await updateDoc(doc(db, 'users', uid!), {
-                    expenseCategory: [
-                      ...expenseCats!,
-                      category.toLowerCase(),
-                    ].map((item) => encrypt(item, uid!)),
-                  });
-                } else if (type === 'income') {
-                  dispatch(addIncomeCategory(category.toLowerCase()));
-                  await updateDoc(doc(db, 'users', uid!), {
-                    incomeCategory: [
-                      ...incomeCats!,
-                      category.toLowerCase(),
-                    ].map((item) => encrypt(item, uid!)),
-                  });
-                }
-                setMyCategory(category.toLocaleLowerCase().trim());
-              } catch (e) {
-                toast.error(e as string);
-              } finally {
-                setForm(false);
-                setCategory('');
-                dispatch(setLoading(false));
-              }
-            }
-          }}
-        />
+        <CustomButton title={STRINGS.Add} onPress={handlePress} />
       </div>
     </Modal>
   );

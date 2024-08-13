@@ -24,7 +24,7 @@ function CustomPassInput({
     setHide((b) => !b);
   };
   return (
-    <div className="border-b border-r border-l border-t rounded-lg border-[#F1F1FA] flex">
+    <div className="border-b border-r border-l border-t rounded-lg border-[#F1F1FA] flex hover:border-gray-400">
       <input
         style={{
           color: inputColor,
@@ -35,6 +35,9 @@ function CustomPassInput({
         value={value}
         maxLength={maxLength}
         onChange={onChange}
+        onPaste={(e) => {
+          e.preventDefault();
+        }}
       />
       <button
         type="button"

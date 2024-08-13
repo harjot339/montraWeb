@@ -1,16 +1,25 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useCallback, useState } from 'react';
+// Third Party Libraries
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { AuthError, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
-import Google from '../../assets/svgs/google.svg';
+import clsx from 'clsx';
+// Custom Components
 import CustomInput from '../../Components/CustomInput';
 import CustomButton from '../../Components/CustomButton';
+import Google from '../../assets/svgs/google.svg';
 import { COLORS, InputBorderColor } from '../../Shared/commonStyles';
 import CustomPassInput from '../../Components/CustomPassInput';
 import { singupUser } from '../../Utils/firebaseFuncs';
-import { emailRegex, nameRegex, STRINGS } from '../../Shared/Strings';
+import {
+  emailRegex,
+  nameRegex,
+  passRegex,
+  STRINGS,
+} from '../../Shared/Strings';
 import {
   ConfirmPassError,
   EmailValError,
@@ -22,9 +31,10 @@ import { setLoading } from '../../Store/Loader';
 import { ROUTES } from '../../Shared/Constants';
 import { auth, db } from '../../Utils/firebaseConfig';
 import { UserFromJson, UserToJson } from '../../Utils/userFuncs';
-import { setUser } from '../../Store/Common';
+import { setTheme, setUser } from '../../Store/Common';
 import { FirebaseAuthErrorHandler } from '../../Utils/commonFuncs';
 import useAppTheme from '../../Hooks/themeHook';
+import './styles.css';
 
 function Signup() {
   // constants
@@ -66,24 +76,26 @@ function Signup() {
       email !== '' &&
       testInput(emailRegex, email) &&
       pass.trim() !== '' &&
-      pass.trim().length >= 6 &&
+      testInput(passRegex, pass) &&
       pass === confirmPass
     ) {
       if (!checked) {
         toast.error(STRINGS.TermsError);
+        toast.clearWaitingQueue();
         return;
       }
       try {
         dispatch(setLoading(true));
         const res = await singupUser({ name, email, pass });
         if (res) {
-          toast.success(STRINGS.SignupSuccesful);
+          toast.success(STRINGS.EmailVerificationSent);
           navigate(ROUTES.LOGIN, { replace: true });
         }
         dispatch(setLoading(false));
       } catch (e) {
         const error: AuthError = e as AuthError;
         toast.error(FirebaseAuthErrorHandler(error.code));
+        toast.clearWaitingQueue();
         dispatch(setLoading(false));
       }
     }
@@ -95,7 +107,7 @@ function Signup() {
       const creds = await signInWithPopup(auth, provider);
       if (creds) {
         const res = await getDoc(doc(db, 'users', creds.user.uid));
-        if (!res.exists) {
+        if (!res.exists()) {
           const user = UserToJson({
             name: creds.user.displayName!,
             email: creds.user.email!,
@@ -104,13 +116,13 @@ function Signup() {
           });
           await setDoc(doc(db, 'users', creds.user.uid), user);
           dispatch(setUser(user));
-          //   dispatch(setTheme(undefined));
+          dispatch(setTheme(undefined));
         } else {
           const data = res;
           const user = UserFromJson(data.data()!);
           if (user) {
             dispatch(setUser(user));
-            // dispatch(setTheme(undefined));
+            dispatch(setTheme(undefined));
           }
         }
       }
@@ -118,6 +130,7 @@ function Signup() {
     } catch (e) {
       const error: AuthError = e as AuthError;
       toast.error(FirebaseAuthErrorHandler(error.code));
+      toast.clearWaitingQueue();
       dispatch(setLoading(false));
     }
   }, [dispatch]);
@@ -133,6 +146,7 @@ function Signup() {
         onChange={(e) => {
           setName(e.target.value);
         }}
+        maxLength={30}
       />
       <NameValError name={name} formKey={form.name} />
       <CustomInput
@@ -166,29 +180,36 @@ function Signup() {
         pass={pass}
         formKey={form.confirmPass}
       />
-      <div className="flex justify-start mt-1">
-        <input
-          type="checkbox"
-          id="checkbox"
-          className="h-7 w-7 rounded-full"
-          value={String(checked)}
-          onClick={(e) => {
-            setChecked((e.target as HTMLInputElement).checked);
-          }}
-        />
+      <div className="flex items-center mt-1">
+        <label
+          className={clsx(
+            'custom-checkbox',
+            form.terms &&
+              !checked &&
+              'outline-red-500 outline-2 outline outline-offset-1 rounded-[3px]'
+          )}
+        >
+          <input
+            type="checkbox"
+            id="checkbox"
+            value={String(checked)}
+            onClick={(e) => {
+              setChecked((e.target as HTMLInputElement).checked);
+            }}
+          />
+          <span />
+        </label>
         <p className="inline ml-4 text-md md:text-xl text-start">
           {STRINGS.BySigningUp}{' '}
-          <a href="." className=" text-[#7F3DFF]">
+          <Link to={ROUTES.Terms} className="inline text-[#7F3DFF]">
             {STRINGS.Terms}
-          </a>
+          </Link>
         </p>
       </div>
       <div className="my-3" />
       <CustomButton title="Sign Up" onPress={handleSignup} />
       <div className="my-2" />
-      <p className="text-sm md:text-xl text-gray-500 font-bold">
-        {STRINGS.OrWith}
-      </p>
+      <p className="text-sm md:text-xl text-gray-500 font-bold">{STRINGS.Or}</p>
       <div className="my-2" />
       <CustomButton
         component={<img alt="" src={Google} width="26vw" />}

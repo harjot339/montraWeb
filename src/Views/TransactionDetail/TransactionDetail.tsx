@@ -1,36 +1,44 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+// Third Party Libraries
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import clsx from 'clsx';
 import { Timestamp } from 'firebase/firestore';
 import { COLORS } from '../../Shared/commonStyles';
+// Custom Components
 import { RootState } from '../../Store';
 import { currencies, monthData, STRINGS, weekData } from '../../Shared/Strings';
 import ArrowLeft from '../../assets/svgs/arrow left.svg';
 import ArrowLeftBlack from '../../assets/svgs/arrow left black.svg';
 import Trash from '../../assets/svgs/trash.svg';
 import TrashBlack from '../../assets/svgs/trash black.svg';
-import { formatWithCommas } from '../../Utils/commonFuncs';
-import { ROUTES } from '../../Shared/Constants';
+import { formatAMPM, formatWithCommas } from '../../Utils/commonFuncs';
 import CustomButton from '../../Components/CustomButton';
 import AddExpense from '../AddExpense/AddExpense';
 import useAppTheme from '../../Hooks/themeHook';
-import DeleteTransactionModal from '../../Components/DeleteTransactionModal/DeleteTransactionModal';
+import { useIsMobile, useIsTablet } from '../../Hooks/mobileCheckHook';
+import DeleteTransactionModal from '../../Components/DeleteTransactionModal';
 
 function TransactionDetail() {
+  // redux
   const data = useSelector(
     (state: RootState) => state.transactions.transactions
   );
-  const conversion = useSelector((state: RootState) => state.common.conversion);
   const currency = useSelector(
     (state: RootState) => state.common.user?.currency
   );
   const uid = useSelector((state: RootState) => state.common.user?.uid);
-  const params = useParams();
+  // state
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [modal, setModal] = useState<boolean>(false);
+  // constants
   const navigate = useNavigate();
+  const params = useParams();
   const transaction = data.find((item) => item.id === params.id);
+  const [theme] = useAppTheme();
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+  // functions
   const getBackgroundColor = useMemo(() => {
     if (transaction?.type === 'expense') {
       return COLORS.PRIMARY.RED;
@@ -40,35 +48,41 @@ function TransactionDetail() {
     }
     return COLORS.PRIMARY.GREEN;
   }, [transaction]);
+  useEffect(() => {
+    setIsOpen(false);
+  }, [params.id]);
   const currencyConvert = useCallback(
     (amount: number) => {
       if (
         Number.isNaN(
-          Number(
-            (
-              (conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ?? 1) *
-              amount
-            ).toFixed(1)
-          )
+          (
+            (transaction?.conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ??
+              1) * amount
+          ).toFixed(2)
         )
       ) {
         return 0;
       }
       return formatWithCommas(
-        Number(
-          (
-            (conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ?? 1) *
-            Number(amount)
-          ).toFixed(1)
-        ).toString()
+        (
+          (transaction?.conversion?.usd?.[currency?.toLowerCase() ?? 'usd'] ??
+            1) * Number(amount)
+        )
+          .toFixed(2)
+          .toString()
       );
     },
-    [conversion?.usd, currency]
+    [currency, transaction]
   );
-  const [theme] = useAppTheme();
+  useEffect(() => {
+    if (isOpen) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
+  // console.log(transaction);
   return isOpen ? (
     <AddExpense
-      height="95vh"
+      height={isMobile || isTablet ? '100dvh' : '95vh'}
       isEdit
       pageType={transaction!.type}
       setIsOpen={setIsOpen}
@@ -78,10 +92,14 @@ function TransactionDetail() {
     transaction && (
       <div
         className={clsx(
-          'flex-col rounded-lg flex w-full max-w-[420px] pb-5 justify-between sticky top-2 right-2',
-          theme === 'dark' ? 'bg-black' : 'bg-white'
+          'flex-col rounded-lg flex w-full pb-5 justify-between sticky top-0',
+          theme === 'dark' ? 'bg-black' : 'bg-white',
+          !isMobile && !isTablet && 'max-w-[450px]'
         )}
-        style={{ height: '95vh' }}
+        style={{
+          minHeight: '95vh',
+          height: isMobile || isTablet ? '100dvh' : 'fit-content',
+        }}
       >
         <DeleteTransactionModal
           modal={modal}
@@ -102,7 +120,8 @@ function TransactionDetail() {
                 type="button"
                 className="outline-none bg-transparent"
                 onClick={() => {
-                  navigate(ROUTES.Transactions);
+                  // navigate(ROUTES.Transactions);
+                  navigate(-1);
                 }}
               >
                 {theme === 'dark' ? (
@@ -128,8 +147,14 @@ function TransactionDetail() {
                 )}
               </button>
             </div>
-            <div className="self-center items-center flex flex-col">
-              <p className="text-5xl  font-bold mb-4">
+            <div className=" items-center flex flex-col">
+              <p
+                className="text-4xl text-ellipsis overflow-hidden whitespace-nowrap font-bold mb-4 max-w-[95%] text-center"
+                title={
+                  (currencies[currency!].symbol ?? '$') +
+                  currencyConvert(transaction.amount)
+                }
+              >
                 {currencies[currency!].symbol ?? '$'}{' '}
                 {currencyConvert(transaction.amount)}
               </p>
@@ -139,31 +164,31 @@ function TransactionDetail() {
               <p className="text-md  font-normal mb-16">
                 {
                   weekData[
-                    Timestamp.fromMillis(transaction!.timeStamp.seconds * 1000)
+                    Timestamp.fromMillis(transaction.timeStamp.seconds * 1000)
                       .toDate()
                       .getDay()
                   ].label
-                }{' '}
-                {Timestamp.fromMillis(transaction!.timeStamp.seconds * 1000)
+                }
+                {', '}
+                {Timestamp.fromMillis(transaction.timeStamp.seconds * 1000)
                   .toDate()
                   .getDate()}{' '}
                 {
                   monthData[
-                    Timestamp.fromMillis(transaction!.timeStamp.seconds * 1000)
+                    Timestamp.fromMillis(transaction.timeStamp.seconds * 1000)
                       .toDate()
                       .getMonth()
                   ].label
                 }{' '}
-                {Timestamp.fromMillis(transaction!.timeStamp.seconds * 1000)
+                {Timestamp.fromMillis(transaction.timeStamp.seconds * 1000)
                   .toDate()
-                  .getFullYear()}{' '}
-                {Timestamp.fromMillis(transaction!.timeStamp.seconds * 1000)
-                  .toDate()
-                  .getHours()}
-                :
-                {Timestamp.fromMillis(transaction!.timeStamp.seconds * 1000)
-                  .toDate()
-                  .getMinutes()}
+                  .getFullYear()}
+                {', '}
+                {formatAMPM(
+                  Timestamp.fromMillis(
+                    transaction.timeStamp.seconds * 1000
+                  ).toDate()
+                )}
               </p>
             </div>
           </div>
@@ -171,24 +196,24 @@ function TransactionDetail() {
             <div className="-translate-y-11">
               <div
                 className={clsx(
-                  'flex w-5/6 border  justify-between mx-auto px-8 py-4 rounded-xl',
+                  'flex w-5/6 border  justify-between mx-auto px-6 py-4 rounded-xl gap-x-3',
                   theme === 'dark' ? 'bg-black text-white' : 'bg-white'
                 )}
               >
-                <div className="text-center">
+                <div className="text-center text-ellipsis overflow-hidden whitespace-nowrap  max-w-[30%]">
                   <p className="text-xl font-semibold">{STRINGS.Type}</p>
-                  <p>
+                  <p className="text-md text-ellipsis overflow-hidden whitespace-nowrap">
                     {transaction.type[0].toUpperCase() +
                       transaction.type.slice(1)}
                   </p>
                 </div>
-                <div className="text-center">
+                <div className="text-center text-ellipsis overflow-hidden whitespace-nowrap  max-w-[30%]">
                   <p className="text-xl font-semibold">
                     {transaction?.type === 'transfer'
                       ? STRINGS.From
                       : STRINGS.Category}
                   </p>
-                  <p>
+                  <p className="text-ellipsis overflow-hidden whitespace-nowrap">
                     {transaction?.type === 'transfer'
                       ? transaction.from[0].toUpperCase() +
                         transaction.from.slice(1)
@@ -196,18 +221,18 @@ function TransactionDetail() {
                         transaction.category.slice(1)}
                   </p>
                 </div>
-                <div className=" text-center">
+                <div className=" text-center text-ellipsis overflow-hidden whitespace-nowrap max-w-[30%]">
                   <p className="text-xl font-semibold">
                     {transaction?.type === 'transfer'
                       ? STRINGS.To
                       : STRINGS.Wallet}
                   </p>
-                  <p>
+                  <p className="text-ellipsis overflow-hidden whitespace-nowrap">
                     {transaction?.type === 'transfer'
                       ? transaction.to[0].toUpperCase() +
                         transaction.to.slice(1)
-                      : transaction.category[0].toUpperCase() +
-                        transaction.category.slice(1)}
+                      : transaction.wallet[0].toUpperCase() +
+                        transaction.wallet.slice(1)}
                   </p>
                 </div>
               </div>
@@ -219,7 +244,7 @@ function TransactionDetail() {
                     </p>
                     <p
                       className={clsx(
-                        'text-lg mt-3',
+                        'text-lg mt-3 text-ellipsis break-words',
                         theme === 'dark' && 'text-white'
                       )}
                     >
@@ -233,14 +258,20 @@ function TransactionDetail() {
                       {STRINGS.Attachement}
                     </p>
                     {transaction?.attachementType === 'image' ? (
-                      <img
-                        src={transaction.attachement}
-                        alt=""
-                        style={{
-                          height: '300px',
-                          overflow: 'hidden',
-                        }}
-                      />
+                      <a
+                        href={transaction?.attachement}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        <img
+                          src={transaction.attachement}
+                          alt=""
+                          style={{
+                            height: '300px',
+                            overflow: 'hidden',
+                          }}
+                        />
+                      </a>
                     ) : (
                       <a
                         className="flex mt-4"
@@ -269,6 +300,7 @@ function TransactionDetail() {
             flex={1}
             onPress={() => {
               setIsOpen(true);
+              // window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
           />
         </div>

@@ -1,12 +1,20 @@
-import { v4 as uuidv4 } from 'uuid';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+// Third Party Libraries
+import { v4 as uuidv4 } from 'uuid';
 import { useDispatch, useSelector } from 'react-redux';
 import clsx from 'clsx';
+import { toast } from 'react-toastify';
 import ReactSwitch from 'react-switch';
 import { Timestamp } from 'firebase/firestore';
+// Custom Components
+import { RemoveScroll } from 'react-remove-scroll';
 import CustomButton from '../../Components/CustomButton';
 import CustomDropdown from '../../Components/CustomDropdown/CustomDropdown';
 import CustomInput from '../../Components/CustomInput';
+import AttachmentCtr from './atoms/AttachmentCtr';
+import RepeatDataModal from './atoms/RepeatDataModal';
+import CategoryModal from '../../Components/CategoryModal';
+import MoneyInput from '../../Components/MoneyInput';
 import {
   EmptyZeroError,
   EmptyError,
@@ -15,17 +23,15 @@ import {
 import { monthData, STRINGS, weekData } from '../../Shared/Strings';
 import { RootState } from '../../Store';
 import { formatWithCommas } from '../../Utils/commonFuncs';
-import AttachmentCtr from './atoms/AttachmentCtr';
-import { COLORS } from '../../Shared/commonStyles';
-import RepeatDataModal from './atoms/RepeatDataModal';
+import { COLORS, InputBorderColor } from '../../Shared/commonStyles';
 import { RepeatDataType, TransactionType } from '../../Defs/transaction';
-import ArrowRight from '../../assets/svgs/arrow right 2.svg';
-import ArrowRightBlack from '../../assets/svgs/arrow right black.svg';
-import Transfer from '../../assets/svgs/transfer.svg';
+import ArrowLeft from '../../assets/svgs/arrow left.svg';
+import ArrowLeftBlack from '../../assets/svgs/arrow left black.svg';
 import { setLoading } from '../../Store/Loader';
 import { handleOnline } from '../../Utils/firebaseFuncs';
-import CategoryModal from '../../Components/CategoryModal';
 import useAppTheme from '../../Hooks/themeHook';
+import { useIsMobile, useIsTablet } from '../../Hooks/mobileCheckHook';
+import Transfer from '../../assets/svgs/transfer.svg';
 
 function AddExpense({
   setIsOpen,
@@ -40,6 +46,7 @@ function AddExpense({
   prevTransaction?: TransactionType;
   height?: string;
 }>) {
+  // redux
   const expenseCategory = useSelector(
     (state: RootState) => state.common.user?.expenseCategory
   );
@@ -49,7 +56,11 @@ function AddExpense({
   const user = useSelector((state: RootState) => state.common.user);
   const conversion = useSelector((state: RootState) => state.common.conversion);
   const dispatch = useDispatch();
+  // constants
   const month = new Date().getMonth();
+  const [theme, COLOR] = useAppTheme();
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
   // state
   const [cat, setCat] = useState<string>('');
   const [from, setFrom] = useState<string>('');
@@ -58,7 +69,6 @@ function AddExpense({
   const [desc, setDesc] = useState<string>('');
   const [amount, setAmount] = useState<string>('0');
   const [form, setForm] = useState<boolean>(false);
-
   const [file, setFile] = useState<{
     file: File | undefined;
     type: TransactionType['attachementType'];
@@ -70,8 +80,7 @@ function AddExpense({
   const [checked, setChecked] = useState(false);
   const [modal, setModal] = useState<boolean>(false);
   const [addCategoryModal, setAddCategoryModal] = useState<boolean>(false);
-
-  //   const [date, setDate] = useState<Date>(getDate());
+  // functions
   const getBackgroundColor = useMemo(() => {
     if (pageType === 'expense') {
       return COLORS.PRIMARY.RED;
@@ -82,7 +91,7 @@ function AddExpense({
     return COLORS.PRIMARY.GREEN;
   }, [pageType]);
 
-  const handlePress = async () => {
+  const handlePress = useCallback(async () => {
     setForm(true);
     if (
       pageType === 'transfer' &&
@@ -108,8 +117,8 @@ function AddExpense({
     try {
       const id = uuidv4();
       await handleOnline({
-        attachement: file!.file,
-        attachementType: file!.type,
+        attachement: file.file,
+        attachementType: file.type,
         id,
         amount,
         category: cat,
@@ -128,24 +137,31 @@ function AddExpense({
       });
       setIsOpen(false);
     } catch (e) {
+      toast.error(e as string);
+      toast.clearWaitingQueue();
       //   console.log(e)
     } finally {
       dispatch(setLoading(false));
     }
-  };
-  useEffect(() => {
-    if (isEdit) {
-      setAmount(String(prevTransaction!.amount));
-      setCat(prevTransaction!.category);
-      setDesc(prevTransaction!.desc);
-      setWallet(prevTransaction!.wallet);
-      setRepeatData(
-        prevTransaction?.freq === null ? undefined : prevTransaction?.freq
-      );
-      setFrom(prevTransaction!.from);
-      setTo(prevTransaction!.to);
-    }
-  }, [isEdit, prevTransaction]);
+  }, [
+    amount,
+    cat,
+    conversion,
+    desc,
+    dispatch,
+    file.file,
+    file.type,
+    from,
+    isEdit,
+    month,
+    pageType,
+    prevTransaction,
+    repeatData,
+    setIsOpen,
+    to,
+    user,
+    wallet,
+  ]);
   const getDate = useCallback(() => {
     if (repeatData) {
       if (isEdit) {
@@ -178,19 +194,50 @@ function AddExpense({
     }
     return '';
   }, [isEdit, repeatData]);
-  const [theme, COLOR] = useAppTheme();
+  useEffect(() => {
+    if (isEdit) {
+      setAmount(
+        formatWithCommas(
+          (
+            (prevTransaction?.conversion?.usd?.[
+              user?.currency?.toLowerCase() ?? 'usd'
+            ] ?? 1) * Number(prevTransaction?.amount)
+          )
+            .toFixed(2)
+            .toString()
+        )
+      );
+      setCat(prevTransaction!.category);
+      setDesc(prevTransaction!.desc);
+      setWallet(prevTransaction!.wallet);
+      setRepeatData(
+        prevTransaction?.freq === null ? undefined : prevTransaction?.freq
+      );
+      setChecked(prevTransaction?.freq !== null);
+      setFrom(prevTransaction!.from);
+      setTo(prevTransaction!.to);
+    }
+  }, [conversion?.usd, isEdit, prevTransaction, user?.currency]);
+  // console.log(img, file);
   return (
     <div
-      className="hidden sm:flex flex-col rounded-lg h-fit flex-1"
-      style={{ backgroundColor: getBackgroundColor, height, maxWidth: '550px' }}
+      className={clsx(
+        'flex flex-col rounded-lg h-screen justify-between w-full sticky top-0 overflow-auto overflow-x-hidden',
+        !isMobile && !isTablet && 'max-w-[450px]'
+      )}
+      style={{ backgroundColor: getBackgroundColor, height }}
     >
-      <RepeatDataModal
-        modal={modal}
-        setModal={setModal}
-        setChecked={setChecked}
-        setRepeatData={setRepeatData}
-        repeatData={repeatData}
-      />
+      {modal && (
+        <RemoveScroll>
+          <RepeatDataModal
+            modal={modal}
+            setModal={setModal}
+            setChecked={setChecked}
+            setRepeatData={setRepeatData}
+            repeatData={repeatData}
+          />
+        </RemoveScroll>
+      )}
       <CategoryModal
         modal={addCategoryModal}
         setModal={setAddCategoryModal}
@@ -198,15 +245,6 @@ function AddExpense({
         type={pageType}
       />
       <div className="flex justify-between px-4 sm:px-8 pt-4 items-center">
-        <div />
-        <p
-          className={clsx(
-            'text-3xl font-semibold',
-            theme === 'dark' ? 'text-black' : 'text-white'
-          )}
-        >
-          {pageType[0].toUpperCase() + pageType.slice(1)}
-        </p>
         <button
           type="button"
           className="bg-transparent outline-none"
@@ -215,83 +253,52 @@ function AddExpense({
           }}
         >
           {theme === 'dark' ? (
-            <img src={ArrowRightBlack} alt="" width="40px" />
+            <img src={ArrowLeftBlack} alt="" width="40px" />
           ) : (
-            <img src={ArrowRight} alt="" width="40px" />
+            <img src={ArrowLeft} alt="" width="40px" />
           )}
         </button>
-      </div>
-      <div className="min-h-48" />
-      <div>
         <p
           className={clsx(
-            'text-5xl px-4 sm:px-8 opacity-80 font-semibold',
+            'text-3xl font-semibold',
+            theme === 'dark' ? 'text-black' : 'text-white'
+          )}
+        >
+          {pageType[0].toUpperCase() + pageType.slice(1)}
+        </p>
+        <div className="w-10" />
+      </div>
+      <div>
+        <div className="min-h-32" />
+        <p
+          className={clsx(
+            'text-4xl px-4 sm:px-8 opacity-80 font-semibold',
             theme === 'dark' ? 'text-black' : 'text-white'
           )}
         >
           {STRINGS.HowMuch}
         </p>
-        <input
-          onClick={() => {
-            if (amount === '0') {
-              setAmount('');
-            }
-          }}
-          onBlur={() => {
-            if (amount === '') {
-              setAmount('0');
-            }
-          }}
-          value={`$ ${amount}`}
-          className={clsx(
-            'bg-transparent w-full px-4 sm:px-8 h-20 outline-none text-6xl font-semibold',
-            theme === 'dark' ? 'text-black' : 'text-white'
-          )}
-          maxLength={10}
-          onChange={(e) => {
-            const str = e.target.value;
-            let numericValue = str.replace(/[^0-9.]+/g, '');
-            if (str === '.') {
-              return;
-            }
-            const decimalCount = numericValue.split('.').length - 1;
-
-            if (decimalCount > 1) {
-              const parts = numericValue.split('.');
-              numericValue = `${parts[0]}.${parts.slice(1).join('')}`;
-            }
-
-            if (numericValue.length > 0 && numericValue.endsWith('.')) {
-              // Allow only if it is not the only character
-              if (
-                numericValue.length === 1 ||
-                numericValue[numericValue.length - 2] === '.'
-              ) {
-                numericValue = numericValue.slice(0, -1);
-              }
-            }
-
-            // Limit to 2 digits after decimal point
-            if (decimalCount === 1) {
-              const parts = numericValue.split('.');
-              if (parts[1].length > 2) {
-                numericValue = `${parts[0]}.${parts[1].slice(0, 2)}`;
-              }
-            }
-
-            if (decimalCount === 1 && numericValue.length > 9) {
-              // Adjusted to account for the two decimal places
-              numericValue = numericValue.slice(0, 9);
-            } else if (decimalCount === 0 && numericValue.length > 7) {
-              numericValue = numericValue.slice(0, 7);
-            }
-
-            setAmount(formatWithCommas(numericValue));
-          }}
+        <MoneyInput
+          isEdit={isEdit}
+          amount={amount}
+          setAmount={setAmount}
+          theme={theme}
+          currency={user?.currency}
+          editAmt={(
+            (conversion?.usd?.[user?.currency?.toLowerCase() ?? 'usd'] ?? 1) *
+            Number(prevTransaction?.amount ?? 0)
+          )
+            .toFixed(2)
+            .toString()}
         />
         <EmptyZeroError
           value={amount}
-          errorText={STRINGS.PleaseFillAnAmount}
+          errorText={
+            (Number(amount.replace(/,/g, '')) > 0 || amount.trim() !== '.') &&
+            amount.trim() === ''
+              ? STRINGS.PleaseFillAnAmount
+              : STRINGS.PleaseFillValidAmount
+          }
           formKey={form}
         />
         <div
@@ -303,6 +310,7 @@ function AddExpense({
           {pageType !== 'transfer' ? (
             <>
               <CustomDropdown
+                borderColor={InputBorderColor}
                 placeholder={STRINGS.Category}
                 data={(pageType === 'expense'
                   ? expenseCategory
@@ -310,13 +318,20 @@ function AddExpense({
                   return { label: item, value: item };
                 })}
                 onChange={(e) => {
-                  if (e.target.value === 'add') {
+                  if (e!.value === 'add') {
                     setAddCategoryModal(true);
                   } else {
-                    setCat(e.target.value);
+                    setCat(e!.value as string);
                   }
                 }}
-                value={cat}
+                value={
+                  cat
+                    ? {
+                        value: cat,
+                        label: cat[0].toUpperCase() + cat.slice(1),
+                      }
+                    : undefined
+                }
               />
               <EmptyError
                 errorText={STRINGS.PleaseSelectACategory}
@@ -326,30 +341,31 @@ function AddExpense({
             </>
           ) : (
             <>
-              <div className="flex gap-x-4">
-                <CustomInput
-                  inputColor={COLOR.DARK[100]}
-                  flex={1}
-                  placeholderText={STRINGS.From}
-                  onChange={(e) => {
-                    setFrom(e.target.value);
-                  }}
+              <div className="flex justify-between items-center">
+                <input
+                  className="w-[45%] inline border-b border-r border-l border-t rounded-lg bg-transparent border-[#F1F1FA] px-3 h-12 md:h-14 outline-none hover:border-gray-400 mr-1"
+                  placeholder={STRINGS.From}
                   value={from}
-                />
-                <img
-                  src={Transfer}
-                  alt=""
-                  width="30px"
-                  className="rounded-full"
-                />
-                <CustomInput
-                  inputColor={COLOR.DARK[100]}
-                  placeholderText={STRINGS.To}
-                  flex={1}
                   onChange={(e) => {
-                    setTo(e.target.value);
+                    const str = e.target.value;
+                    const value = str.replace(/[^a-zA-Z]/g, '');
+                    setFrom(value);
+                  }}
+                  style={{ color: COLOR.DARK[100] }}
+                  maxLength={20}
+                />
+                <img src={Transfer} alt="" width="28px" />
+                <input
+                  className="w-[45%] inline border-b border-r border-l border-t rounded-lg bg-transparent border-[#F1F1FA] px-3 h-12 md:h-14 outline-none hover:border-gray-400 ml-1"
+                  placeholder={STRINGS.To}
+                  onChange={(e) => {
+                    const str = e.target.value;
+                    const value = str.replace(/[^a-zA-Z]/g, '');
+                    setTo(value);
                   }}
                   value={to}
+                  style={{ color: COLOR.DARK[100] }}
+                  maxLength={20}
                 />
               </div>
               <CompundEmptyError
@@ -372,20 +388,28 @@ function AddExpense({
           {pageType !== 'transfer' && (
             <>
               <CustomDropdown
+                borderColor={InputBorderColor}
                 placeholder={STRINGS.Wallet}
                 data={[
                   { label: 'Paypal', value: 'paypal' },
                   { label: 'Chase', value: 'chase' },
                 ]}
                 onChange={(e) => {
-                  setWallet(e.target.value);
+                  setWallet(e!.value as string);
                 }}
-                value={wallet}
+                value={
+                  wallet
+                    ? {
+                        value: wallet,
+                        label: wallet[0].toUpperCase() + wallet.slice(1),
+                      }
+                    : undefined
+                }
               />
               <EmptyError
                 errorText={STRINGS.PleaseSelectAWallet}
                 formKey={form}
-                value={cat}
+                value={wallet}
               />
             </>
           )}
@@ -402,13 +426,17 @@ function AddExpense({
             <>
               <div
                 className={clsx(
-                  'flex justify-between',
+                  'flex justify-between items-center',
                   theme === 'dark' && 'text-white'
                 )}
               >
                 <div>
                   <p className="text-2xl font-semibold">{STRINGS.Repeat}</p>
-                  <p>{STRINGS.RepeatTransaction}</p>
+                  <p>
+                    {repeatData
+                      ? 'Repeat transaction, set your own time'
+                      : STRINGS.RepeatTransaction}
+                  </p>
                 </div>
                 <ReactSwitch
                   checked={checked}
@@ -416,14 +444,24 @@ function AddExpense({
                     setChecked(c);
                     if (c) {
                       setModal(true);
-                    } else {
-                      setRepeatData(undefined);
+                    } else if (repeatData !== undefined) {
+                      // eslint-disable-next-line no-alert
+                      const res = window.confirm(
+                        STRINGS.ClearRepeatTransaction
+                      );
+                      if (res) {
+                        setRepeatData(undefined);
+                      } else {
+                        setChecked(true);
+                      }
                     }
                   }}
                   checkedIcon={false}
                   uncheckedIcon={false}
                   onColor={COLORS.VIOLET[100]}
                   offColor={COLORS.VIOLET[20]}
+                  boxShadow="0"
+                  activeBoxShadow="0"
                 />
               </div>
               <div className="my-2.5" />
@@ -450,14 +488,14 @@ function AddExpense({
                     weekData[repeatData.weekDay].label}
                 </p>
               </div>
-              {repeatData.end !== 'never' ? (
-                <div>
-                  <p className="text-xl font-semibold">{STRINGS.EndAfter}</p>
-                  <p>{getDate()}</p>
-                </div>
-              ) : (
+              {/* {repeatData.end !== 'never' ? ( */}
+              <div>
+                <p className="text-xl font-semibold">{STRINGS.EndAfter}</p>
+                <p> {repeatData.end === 'date' ? getDate() : 'Never'}</p>
+              </div>
+              {/* ) : (
                 <div />
-              )}
+              )} */}
               <button
                 type="button"
                 className="rounded-2xl px-4 h-8 text-sm sm:text-base font-semibold"
