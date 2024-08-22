@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
+import clsx from 'clsx';
 import { auth } from '../../Utils/firebaseConfig';
 import { ROUTES } from '../../Shared/Constants';
 import CustomButton from '../../Components/CustomButton';
@@ -80,8 +81,18 @@ export default function ResetPassword() {
   }, [confirmPass, dispatch, navigate, oobCode, pass]);
   return (
     <div className=" flex justify-center items-center border h-[100vh]">
-      <div className="max-w-2xl flex flex-col self-center w-11/12 bg-white px-12 py-12 rounded-2xl">
-        <p className="text-3xl font-semibold md:text-4xl lg:text-5xl mb-16 text-center">
+      <div
+        className={clsx(
+          'max-w-2xl flex flex-col self-center w-11/12 px-12 py-12 rounded-2xl',
+          appTheme[0] === 'dark' ? 'bg-black' : 'bg-white'
+        )}
+      >
+        <p
+          className={clsx(
+            'text-3xl font-semibold md:text-4xl lg:text-5xl mb-16 text-center',
+            appTheme[0] === 'dark' ? 'text-white' : 'text-black'
+          )}
+        >
           {STRINGS.ResetPassword}
         </p>
         <CustomPassInput

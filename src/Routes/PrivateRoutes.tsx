@@ -10,6 +10,7 @@ import BudgetDetail from '../Views/BudgetDetail';
 import FinancialReport from '../Views/FinancialReport';
 import TermsScreen from '../Views/TermsScreen';
 import ResetPassword from '../Views/ResetPassword/ResetPassword';
+import VerifyEmail from '../Views/VerifyEmail';
 
 // eslint-disable-next-line import/prefer-default-export
 export const PRIVATE_ROUTES: Array<CustomRouter> = [
@@ -55,6 +56,11 @@ export const PRIVATE_ROUTES: Array<CustomRouter> = [
     path: `${ROUTES_CONFIG.ResetPassword.path}`,
     title: ROUTES_CONFIG.ResetPassword.title,
     element: <ResetPassword />,
+  },
+  {
+    path: `${ROUTES_CONFIG.VerifyEmail.path}`,
+    title: ROUTES_CONFIG.VerifyEmail.title,
+    element: <VerifyEmail />,
   },
   {
     path: '*',

@@ -8,6 +8,7 @@ const ROUTES = {
   Report: '/report',
   Terms: '/terms',
   ResetPassword: '/reset-pass',
+  VerifyEmail: '/verify-email',
 };
 
 const WILDCARD_ROUTES = {
@@ -50,6 +51,10 @@ const ROUTES_CONFIG = {
   },
   ResetPassword: {
     path: ROUTES.ResetPassword,
+    title: 'Reset Password',
+  },
+  VerifyEmail: {
+    path: ROUTES.VerifyEmail,
     title: 'Reset Password',
   },
 };

@@ -6,7 +6,9 @@ import useAppTheme from '../../../Hooks/themeHook';
 function PublicLayout({ children }: Readonly<AppLayoutProps>): JSX.Element {
   const appTheme = useAppTheme();
   const loc = useLocation();
-  return loc.pathname === '/terms' || loc.pathname === '/reset-pass' ? (
+  return loc.pathname === '/terms' ||
+    loc.pathname === '/reset-pass' ||
+    loc.pathname === '/verify-email' ? (
     <div
       style={{
         backgroundColor: appTheme[1].PRIMARY.LIGHT,

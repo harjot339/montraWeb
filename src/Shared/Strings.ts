@@ -17,7 +17,7 @@ export const initialIncomeCategories = [
 export const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 export const nameRegex = /^[a-zA-Z ]*$/;
 export const passRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\s])[A-Za-z\d@$!%*?&\s]{8,}$/;
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d\s])[A-Za-z\d\W\s]{8,}$/;
 
 export const STRINGS = {
   ResetPassword: 'Reset Password',
