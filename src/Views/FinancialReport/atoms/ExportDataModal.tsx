@@ -12,6 +12,7 @@ import { setLoading } from '../../../Store/Loader';
 import useAppTheme from '../../../Hooks/themeHook';
 import { COLORS } from '../../../Shared/commonStyles';
 import { useIsDesktop } from '../../../Hooks/mobileCheckHook';
+import { convertLastNdaysText } from '../../../localization';
 
 function ExportDataModal({
   modal,
@@ -54,11 +55,11 @@ function ExportDataModal({
         }
         let frequency = '';
         if (val.freq?.freq === 'yearly') {
-          frequency = val.freq.day + monthData[val.freq.month!].label;
+          frequency = val.freq.day + monthData(STRINGS)[val.freq.month!].label;
         } else if (val.freq?.freq === 'monthly') {
           frequency = String(val.freq.day);
         } else if (val.freq?.freq === 'weekly') {
-          frequency = weekData[val.freq.weekDay].label;
+          frequency = weekData(STRINGS)[val.freq.weekDay].label;
         }
         return {
           ...val,
@@ -130,7 +131,9 @@ function ExportDataModal({
         <CustomDropdown
           data={['all', 'expense', 'income', 'transfer'].map((item) => {
             return {
-              label: item[0].toUpperCase() + item.slice(1),
+              label:
+                STRINGS?.[item[0].toUpperCase() + item.slice(1)] ??
+                item[0].toUpperCase() + item.slice(1),
               value: item,
             };
           })}
@@ -141,7 +144,9 @@ function ExportDataModal({
           value={
             dataType
               ? {
-                  label: dataType[0].toUpperCase() + dataType.slice(1),
+                  label:
+                    STRINGS?.[dataType[0].toUpperCase() + dataType.slice(1)] ??
+                    dataType[0].toUpperCase() + dataType.slice(1),
                   value: dataType,
                 }
               : undefined
@@ -153,7 +158,7 @@ function ExportDataModal({
         <CustomDropdown
           data={['7', '15', '30'].map((item) => {
             return {
-              label: `Last ${item} days`,
+              label: convertLastNdaysText(STRINGS, item),
               value: item,
             };
           })}
@@ -164,7 +169,7 @@ function ExportDataModal({
           value={
             dataRange
               ? {
-                  label: `Last ${dataRange} days`,
+                  label: convertLastNdaysText(STRINGS, dataRange),
                   value: String(dataRange),
                 }
               : undefined

@@ -16,6 +16,7 @@ import { formatAMPM } from '../../../Utils/commonFuncs';
 import NotifcationDeleteModal from '../../../Components/NotifcationDeleteModal/NotifcationDeleteModal';
 import { setLoading } from '../../../Store/Loader';
 import { COLORS } from '../../../Shared/commonStyles';
+import { convertNotificationText } from '../../../localization';
 
 function Header({
   month,
@@ -140,26 +141,31 @@ function Header({
                               )}
                             >
                               {item.type === 'budget-percent'
-                                ? `Exceeded ${item.percentage}% of ${
-                                    item.category[0].toUpperCase() +
-                                    item.category.slice(1)
-                                  } budget`
-                                : `${
-                                    item.category[0].toUpperCase() +
-                                    item.category.slice(1)
-                                  } Budget Limit Exceeded`}
+                                ? convertNotificationText(
+                                    STRINGS,
+                                    item.category,
+                                    1,
+                                    item.percentage
+                                  )
+                                : convertNotificationText(
+                                    STRINGS,
+                                    item.category,
+                                    1
+                                  )}
                             </p>
                             <p className="text-sm sm:text-lg text-gray-600">
                               {item.type === 'budget-percent'
-                                ? `You've exceeded ${
+                                ? convertNotificationText(
+                                    STRINGS,
+                                    item.category,
+                                    2,
                                     item.percentage
-                                  }% of your ${
-                                    item.category[0].toUpperCase() +
-                                    item.category.slice(1)
-                                  } budget. Take action to stay on track.`
-                                : `Your ${item.category[0].toUpperCase()}${item.category.slice(
-                                    1
-                                  )} ${STRINGS.BudgetExceed}`}
+                                  )
+                                : convertNotificationText(
+                                    STRINGS,
+                                    item.category,
+                                    2
+                                  )}
                             </p>
                           </div>
                           <div className="flex flex-col items-end text-gray-600 text-sm font-semibold text-end">
@@ -185,7 +191,7 @@ function Header({
                               {`${Timestamp.fromMillis(item.time.seconds * 1000)
                                 ?.toDate()
                                 ?.getDate()} ${
-                                monthData[
+                                monthData(STRINGS)[
                                   Timestamp.fromMillis(item.time.seconds * 1000)
                                     ?.toDate()
                                     ?.getMonth()
@@ -225,12 +231,12 @@ function Header({
           </div>
         )}
         <CustomDropdown
-          data={monthData.slice(0, new Date().getMonth() + 1)}
+          data={monthData(STRINGS).slice(0, new Date().getMonth() + 1)}
           onChange={(e) => {
             setMonth(Number(e!.value) - 1);
           }}
           placeholder={STRINGS.Month}
-          value={monthData[month]}
+          value={monthData(STRINGS)[month]}
         />
         <button
           type="button"

@@ -150,7 +150,7 @@ function RepeatDataModal({
             menuPlacement="bottom"
             placeholder={STRINGS.Frequency}
             flex={1}
-            data={FreqDropdownData}
+            data={FreqDropdownData(STRINGS)}
             onChange={(e) => {
               setFreq(e!.value as RepeatDataType['freq']);
             }}
@@ -158,7 +158,7 @@ function RepeatDataModal({
             value={
               freq
                 ? {
-                    label: freq[0].toUpperCase() + freq.slice(1),
+                    label: STRINGS[freq[0].toUpperCase() + freq.slice(1)],
                     value: freq,
                   }
                 : undefined
@@ -169,11 +169,13 @@ function RepeatDataModal({
               menuPlacement="bottom"
               placeholder={STRINGS.Month}
               flex={1}
-              data={monthData}
+              data={monthData(STRINGS)}
               onChange={(e) => {
                 setMonth(Number(e!.value));
               }}
-              value={month !== undefined ? monthData[month - 1] : undefined}
+              value={
+                month !== undefined ? monthData(STRINGS)[month - 1] : undefined
+              }
             />
           )}
           {(freq === 'yearly' || freq === 'monthly') && (
@@ -209,13 +211,13 @@ function RepeatDataModal({
             <CustomDropdown
               menuPlacement="bottom"
               placeholder={STRINGS.Day}
-              data={weekData}
+              data={weekData(STRINGS)}
               onChange={(e) => {
                 setWeekDay(Number(e!.value));
               }}
               value={
                 weekDay !== undefined
-                  ? { label: weekData[weekDay].label, value: weekDay }
+                  ? { label: weekData(STRINGS)[weekDay].label, value: weekDay }
                   : undefined
               }
             />
@@ -229,13 +231,17 @@ function RepeatDataModal({
         <div className="flex gap-x-4">
           <CustomDropdown
             placeholder={STRINGS.EndAfter}
-            data={EndDropdownData}
+            data={EndDropdownData(STRINGS)}
             onChange={(e) => {
               setEnd(e!.value as RepeatDataType['end']);
             }}
             value={
               end
-                ? { label: end[0].toUpperCase() + end.slice(1), value: end }
+                ? {
+                    label:
+                      STRINGS?.[end] ?? end[0].toUpperCase() + end.slice(1),
+                    value: end,
+                  }
                 : undefined
             }
             flex={1}

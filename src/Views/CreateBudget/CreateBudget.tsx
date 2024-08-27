@@ -32,6 +32,7 @@ import CategoryModal from '../../Components/CategoryModal';
 import useAppTheme from '../../Hooks/themeHook';
 import { useIsMobile, useIsTablet } from '../../Hooks/mobileCheckHook';
 import MoneyInput from '../../Components/MoneyInput';
+import { convertCatLang } from '../../localization';
 
 function CreateBudget({
   setIsOpen,
@@ -78,8 +79,8 @@ function CreateBudget({
           return {
             label:
               item === 'add'
-                ? 'ADD NEW CATEGORY'
-                : item[0].toUpperCase() + item.slice(1),
+                ? STRINGS.addNewCategory
+                : convertCatLang(STRINGS, item),
             value: item,
           };
         }),
@@ -281,7 +282,7 @@ function CreateBudget({
             value={
               cat
                 ? {
-                    label: cat[0].toUpperCase() + cat.slice(1),
+                    label: convertCatLang(STRINGS, cat),
                     value: cat,
                   }
                 : undefined

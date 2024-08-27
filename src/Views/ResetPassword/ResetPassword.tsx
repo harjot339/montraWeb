@@ -45,7 +45,7 @@ export default function ResetPassword() {
         } catch (e) {
           toast.error(e as string);
           navigate('*');
-          toast.error('Link Expired/Already Used');
+          toast.error(STRINGS.LinkExpired);
         } finally {
           dispatch(setLoading(false));
         }

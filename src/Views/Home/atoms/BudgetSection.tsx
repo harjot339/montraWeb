@@ -12,6 +12,7 @@ import useAppTheme from '../../../Hooks/themeHook';
 import Alert from '../../../assets/svgs/alert.svg';
 import { COLORS } from '../../../Shared/commonStyles';
 import { ROUTES_CONFIG } from '../../../Shared/Constants';
+import { convertCatLang } from '../../../localization';
 
 function BudgetSection({ month }: Readonly<{ month: number }>) {
   // redux
@@ -109,7 +110,7 @@ function BudgetSection({ month }: Readonly<{ month: number }>) {
                         ) : (
                           <div style={{ width: '25px' }} />
                         )}
-                        {key[0].toUpperCase() + key.slice(1)}
+                        {convertCatLang(STRINGS, key)}
                         <div />
                       </td>
                       <td

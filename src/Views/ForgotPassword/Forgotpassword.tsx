@@ -70,14 +70,14 @@ function Forgotpassword() {
         </p>
         <CustomInput
           inputColor={appTheme[1].DARK[100]}
-          placeholderText="Email"
+          placeholderText={STRINGS.Email}
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
           }}
         />
         <EmailEmptyError email={email} formKey={form} />
-        <CustomButton title="Continue" onPress={handlePress} />
+        <CustomButton title={STRINGS.Continue} onPress={handlePress} />
       </div>
     </div>
   );

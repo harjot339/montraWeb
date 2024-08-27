@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import Select, { ActionMeta, SingleValue } from 'react-select';
 import { COLORS, PlaceholderTextColor } from '../../Shared/commonStyles';
 import useAppTheme from '../../Hooks/themeHook';
@@ -32,22 +32,9 @@ function CustomDropdown({
   menuPosition?: 'absolute' | 'fixed';
 }>) {
   const apptheme = useAppTheme();
-  const dropdownData = useMemo(
-    () =>
-      data.map((item) => {
-        return {
-          label:
-            item.value === 'add'
-              ? 'ADD NEW CATEGORY'
-              : item.label[0].toUpperCase() + item.label.slice(1),
-          value: item.value,
-        };
-      }),
-    [data]
-  );
   return (
     <Select
-      options={dropdownData}
+      options={data}
       onChange={onChange}
       placeholder={placeholder}
       value={value}

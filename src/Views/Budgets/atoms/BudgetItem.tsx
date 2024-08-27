@@ -5,6 +5,7 @@ import { STRINGS, currencies } from '../../../Shared/Strings';
 import { formatWithCommas } from '../../../Utils/commonFuncs';
 import Alert from '../../../assets/svgs/alert.svg';
 import useAppTheme from '../../../Hooks/themeHook';
+import { convertCatLang } from '../../../localization';
 
 function BudgetItem({
   item,
@@ -84,7 +85,7 @@ function BudgetItem({
             className="w-5 h-5 rounded-full"
             style={{ backgroundColor: color }}
           />
-          <p>{key[0].toUpperCase() + key.slice(1)}</p>
+          <p>{convertCatLang(STRINGS, key)}</p>
         </div>
         {(spend?.[key]?.USD ?? 0) >= val.limit && (
           <img src={Alert} width="30px" alt="" />

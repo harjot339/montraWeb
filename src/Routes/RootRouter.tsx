@@ -7,18 +7,26 @@ import AppLayout from '../Components/Layouts/AppLayout';
 import type { RootState } from '../Store';
 import { useGetUsdConversionQuery } from '../Services/Api/module/converApi';
 import { setConversionData } from '../Store/Common';
-import { currencies } from '../Shared/Strings';
+import { currencies, STRINGS } from '../Shared/Strings';
 
 function RootRouter() {
   const guest = useRoutes(guestRoutes);
   const authenticated = useRoutes(authenticatedRoutes);
   const uid = useSelector((state: RootState) => state?.common?.user?.uid);
+  const lang = useSelector((state: RootState) => state?.common?.user?.lang);
   const isAuthenticated = !!uid;
   const dispatch = useDispatch();
   const todayDate = new Date().toISOString().split('T')[0]; // Format date as YYYY-MM-DD
   const { data: conversion, isSuccess } = useGetUsdConversionQuery({
     date: todayDate,
   });
+  useEffect(() => {
+    if (isAuthenticated) {
+      STRINGS.setLanguage(lang ?? STRINGS.getInterfaceLanguage());
+    } else {
+      STRINGS.setLanguage(STRINGS.getInterfaceLanguage());
+    }
+  }, [isAuthenticated, lang]);
   useEffect(() => {
     if (isSuccess) {
       const myCurrencies: { [key: string]: number } = {};

@@ -74,6 +74,7 @@ function LogoutModal({
               dispatch(setTheme(authTheme));
               dispatch(setUser(undefined));
               dispatch(setSidebar(false));
+              STRINGS.setLanguage(STRINGS.getInterfaceLanguage());
             }}
             flex={1}
           />

@@ -32,6 +32,7 @@ import { handleOnline } from '../../Utils/firebaseFuncs';
 import useAppTheme from '../../Hooks/themeHook';
 import { useIsMobile, useIsTablet } from '../../Hooks/mobileCheckHook';
 import Transfer from '../../assets/svgs/transfer.svg';
+import { convertCatLang } from '../../localization';
 
 function AddExpense({
   setIsOpen,
@@ -171,7 +172,7 @@ function AddExpense({
           )
             ?.toDate()
             ?.getDate()} ${
-            monthData[
+            monthData(STRINGS)[
               Timestamp.fromMillis(
                 (repeatData.date as Timestamp).seconds * 1000
               )
@@ -185,11 +186,11 @@ function AddExpense({
             ?.getFullYear()}`;
         }
         return `${(repeatData.date as Date)?.getDate()} ${
-          monthData[(repeatData.date as Date)?.getMonth()].label
+          monthData(STRINGS)[(repeatData.date as Date)?.getMonth()].label
         } ${(repeatData.date as Date)?.getFullYear()}`;
       }
       return `${(repeatData.date as Date)?.getDate()} ${
-        monthData[(repeatData.date as Date)?.getMonth()].label
+        monthData(STRINGS)[(repeatData.date as Date)?.getMonth()].label
       } ${(repeatData.date as Date)?.getFullYear()}`;
     }
     return '';
@@ -264,7 +265,8 @@ function AddExpense({
             theme === 'dark' ? 'text-black' : 'text-white'
           )}
         >
-          {pageType[0].toUpperCase() + pageType.slice(1)}
+          {STRINGS?.[pageType[0].toUpperCase() + pageType.slice(1)] ??
+            pageType[0].toUpperCase() + pageType.slice(1)}
         </p>
         <div className="w-10" />
       </div>
@@ -315,7 +317,13 @@ function AddExpense({
                 data={(pageType === 'expense'
                   ? expenseCategory
                   : incomeCategory)!.map((item) => {
-                  return { label: item, value: item };
+                  return {
+                    label: convertCatLang(
+                      STRINGS,
+                      item === 'add' ? 'addNewCategory' : item
+                    ),
+                    value: item,
+                  };
                 })}
                 onChange={(e) => {
                   if (e!.value === 'add') {
@@ -328,7 +336,7 @@ function AddExpense({
                   cat
                     ? {
                         value: cat,
-                        label: cat[0].toUpperCase() + cat.slice(1),
+                        label: convertCatLang(STRINGS, cat),
                       }
                     : undefined
                 }
@@ -434,7 +442,7 @@ function AddExpense({
                   <p className="text-2xl font-semibold">{STRINGS.Repeat}</p>
                   <p>
                     {repeatData
-                      ? 'Repeat transaction, set your own time'
+                      ? STRINGS.RepeatSetOwnTime
                       : STRINGS.RepeatTransaction}
                   </p>
                 </div>
@@ -477,21 +485,24 @@ function AddExpense({
               <div>
                 <p className="text-xl font-semibold">{STRINGS.Frequency}</p>
                 <p>
-                  {repeatData.freq[0].toUpperCase() + repeatData.freq.slice(1)}
+                  {STRINGS[
+                    repeatData.freq[0].toUpperCase() + repeatData.freq.slice(1)
+                  ] ??
+                    repeatData.freq[0].toUpperCase() + repeatData.freq.slice(1)}
                   {repeatData.freq !== 'daily' && ' - '}
                   {repeatData.freq === 'yearly' &&
-                    monthData[repeatData.month! - 1].label}{' '}
+                    monthData(STRINGS)[repeatData.month! - 1].label}{' '}
                   {(repeatData.freq === 'yearly' ||
                     repeatData.freq === 'monthly') &&
                     repeatData.day}
                   {repeatData.freq === 'weekly' &&
-                    weekData[repeatData.weekDay].label}
+                    weekData(STRINGS)[repeatData.weekDay].label}
                 </p>
               </div>
               {/* {repeatData.end !== 'never' ? ( */}
               <div>
                 <p className="text-xl font-semibold">{STRINGS.EndAfter}</p>
-                <p> {repeatData.end === 'date' ? getDate() : 'Never'}</p>
+                <p> {repeatData.end === 'date' ? getDate() : STRINGS.never}</p>
               </div>
               {/* ) : (
                 <div />

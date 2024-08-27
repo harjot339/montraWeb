@@ -235,8 +235,8 @@ function TransactionScreen() {
           </p>
           <div className="flex justify-between w-full sm:w-fit items-center gap-x-3">
             <CustomDropdown
-              data={monthData.slice(0, new Date().getMonth() + 1)}
-              value={monthData[month]}
+              data={monthData(STRINGS).slice(0, new Date().getMonth() + 1)}
+              value={monthData(STRINGS)[month]}
               placeholder={STRINGS.Month}
               onChange={(e) => {
                 setMonth(Number(e!.value) - 1);

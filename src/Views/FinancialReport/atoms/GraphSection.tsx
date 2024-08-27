@@ -93,7 +93,7 @@ function GraphSection({
                 theme === 'dark' && 'text-white'
               )}
             >
-              {`${STRINGS.Transaction}s`}
+              {STRINGS.Transaction}
             </p>
             <button
               type="button"

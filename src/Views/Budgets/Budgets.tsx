@@ -80,8 +80,10 @@ function Budgets() {
                     </div>
                   )}
                 <CustomDropdown
-                  data={monthData.slice(0, new Date().getMonth() + 1)}
-                  value={month !== undefined ? monthData[month] : undefined}
+                  data={monthData(STRINGS).slice(0, new Date().getMonth() + 1)}
+                  value={
+                    month !== undefined ? monthData(STRINGS)[month] : undefined
+                  }
                   onChange={(e) => {
                     setMonth(Number(e!.value) - 1);
                   }}

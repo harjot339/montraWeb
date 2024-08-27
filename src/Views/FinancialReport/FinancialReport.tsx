@@ -69,8 +69,8 @@ function FinancialReport() {
           {isDesktop && (
             <CustomDropdown
               data={[
-                { label: 'Expense', value: 'expense' },
-                { label: 'Income', value: 'income' },
+                { label: STRINGS.Expense, value: 'expense' },
+                { label: STRINGS.Income, value: 'income' },
               ]}
               placeholder={STRINGS.Type}
               onChange={(e) => {
@@ -78,20 +78,20 @@ function FinancialReport() {
               }}
               value={
                 type === 'expense'
-                  ? { label: 'Expense', value: 'expense' }
-                  : { label: 'Income', value: 'income' }
+                  ? { label: STRINGS.Expense, value: 'expense' }
+                  : { label: STRINGS.Income, value: 'income' }
               }
             />
           )}
           {/* <div className="flex w-full max-w-[0%]"> */}
           <CustomDropdown
             flex={1}
-            data={monthData.slice(0, new Date().getMonth() + 1)}
+            data={monthData(STRINGS).slice(0, new Date().getMonth() + 1)}
             placeholder={STRINGS.Month}
             onChange={(e) => {
               setMonth(Number(e!.value) - 1);
             }}
-            value={month !== undefined ? monthData[month] : undefined}
+            value={month !== undefined ? monthData(STRINGS)[month] : undefined}
           />
           {/* </div> */}
         </div>

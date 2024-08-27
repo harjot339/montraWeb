@@ -18,6 +18,7 @@ import AddExpense from '../AddExpense/AddExpense';
 import useAppTheme from '../../Hooks/themeHook';
 import { useIsMobile, useIsTablet } from '../../Hooks/mobileCheckHook';
 import DeleteTransactionModal from '../../Components/DeleteTransactionModal';
+import { convertCatLang } from '../../localization';
 
 function TransactionDetail() {
   // redux
@@ -163,7 +164,7 @@ function TransactionDetail() {
               </p>
               <p className="text-md  font-normal mb-16">
                 {
-                  weekData[
+                  weekData(STRINGS)[
                     Timestamp.fromMillis(transaction.timeStamp.seconds * 1000)
                       .toDate()
                       .getDay()
@@ -174,7 +175,7 @@ function TransactionDetail() {
                   .toDate()
                   .getDate()}{' '}
                 {
-                  monthData[
+                  monthData(STRINGS)[
                     Timestamp.fromMillis(transaction.timeStamp.seconds * 1000)
                       .toDate()
                       .getMonth()
@@ -203,8 +204,12 @@ function TransactionDetail() {
                 <div className="text-center text-ellipsis overflow-hidden whitespace-nowrap  max-w-[30%]">
                   <p className="text-xl font-semibold">{STRINGS.Type}</p>
                   <p className="text-md text-ellipsis overflow-hidden whitespace-nowrap">
-                    {transaction.type[0].toUpperCase() +
-                      transaction.type.slice(1)}
+                    {STRINGS[
+                      transaction.type[0].toUpperCase() +
+                        transaction.type.slice(1)
+                    ] ??
+                      transaction.type[0].toUpperCase() +
+                        transaction.type.slice(1)}
                   </p>
                 </div>
                 <div className="text-center text-ellipsis overflow-hidden whitespace-nowrap  max-w-[30%]">
@@ -217,8 +222,7 @@ function TransactionDetail() {
                     {transaction?.type === 'transfer'
                       ? transaction.from[0].toUpperCase() +
                         transaction.from.slice(1)
-                      : transaction.category[0].toUpperCase() +
-                        transaction.category.slice(1)}
+                      : convertCatLang(STRINGS, transaction.category)}
                   </p>
                 </div>
                 <div className=" text-center text-ellipsis overflow-hidden whitespace-nowrap max-w-[30%]">

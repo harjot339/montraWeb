@@ -11,10 +11,10 @@ import LogoutModal from '../../../LogoutModal';
 import { COLORS } from '../../../../Shared/commonStyles';
 import { db } from '../../../../Utils/firebaseConfig';
 import { ROUTES } from '../../../../Shared/Constants';
-import { currencies, STRINGS } from '../../../../Shared/Strings';
+import { currencies, languages, STRINGS } from '../../../../Shared/Strings';
 import { RootState } from '../../../../Store';
 import { encrypt } from '../../../../Utils/encryption';
-import { setSidebar } from '../../../../Store/Loader';
+import { setLoading, setSidebar } from '../../../../Store/Loader';
 import useAppTheme from '../../../../Hooks/themeHook';
 import Transaction from '../../../../assets/svgs/transaction.svg';
 import Pie from '../../../../assets/svgs/pie-chart.svg';
@@ -41,6 +41,7 @@ export function SidebarLayout({
   const theme = useSelector((state: RootState) => state.common.user?.theme);
   const uid = useSelector((state: RootState) => state.common.user?.uid);
   const username = useSelector((state: RootState) => state.common.user?.name);
+  const lang = useSelector((state: RootState) => state.common.user?.lang);
   // state
   const [modal, setModal] = useState<boolean>(false);
   return (
@@ -90,25 +91,25 @@ export function SidebarLayout({
                 </li>
                 {[
                   {
-                    name: 'Dashboard',
+                    name: STRINGS.Dashboard,
                     route: ROUTES.HOMEPAGE,
                     check: location.pathname === '/',
                     icon: Dashboard,
                   },
                   {
-                    name: 'Transactions',
+                    name: STRINGS.Transaction,
                     route: ROUTES.Transactions,
                     check: location.pathname.startsWith('/transactions'),
                     icon: Transaction,
                   },
                   {
-                    name: 'Budgets',
+                    name: STRINGS.Budget,
                     route: ROUTES.Budgets,
                     check: location.pathname.startsWith('/budgets'),
                     icon: Pie,
                   },
                   {
-                    name: 'Report',
+                    name: STRINGS.Report,
                     route: ROUTES.Report,
                     check: location.pathname.startsWith('/report'),
                     icon: Report,
@@ -160,12 +161,12 @@ export function SidebarLayout({
                 <CustomDropdown
                   menuPlacement="top"
                   data={['light', 'dark', 'device'].map((item) => ({
-                    label: item[0].toUpperCase() + item.slice(1),
+                    label: STRINGS[item[0].toUpperCase() + item.slice(1)],
                     value: item,
                   }))}
                   placeholder="Theme"
                   value={{
-                    label: theme![0].toUpperCase() + theme!.slice(1),
+                    label: STRINGS[theme![0].toUpperCase() + theme!.slice(1)],
                     value: theme!,
                   }}
                   onChange={async (e) => {
@@ -192,6 +193,27 @@ export function SidebarLayout({
                     await updateDoc(doc(db, 'users', uid!), {
                       currency: encrypt(e!.value as string, uid!),
                     });
+                  }}
+                  menuPosition="absolute"
+                />
+                <div className="my-4" />
+                <CustomDropdown
+                  menuPlacement="top"
+                  data={Object.values(languages).map((item) => ({
+                    label: `${item.language}`,
+                    value: item.locale,
+                  }))}
+                  placeholder="Language"
+                  value={{
+                    label: languages[lang ?? 'en-US'].language,
+                    value: lang ?? 'en-US',
+                  }}
+                  onChange={async (e) => {
+                    dispatch(setLoading(true));
+                    await updateDoc(doc(db, 'users', uid!), {
+                      lang: e!.value,
+                    });
+                    window.location.reload();
                   }}
                   menuPosition="absolute"
                 />

@@ -42,4 +42,5 @@ export type UserType = {
   currency: string;
   theme: 'device' | 'light' | 'dark';
   isSocial: boolean;
+  lang?: string;
 };

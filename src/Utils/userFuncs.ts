@@ -201,5 +201,6 @@ export function UserFromJson(json: DocumentData): UserType {
       (decrypt(json.theme, json.uid) as 'device' | 'light' | 'dark') ??
       'device',
     isSocial: json.isSocial ?? false,
+    lang: json.lang ?? 'en-US',
   };
 }

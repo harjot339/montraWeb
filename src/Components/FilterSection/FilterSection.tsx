@@ -15,6 +15,7 @@ import {
 } from '../../Store/Transactions';
 import { RootState } from '../../Store';
 import useAppTheme from '../../Hooks/themeHook';
+import { convertCatLang } from '../../localization';
 
 function FilterSection({
   setMenu,
@@ -116,7 +117,7 @@ function FilterSection({
         {STRINGS.FilterBy}
       </p>
       <div className="flex flex-wrap gap-3">
-        {['Income', 'Expense', 'Transfer'].map((item, i) => (
+        {[STRINGS.Income, STRINGS.Expense, STRINGS.Transfer].map((item, i) => (
           <button
             key={item}
             type="button"
@@ -148,28 +149,30 @@ function FilterSection({
         {STRINGS.SortBy}
       </p>
       <div className="flex flex-wrap gap-3">
-        {['Highest', 'Lowest', 'Newest', 'Oldest'].map((item, i) => (
-          <button
-            key={item}
-            type="button"
-            className="py-2 px-4 sm:py-3 sm:px-6 rounded-3xl"
-            style={{
-              border: `1px solid ${COLORS.LIGHT[20]}`,
-              backgroundColor:
-                sort === i ? COLORS.VIOLET[20] : COLOR.LIGHT[100],
-              color: sort === i ? COLORS.VIOLET[100] : COLOR.DARK[100],
-            }}
-            onClick={() => {
-              if (sort === i) {
-                setSort(-1);
-              } else {
-                setSort(i);
-              }
-            }}
-          >
-            {item}
-          </button>
-        ))}
+        {[STRINGS.Highest, STRINGS.Lowest, STRINGS.Newest, STRINGS.Oldest].map(
+          (item, i) => (
+            <button
+              key={item}
+              type="button"
+              className="py-2 px-4 sm:py-3 sm:px-6 rounded-3xl"
+              style={{
+                border: `1px solid ${COLORS.LIGHT[20]}`,
+                backgroundColor:
+                  sort === i ? COLORS.VIOLET[20] : COLOR.LIGHT[100],
+                color: sort === i ? COLORS.VIOLET[100] : COLOR.DARK[100],
+              }}
+              onClick={() => {
+                if (sort === i) {
+                  setSort(-1);
+                } else {
+                  setSort(i);
+                }
+              }}
+            >
+              {item}
+            </button>
+          )
+        )}
       </div>
       <p
         className={clsx(
@@ -194,17 +197,17 @@ function FilterSection({
           options={incomeCategories?.slice(1).map((item) => {
             return {
               value: item,
-              label: item[0].toUpperCase() + item.slice(1),
+              label: convertCatLang(STRINGS, item),
             };
           })}
           onChange={(data) => {
             setIncomeCategory(data.map((item) => item.value));
           }}
-          placeholder="Income Categories"
+          placeholder={STRINGS.IncomeCategories}
           value={incomeCategory.map((item) => {
             return {
               value: item,
-              label: item[0].toUpperCase() + item.slice(1),
+              label: convertCatLang(STRINGS, item),
             };
           })}
           styles={{
@@ -270,17 +273,17 @@ function FilterSection({
           options={expenseCategories?.slice(1).map((item) => {
             return {
               value: item,
-              label: item[0].toUpperCase() + item.slice(1),
+              label: convertCatLang(STRINGS, item),
             };
           })}
           onChange={(data) => {
             setExpenseCategory(data.map((item) => item.value));
           }}
-          placeholder="Expense Categories"
+          placeholder={STRINGS.ExpenseCategories}
           value={expenseCategory.map((item) => {
             return {
               value: item,
-              label: item[0].toUpperCase() + item.slice(1),
+              label: convertCatLang(STRINGS, item),
             };
           })}
           styles={{

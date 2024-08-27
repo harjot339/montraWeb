@@ -21,6 +21,7 @@ import { COLORS } from '../../Shared/commonStyles';
 import DeleteBudgetModal from '../../Components/DeleteBudgetModal/DeleteBudgetModal';
 import useAppTheme from '../../Hooks/themeHook';
 import { useIsMobile, useIsTablet } from '../../Hooks/mobileCheckHook';
+import { convertCatLang } from '../../localization';
 
 function BudgetDetail() {
   // constants
@@ -134,8 +135,7 @@ function BudgetDetail() {
                     theme === 'dark' && 'text-white'
                   )}
                 >
-                  {params.id!.split('_')[1][0].toUpperCase() +
-                    params.id!.split('_')[1].slice(1)}
+                  {convertCatLang(STRINGS, params.id!.split('_')[1])}
                 </p>
               </div>
             </div>

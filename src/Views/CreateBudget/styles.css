@@ -6,14 +6,17 @@
   color: white;
   outline: none;
   z-index: 0 !important;
+  cursor: pointer;
 }
 .track-0 {
   background-color: #7f3dff;
   height: 13px;
   border-radius: 50px;
+  cursor: pointer;
 }
 .track-1 {
   background-color: #e3e5e5;
   height: 13px;
   border-radius: 50px;
+  cursor: pointer;
 }

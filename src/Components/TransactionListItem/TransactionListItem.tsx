@@ -12,13 +12,14 @@ import { COLORS } from '../../Shared/commonStyles';
 import { TransactionType } from '../../Defs/transaction';
 import Money from '../../assets/svgs/money-bag.svg';
 import Transfer from '../../assets/svgs/currency-exchange.svg';
-import { currencies, monthData } from '../../Shared/Strings';
+import { currencies, monthData, STRINGS } from '../../Shared/Strings';
 import useAppTheme from '../../Hooks/themeHook';
 import {
   useIsDesktop,
   useIsMobile,
   useIsTablet,
 } from '../../Hooks/mobileCheckHook';
+import { convertCatLang } from '../../localization';
 
 function TransactionListItem({
   item,
@@ -117,7 +118,7 @@ function TransactionListItem({
             ? `${
                 item.from[0].toUpperCase() + item.from.slice(1)
               } - ${item.to[0].toUpperCase()}${item.to.slice(1)}`
-            : item.category[0].toUpperCase() + item.category.slice(1)}
+            : convertCatLang(STRINGS, item.category)}
         </p>
         <p
           className={clsx(
@@ -164,7 +165,7 @@ function TransactionListItem({
             {`${Timestamp.fromMillis(item.timeStamp.seconds * 1000)
               ?.toDate()
               ?.getDate()} ${
-              monthData[
+              monthData(STRINGS)[
                 Timestamp.fromMillis(item.timeStamp.seconds * 1000)
                   ?.toDate()
                   ?.getMonth()

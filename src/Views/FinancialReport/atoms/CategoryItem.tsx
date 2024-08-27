@@ -2,8 +2,9 @@ import React from 'react';
 import ProgressBar from '@ramonak/react-progress-bar';
 import clsx from 'clsx';
 import { COLORS } from '../../../Shared/commonStyles';
-import { currencies } from '../../../Shared/Strings';
+import { currencies, STRINGS } from '../../../Shared/Strings';
 import { formatWithCommas } from '../../../Utils/commonFuncs';
+import { convertCatLang } from '../../../localization';
 
 function CategoryItem({
   item,
@@ -43,7 +44,7 @@ function CategoryItem({
               theme === 'dark' && 'text-white'
             )}
           >
-            {item[0][0].toUpperCase() + item[0].slice(1)}
+            {convertCatLang(STRINGS, item[0])}
           </p>
         </div>
         <p

@@ -18,6 +18,7 @@ import { setUser } from '../Store/Common';
 import { TransactionType } from '../Defs/transaction';
 import TransFromJson from '../Utils/transFuncs';
 import { setTransactions } from '../Store/Transactions';
+import { STRINGS } from '../Shared/Strings';
 
 export default function useInitialSetup() {
   const uid = useSelector((state: RootState) => state.common.user?.uid);
@@ -42,6 +43,9 @@ export default function useInitialSetup() {
         (snapshot: DocumentSnapshot) => {
           const user = UserFromJson(snapshot.data() as UserType);
           dispatch(setUser(user));
+          if (STRINGS.getLanguage() !== user.lang) {
+            STRINGS.setLanguage(user.lang ?? STRINGS.getInterfaceLanguage());
+          }
         }
       );
       return () => unsubscribe();

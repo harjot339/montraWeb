@@ -7,7 +7,7 @@ import { useLocation } from 'react-router-dom';
 import Onbarding1 from '../../../../assets/images/onboarding1.png';
 import Onbarding2 from '../../../../assets/images/onboarding2.png';
 import Onbarding3 from '../../../../assets/images/onboarding3.png';
-import { OnboardData } from '../../../../Shared/Strings';
+import { OnboardData, STRINGS } from '../../../../Shared/Strings';
 import useAppTheme from '../../../../Hooks/themeHook';
 
 function AuthLayout({ children }: Readonly<{ children: React.JSX.Element }>) {
@@ -46,7 +46,7 @@ function AuthLayout({ children }: Readonly<{ children: React.JSX.Element }>) {
               showIndicators={false}
               interval={3000}
             >
-              {OnboardData.map((item, i) => (
+              {OnboardData(STRINGS).map((item, i) => (
                 <div key={item.text1}>
                   <img src={image(i)} alt="" style={{ maxWidth: '450px' }} />
                   <p className="text-2xl md:text-3xl lg:text-4xl font-semibold">
